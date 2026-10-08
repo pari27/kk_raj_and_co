@@ -34,7 +34,7 @@ class EmployeeController extends Controller
         $employees = User::query()
             ->where('role', UserRole::Employee)
             ->with('profile.designation')
-            ->orderBy('name')
+            ->latest('created_at')
             ->get();
 
         $designationsCount = EmployeeDesignation::query()->where('is_active', true)->count();
@@ -150,6 +150,8 @@ class EmployeeController extends Controller
             ->map->count()
             ->sortDesc();
 
+        $assignedTicketsCount = $tickets->count();
+
         $recentTickets = $tickets->sortByDesc('created_at')->take(5);
 
         $activity = AuditLog::query()
@@ -174,6 +176,7 @@ class EmployeeController extends Controller
             'avgTurnaroundDays',
             'openByStatus',
             'ticketsByService',
+            'assignedTicketsCount',
             'recentTickets',
             'activity',
             'addedBy',

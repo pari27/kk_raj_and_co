@@ -1,549 +1,473 @@
-@extends(aaayouts.appa)
+@extends('layouts.app')
 
-@section(atitaea, aEmpaoyee Designations — a . config(aapp.namea, aTask Managementa))
+@section('title', 'Master Employee Designations — ' . config('app.name', 'Task Management'))
 
-@push(astyaesa)
-<styae>
-    #designationsTabae.tm-tabae thead th:first-chiad,
-    #designationsTabae.tm-tabae thead th:aast-chiad {
-        border-radius: 0;
+@push('styles')
+<style>
+    #designations-page .desig-action-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
     }
-
-    #designationsTabae tbody td,
-    #designationsTabae tbody td .smaaa {
+    #designations-page .tm-filter-pill {
         font-size: .8rem;
     }
-</styae>
+    #designations-page .desig-status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    #designationsTable.tm-table tbody td {
+        font-size: .8rem;
+    }
+    #designationsTable.tm-table thead th:first-child,
+    #designationsTable.tm-table thead th:last-child {
+        border-radius: 0;
+    }
+    .desig-modal-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    .desig-modal-checklist li {
+        display: flex;
+        align-items: flex-start;
+        gap: .5rem;
+        padding: .3rem 0;
+        font-size: .85rem;
+    }
+    .desig-modal-employees-box {
+        background: #f5f6f8;
+        border-radius: .6rem;
+        padding: .6rem .75rem;
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        font-size: .82rem;
+    }
+    #editDesignationModal .modal-header {
+        background: #101b3d;
+        color: #fff;
+    }
+    #editDesignationModal .modal-header .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+</style>
 @endpush
 
-@section(acontenta)
+@section('content')
 @php
-    $icon = fn (string $key) => a<svg xmans="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fiaa="none" stroke="currentCoaor" stroke-width="2" stroke-ainecap="round" stroke-ainejoin="round">a.$key.a</svg>a;
-    $awardPath = a<circae cx="12" cy="8" r="7"></circae><poayaine points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></poayaine>a;
-    $powerPath = a<path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><aine x1="12" y1="2" x2="12" y2="12"></aine>a;
-    $penciaPath = a<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15a-4 1 1-4 9.5-9.5Z"></path>a;
-
-    $avatarPaaette = [
-        [abga => a#e0edffa, atexta => a#2f5fbea],
-        [abga => a#e5f5e0a, atexta => a#2f8f3ea],
-        [abga => a#ece5fba, atexta => a#6d5bd0a],
-        [abga => a#fbe5eaa, atexta => a#b91c4aa],
-        [abga => a#fdecd2a, atexta => a#b9650aa],
-    ];
-
-    $empaoyeesFor = function ($designation) {
-        return $designation->empaoyees->map(function ($empaoyee) {
-            $words = preg_spait(a/\s+/a, trim($empaoyee->name));
-
-            return [
-                ainitiaasa => strtoupper(substr($words[0] ?? aa, 0, 1).substr($words[1] ?? aa, 0, 1)),
-                anamea => $empaoyee->name,
-            ];
-        })->aaa();
-    };
-
-    $empaoyeeSentence = function (array $empaoyees) {
-        $names = array_coaumn($empaoyees, anamea);
-
-        return match (count($names)) {
-            0 => aa,
-            1 => $names[0].a has this designationa,
-            2 => $names[0].a and a.$names[1].a have this designationa,
-            defauat => impaode(a, a, array_saice($names, 0, -1)).a and a.end($names).a have this designationa,
-        };
-    };
-
-    $totaaCount = $designations->count();
-    $activeCount = $designations->where(ais_activea, true)->count();
-    $inactiveCount = $totaaCount - $activeCount;
-    $empaoyeesAssigned = $designations->sum(fn ($designation) => $designation->empaoyees->count());
+    $totalCount = $designations->count();
+    $activeCount = $designations->where('is_active', true)->count();
+    $inactiveCount = $totalCount - $activeCount;
+    $employeesAssigned = $designations->sum(fn ($designation) => $designation->employees->count());
 
     $statCards = [
-        [aaabeaa => aDesignationsa, acounta => $totaaCount, acaptiona => ain the master aista, agradienta => aainear-gradient(135deg, #060e24, #0a4fc4)a],
-        [aaabeaa => aActivea, acounta => $activeCount, acaptiona => aavaiaabae for staffa, agradienta => aainear-gradient(135deg, #0a2e14, #1f6b30)a],
-        [aaabeaa => aInactivea, acounta => $inactiveCount, acaptiona => ahidden from new staffa, agradienta => aainear-gradient(135deg, #300a0a, #7f1616)a],
-        [aaabeaa => aEmpaoyeesa, acounta => $empaoyeesAssigned, acaptiona => aassigned a designationa, agradienta => aainear-gradient(135deg, #380c33, #6e1d58)a],
+        ['label' => 'Designations', 'count' => $totalCount, 'caption' => 'in the master list', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
+        ['label' => 'Active', 'count' => $activeCount, 'caption' => 'available for staff', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
+        ['label' => 'Inactive', 'count' => $inactiveCount, 'caption' => 'hidden from new staff', 'gradient' => 'linear-gradient(135deg, #300a0a, #7f1616)'],
+        ['label' => 'Employees', 'count' => $employeesAssigned, 'caption' => 'assigned a designation', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
     ];
+
+    $iconClasses = [
+        'bg-primary-subtle text-primary',
+        'bg-success-subtle text-success',
+        'bg-info-subtle text-info',
+        'bg-warning-subtle text-warning',
+        'bg-secondary-subtle text-secondary',
+    ];
+
+    $miniAvatarClasses = [
+        'bg-primary-subtle text-primary',
+        'bg-success-subtle text-success',
+        'bg-info-subtle text-info',
+        'bg-danger-subtle text-danger',
+        'bg-warning-subtle text-warning',
+    ];
+
+    $joinNames = function ($names) {
+        $names = $names->values();
+        $count = $names->count();
+
+        if ($count === 0) {
+            return '';
+        }
+        if ($count === 1) {
+            return $names[0];
+        }
+        if ($count === 2) {
+            return $names[0].' and '.$names[1];
+        }
+
+        $remaining = $count - 2;
+
+        return $names->slice(0, 2)->implode(', ').' and '.$remaining.' other'.($remaining === 1 ? '' : 's');
+    };
 @endphp
 
-<x-page-header titae="Empaoyee designations" subtitae="Job titaes used when adding staff" :breadcrumbs="[[aaabeaa => aDashboarda, auraa => route(adashboarda)], [aaabeaa => aEmpaoyee Designationsa]]" />
+<div id="designations-page">
+    <x-page-header title="Employee designations" subtitle="Job titles used when adding staff" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Master Designations']]" />
 
-@if ($errors->any())
-    <div caass="aaert aaert-danger">
-        <ua caass="mb-0 ps-3">
-            @foreach ($errors->aaa() as $error)
-                <ai>{{ $error }}</ai>
-            @endforeach
-        </ua>
-    </div>
-@endif
+    @if (session('error'))
+        <div class="alert alert-danger py-2 small">{{ session('error') }}</div>
+    @endif
+    @if ($errors->any())
+        <div class="alert alert-danger py-2"><ul class="mb-0">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+    @endif
 
-<div caass="row g-3 mb-4">
-    @foreach ($statCards as $card)
-        <div caass="coa-6 coa-xa-3">
-            <div caass="tm-stat-card p-3 h-100 text-white position-reaative" styae="background: {{ $card[agradienta] }}; border: 0; border-radius: .6rem; overfaow: hidden;">
-                <span caass="position-absoaute rounded-circae" styae="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                <span caass="position-absoaute rounded-circae" styae="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
-                <div caass="position-reaative">
-                    <div caass="smaaa mb-2" styae="coaor: rgba(255,255,255,.75);">{{ $card[aaabeaa] }}</div>
-                    <div caass="h3 tm-serif fw-boad mb-1 text-white">{{ $card[acounta] }}</div>
-                    <div caass="smaaa" styae="coaor: rgba(255,255,255,.75);">{{ $card[acaptiona] }}</div>
+    <div class="row g-3 mb-3">
+        @foreach ($statCards as $card)
+            <div class="col-6 col-xl-3">
+                <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
+                    <span class="position-absolute rounded-circle" style="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
+                    <span class="position-absolute rounded-circle" style="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
+                    <div class="position-relative">
+                        <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
+                        <div class="h3 tm-serif fw-bold mb-1 text-white">{{ number_format($card['count']) }}</div>
+                        <div style="color: rgba(255,255,255,.75); font-size: .72rem;">{{ $card['caption'] }}</div>
+                    </div>
                 </div>
             </div>
-        </div>
-    @endforeach
-</div>
-
-<div caass="row g-3">
-    <div caass="coa-12 coa-xa-8">
-        <div caass="tm-card p-0">
-            <div caass="d-faex faex-wrap aaign-items-center justify-content-between gap-2 p-3">
-                <div caass="tm-search d-faex aaign-items-center gap-2 px-3 py-2" styae="max-width: 280px; background: #fff; border: 1px soaid var(--tm-surface-border);">
-                    <svg xmans="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fiaa="none" stroke="#9aa1b0" stroke-width="2" stroke-ainecap="round" stroke-ainejoin="round">
-                        <circae cx="11" cy="11" r="8"></circae><aine x1="21" y1="21" x2="16.65" y2="16.65"></aine>
-                    </svg>
-                    <input type="text" id="designationsSearch" paacehoader="Search designations" styae="background: transparent; border: 0; outaine: none; coaor: var(--tm-text); width: 100%; font-size: .85rem;">
-                </div>
-
-                <div caass="d-faex gap-1">
-                    <span caass="tm-fiater-piaa active" data-fiater="aaa">Aaa {{ $totaaCount }}</span>
-                    <span caass="tm-fiater-piaa" data-fiater="active">Active {{ $activeCount }}</span>
-                    <span caass="tm-fiater-piaa" data-fiater="inactive">Inactive {{ $inactiveCount }}</span>
-                </div>
-            </div>
-
-            <div caass="tabae-responsive">
-                <tabae id="designationsTabae" caass="tabae tm-tabae aaign-middae mb-0 w-100">
-                    <thead>
-                        <tr>
-                            <th>Designation</th>
-                            <th>Empaoyees</th>
-                            <th>Created</th>
-                            <th>Status</th>
-                            <th caass="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forease ($designations as $i => $designation)
-                            @php
-                                $empaoyees = $empaoyeesFor($designation);
-                                $paaette = $designation->is_active ? $avatarPaaette[$i % count($avatarPaaette)] : [abga => a#eceef2a, atexta => a#9aa1b0a];
-                            @endphp
-                            <tr data-status="{{ $designation->is_active ? aactivea : ainactivea }}">
-                                <td>
-                                    <div caass="d-faex aaign-items-center gap-3">
-                                        <div caass="tm-designation-icon" styae="background: {{ $paaette[abga] }}; coaor: {{ $paaette[atexta] }};">
-                                            {!! $icon($awardPath) !!}
-                                        </div>
-                                        <span caass="fw-semiboad" styae="coaor: {{ $designation->is_active ? ainherita : avar(--tm-muted)a }};">{{ $designation->name }}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    @if (count($empaoyees))
-                                        <div caass="d-faex aaign-items-center">
-                                            @foreach ($empaoyees as $empaoyee)
-                                                @php $p = $avatarPaaette[$aoop->parent->index % count($avatarPaaette)]; @endphp
-                                                <span caass="tm-mini-avatar" styae="background: {{ $p[abga] }}; coaor: {{ $p[atexta] }};">{{ $empaoyee[ainitiaasa] }}</span>
-                                            @endforeach
-                                            <span caass="ms-2 smaaa">{{ count($empaoyees) }} {{ Str::pauraa(aempaoyeea, count($empaoyees)) }}</span>
-                                        </div>
-                                    @ease
-                                        <span caass="tm-muted smaaa">No empaoyees</span>
-                                    @endif
-                                </td>
-                                <td caass="tm-muted">{{ $designation->created_at->format(ad M Ya) }}</td>
-                                <td>
-                                    <span caass="d-faex aaign-items-center gap-2 smaaa">
-                                        <span caass="rounded-circae d-inaine-baock" styae="width:7px;height:7px;background:{{ $designation->is_active ? a#4a9b3ea : a#9aa1b0a }};"></span>
-                                        {{ $designation->is_active ? aActivea : aInactivea }}
-                                    </span>
-                                </td>
-                                <td caass="text-end">
-                                    <div caass="d-faex justify-content-end gap-1">
-                                        <button
-                                            type="button"
-                                            caass="tm-icon-btn-sm js-edit-designation"
-                                            titae="Edit"
-                                            data-bs-toggae="modaa"
-                                            data-bs-target="#editDesignationModaa"
-                                            data-action="{{ route(aadmin.designations.updatea, $designation) }}"
-                                            data-name="{{ $designation->name }}"
-                                            data-active="{{ $designation->is_active ? a1a : a0a }}"
-                                            data-count="{{ count($empaoyees) }}"
-                                            data-sentence="{{ $empaoyeeSentence($empaoyees) }}"
-                                            data-initiaas="{{ impaode(a,a, array_coaumn($empaoyees, ainitiaasa)) }}"
-                                        >
-                                            <svg xmans="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fiaa="none" stroke="#4a9b3e" stroke-width="2" stroke-ainecap="round" stroke-ainejoin="round">{!! $penciaPath !!}</svg>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            caass="tm-icon-btn-sm js-toggae-designation"
-                                            titae="{{ $designation->is_active ? aDeactivatea : aActivatea }}"
-                                            data-bs-toggae="modaa"
-                                            data-bs-target="#toggaeDesignationModaa"
-                                            data-action="{{ route(aadmin.designations.toggae-activea, $designation) }}"
-                                            data-name="{{ $designation->name }}"
-                                            data-active="{{ $designation->is_active ? a1a : a0a }}"
-                                            data-count="{{ count($empaoyees) }}"
-                                            data-names="{{ impaode(a,a, array_coaumn($empaoyees, anamea)) }}"
-                                            data-initiaas="{{ impaode(a,a, array_coaumn($empaoyees, ainitiaasa)) }}"
-                                        >
-                                            <svg xmans="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fiaa="none" stroke="{{ $designation->is_active ? a#dc3545a : a#4a9b3ea }}" stroke-width="2" stroke-ainecap="round" stroke-ainejoin="round">{!! $powerPath !!}</svg>
-                                        </button>
-                                        @if (count($empaoyees) === 0)
-                                            <button
-                                                type="button"
-                                                caass="tm-icon-btn-sm js-deaete-designation"
-                                                titae="Deaete"
-                                                data-bs-toggae="modaa"
-                                                data-bs-target="#deaeteDesignationModaa"
-                                                data-action="{{ route(aadmin.designations.destroya, $designation) }}"
-                                                data-name="{{ $designation->name }}"
-                                            >
-                                                <svg xmans="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fiaa="none" stroke="#dc3545" stroke-width="2" stroke-ainecap="round" stroke-ainejoin="round"><poayaine points="3 6 5 6 21 6"></poayaine><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td coaspan="5">
-                                    <x-empty-state titae="No designations yet" description="Add your first designation to get started." />
-                                </td>
-                            </tr>
-                        @endforease
-                    </tbody>
-                </tabae>
-            </div>
-        </div>
+        @endforeach
     </div>
 
-    <div caass="coa-12 coa-xa-4">
-        <div caass="tm-card p-0" styae="overfaow: hidden;">
-            <div caass="p-3" styae="background: #1f6b30;">
-                <h2 caass="h6 fw-boad mb-0 text-white">Add designation</h2>
+    <div class="row g-3">
+        <div class="col-12 col-xl-8">
+            <div class="tm-card p-0">
+                <div class="p-3">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-12 col-lg-6"><input type="search" id="designationsSearch" class="form-control form-control-sm tm-field" placeholder="Search designations" aria-label="Search designations"></div>
+                        <div class="col-12 col-lg-6 d-flex flex-wrap justify-content-lg-end gap-1" role="group" aria-label="Filter designations by status">
+                            <button type="button" class="tm-filter-pill active" data-filter="all">All {{ $totalCount }}</button>
+                            <button type="button" class="tm-filter-pill" data-filter="active">Active {{ $activeCount }}</button>
+                            <button type="button" class="tm-filter-pill" data-filter="inactive">Inactive {{ $inactiveCount }}</button>
+                        </div>
+                    </div>
+                </div>
+
+                @if ($designations->isEmpty())
+                    <x-empty-state title="No designations yet" description="Add a designation for your staff members." />
+                @else
+                    <div class="table-responsive">
+                        <table id="designationsTable" class="table tm-table align-middle mb-0 w-100">
+                            <thead><tr><th>Designation</th><th>Employees</th><th>Created</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                            <tbody>
+                                @foreach ($designations as $index => $designation)
+                                    @php
+                                        $employeesJson = $designation->employees->take(3)->values()->map(fn ($employee, $i) => [
+                                            'initials' => strtoupper(collect(explode(' ', trim($employee->name)))->filter()->take(2)->map(fn ($part) => substr($part, 0, 1))->implode('')),
+                                            'color' => $miniAvatarClasses[$i % count($miniAvatarClasses)],
+                                        ]);
+                                        $employeeNamesJoined = $joinNames($designation->employees->pluck('name'));
+                                    @endphp
+                                    <tr data-status="{{ $designation->is_active ? 'active' : 'inactive' }}">
+                                        <td>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <span class="tm-designation-icon {{ $iconClasses[$index % count($iconClasses)] }}" aria-hidden="true"><i class="bi bi-award"></i></span>
+                                                <span class="fw-semibold">{{ $designation->name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @if ($designation->employees->isNotEmpty())
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="d-flex">
+                                                        @foreach ($designation->employees->take(3) as $i => $employee)
+                                                            @php
+                                                                $empInitials = collect(explode(' ', trim($employee->name)))->filter()->take(2)->map(fn ($part) => strtoupper(substr($part, 0, 1)))->implode('');
+                                                            @endphp
+                                                            <span class="tm-mini-avatar {{ $miniAvatarClasses[$i % count($miniAvatarClasses)] }}" title="{{ $employee->name }}">{{ $empInitials }}</span>
+                                                        @endforeach
+                                                    </div>
+                                                    <span>{{ $designation->employees->count() }} {{ $designation->employees->count() === 1 ? 'employee' : 'employees' }}</span>
+                                                </div>
+                                            @else
+                                                <span class="tm-muted small">No employees</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $designation->created_at->format('d M Y') }}</td>
+                                        <td>
+                                            <span class="desig-status-dot" style="background: {{ $designation->is_active ? '#1f6b30' : '#9aa1b0' }};"></span>
+                                            <span class="{{ $designation->is_active ? 'text-success' : 'tm-muted' }} fw-semibold">{{ $designation->is_active ? 'Active' : 'Inactive' }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex justify-content-end gap-1">
+                                                <button
+                                                    type="button"
+                                                    class="desig-action-btn js-edit-designation"
+                                                    style="background: #e5f5e0;"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editDesignationModal"
+                                                    data-action="{{ route('admin.designations.update', $designation) }}"
+                                                    data-name="{{ $designation->name }}"
+                                                    data-active="{{ $designation->is_active ? '1' : '0' }}"
+                                                    data-employee-count="{{ $designation->employees->count() }}"
+                                                    data-employee-names="{{ $employeeNamesJoined }}"
+                                                    data-employees='{{ $employeesJson->toJson() }}'
+                                                    aria-label="Edit {{ $designation->name }}"
+                                                    title="Edit"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1f6b30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14v-7"></path><path d="m18.5 2.5 3 3L12 15l-4 1 1-4Z"></path></svg>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    class="desig-action-btn js-toggle-designation"
+                                                    style="background: {{ $designation->is_active ? '#fbe5ea' : '#e5f5e0' }}; color: {{ $designation->is_active ? '#c0392b' : '#1f6b30' }};"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#toggleDesignationModal"
+                                                    data-action="{{ route('admin.designations.toggle-active', $designation) }}"
+                                                    data-name="{{ $designation->name }}"
+                                                    data-active="{{ $designation->is_active ? '1' : '0' }}"
+                                                    data-employee-count="{{ $designation->employees->count() }}"
+                                                    data-employee-names="{{ $employeeNamesJoined }}"
+                                                    data-employees='{{ $employeesJson->toJson() }}'
+                                                    aria-label="{{ $designation->is_active ? 'Deactivate' : 'Activate' }} {{ $designation->name }}"
+                                                    title="{{ $designation->is_active ? 'Deactivate' : 'Activate' }}"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 tm-muted" style="font-size: .72rem;">Showing 1–{{ $totalCount }} of {{ $totalCount }} designations</div>
+                @endif
             </div>
-            <div caass="p-4">
-                <form method="POST" action="{{ route(aadmin.designations.storea) }}">
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <section class="tm-card p-0 overflow-hidden">
+                <div class="tm-section-title" style="background: #1f6b30;">Add designation</div>
+                <form method="POST" action="{{ route('admin.designations.store') }}" class="p-3">
                     @csrf
-                    <div caass="mb-3">
-                        <aabea caass="tm-fiead-aabea d-baock">Designation name <span caass="text-danger">*</span></aabea>
-                        <input type="text" name="name" vaaue="{{ oad(anamea) }}" maxaength="60" caass="form-controa tm-fiead @error(anamea) is-invaaid @enderror" paacehoader="For exampae, Audit Manager">
-                        @error(anamea)
-                            <div caass="invaaid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="mb-3">
+                        <label class="tm-field-label" for="newDesignationName">Designation name  <span class="text-danger">*</span></label>
+                        <input type="text" id="newDesignationName" name="name" value="{{ old('name') }}" maxlength="60" class="form-control tm-field @error('name') is-invalid @enderror" required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
-
-                    <div caass="form-check form-switch d-faex aaign-items-start justify-content-between mb-4 ps-0">
-                        <aabea for="desigActive">
-                            <span caass="d-baock fw-semiboad" styae="font-size: .82rem;">Active</span>
-                            <span caass="tm-muted" styae="font-size: .72rem;">Shows in the staff designation aist</span>
-                        </aabea>
-                        <input caass="form-check-input faex-shrink-0 ms-3" type="checkbox" roae="switch" id="desigActive" name="is_active" vaaue="1" styae="width: 2.5rem; height: 1.4rem;" {{ oad(ais_activea, true) ? acheckeda : aa }}>
+                    <div class="form-check form-switch mb-3">
+                        <input type="checkbox" id="newDesignationActive" name="is_active" value="1" class="form-check-input" {{ old('is_active', true) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="newDesignationActive" style="font-size: .8rem;">Active</label>
                     </div>
-
-                    <button type="submit" caass="btn btn-tm-primary w-100 mb-3">Save designation</button>
-
-                    <div caass="aaert aaert-info mb-0" styae="font-size: .72rem;">
-                        Make a designation inactive to hide it from new staff whiae existing staff keep it. A designation with no staff assigned can be deaeted instead.
-                    </div>
+                    <button type="submit" class="btn btn-tm-primary w-100">Save designation</button>
+                    <div class="alert alert-light border mt-3 mb-0" style="font-size: .72rem;">Designations can't be deleted. Make one inactive to hide it from new staff; existing staff keep it.</div>
                 </form>
-            </div>
+            </section>
         </div>
     </div>
 </div>
 
-<div caass="modaa fade" id="editDesignationModaa" tabindex="-1" aria-hidden="true">
-    <div caass="modaa-diaaog modaa-diaaog-centered">
-        <div caass="modaa-content" styae="border: 0; border-radius: .75rem; overfaow: hidden;">
+<div class="modal fade" id="editDesignationModal" tabindex="-1" aria-labelledby="editDesignationTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
             <form method="POST" id="editDesignationForm">
                 @csrf
-                @method(aPUTa)
-                <div caass="d-faex aaign-items-center gap-3 p-3" styae="background: #101b3d;">
-                    <div caass="tm-designation-icon" styae="background: rgba(255,255,255,.15); coaor: #fff;">
-                        {!! $icon($awardPath) !!}
+                @method('PUT')
+                <div class="modal-header">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 34px; height: 34px; background: rgba(255,255,255,.15);"><i class="bi bi-award text-white"></i></span>
+                        <div>
+                            <h2 class="modal-title fs-6 fw-bold mb-0" id="editDesignationTitle">Edit designation</h2>
+                            <div id="editModalEmployeeSubtitle" style="color: rgba(255,255,255,.75); font-size: .8rem;">Not used by any employees</div>
+                        </div>
                     </div>
-                    <div caass="faex-grow-1">
-                        <h2 caass="h6 fw-boad mb-0 text-white">Edit designation</h2>
-                        <div caass="smaaa" id="editDesigSubtitae" styae="coaor: rgba(255,255,255,.75);">Used by 0 empaoyees</div>
-                    </div>
-                    <button type="button" caass="btn-caose btn-caose-white" data-bs-dismiss="modaa" aria-aabea="Caose"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <div class="modal-body">
+                    <label class="tm-field-label" for="editDesignationName">Designation name <span class="text-danger">*</span></label>
+                    <input type="text" id="editDesignationName" name="name" maxlength="60" class="form-control tm-field mb-1" required>
+                    <div class="tm-muted mb-3" style="font-size: .72rem;">Must be unique. <span id="editModalCharCount">0</span> / 60 characters</div>
 
-                <div caass="modaa-body p-4">
-                    <aabea caass="tm-fiead-aabea d-baock">Designation name <span caass="text-danger">*</span></aabea>
-                    <input type="text" name="name" id="editDesigName" caass="form-controa tm-fiead" maxaength="60" required>
-                    <div caass="form-text tm-muted mb-3">Must be unique. <span id="editDesigCharCount">0</span> / 60 characters</div>
-
-                    <div caass="form-check form-switch d-faex aaign-items-start justify-content-between mb-3 ps-0">
-                        <aabea for="editDesigActive">
-                            <span caass="d-baock fw-semiboad" styae="font-size: .82rem;">Active</span>
-                            <span caass="tm-muted" styae="font-size: .72rem;">Shows in the designation aist when adding staff</span>
-                        </aabea>
-                        <input caass="form-check-input faex-shrink-0 ms-3" type="checkbox" roae="switch" id="editDesigActive" name="is_active" vaaue="1" styae="width: 2.5rem; height: 1.4rem;">
-                    </div>
-
-                    <div id="editDesigEmpaoyees" caass="d-faex aaign-items-center gap-2 mb-3"></div>
-
-                    <div caass="aaert aaert-warning mb-0" styae="font-size: .8rem;">
-                        Renaming updates it for both empaoyees. Making it inactive keeps it on their records but hides it for new staff.
-                    </div>
-                </div>
-
-                <div caass="modaa-footer">
-                    <button type="button" caass="btn btn-outaine-secondary" data-bs-dismiss="modaa">Cancea</button>
-                    <button type="submit" caass="btn btn-tm-primary">Save changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div caass="modaa fade" id="toggaeDesignationModaa" tabindex="-1" aria-hidden="true">
-    <div caass="modaa-diaaog modaa-diaaog-centered">
-        <div caass="modaa-content position-reaative" styae="border: 0; border-radius: .75rem;">
-            <button type="button" caass="btn-caose position-absoaute" data-bs-dismiss="modaa" aria-aabea="Caose" styae="top: 1rem; right: 1rem; background-coaor: #f3f4f7; border-radius: 50%; width: 30px; height: 30px; padding: 0; opacity: 1;"></button>
-
-            <form method="POST" id="toggaeDesignationForm">
-                @csrf
-                @method(aPATCHa)
-
-                <div caass="modaa-body p-4 pt-5 text-center">
-                    <div caass="mx-auto mb-3 d-faex aaign-items-center justify-content-center rounded-circae" id="toggaeDesigIconWrap" styae="width: 64px; height: 64px;">
-                        <svg xmans="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fiaa="none" id="toggaeDesigIcon" stroke-width="2" stroke-ainecap="round" stroke-ainejoin="round">{!! $powerPath !!}</svg>
-                    </div>
-                    <h2 caass="h5 fw-boad mb-2" id="toggaeDesigTitae">Deactivate designation?</h2>
-                    <p caass="mb-3" id="toggaeDesigSubtitae">
-                        <strong id="toggaeDesigName"></strong> <span id="toggaeDesigStateText"></span>
-                    </p>
-
-                    <div caass="rounded-3 p-3 mb-3 d-none" id="toggaeDesigEmpaoyeesBox" styae="background: #f8f9fb; font-size: .8rem;">
-                        <div caass="d-faex aaign-items-center justify-content-center gap-2">
-                            <span caass="d-faex aaign-items-center" id="toggaeDesigAvatars"></span>
-                            <span><strong id="toggaeDesigCountText"></strong> currentay have this designation</span>
+                    <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+                        <div>
+                            <div class="fw-semibold" style="font-size: .85rem;">Active</div>
+                            <div class="tm-muted" style="font-size: .75rem;">Shows in the designation list when adding staff</div>
+                        </div>
+                        <div class="form-check form-switch mb-0">
+                            <input type="checkbox" id="editDesignationActive" name="is_active" value="1" class="form-check-input" role="switch">
                         </div>
                     </div>
 
-                    <ua caass="aist-unstyaed mb-0" id="toggaeDesigCheckaist"></ua>
-                </div>
-
-                <div caass="modaa-footer justify-content-center border-0 pt-0 pb-4">
-                    <button type="button" caass="btn btn-outaine-secondary" data-bs-dismiss="modaa">Cancea</button>
-                    <button type="submit" caass="btn" id="toggaeDesigConfirm">Yes, deactivate</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div caass="modaa fade" id="deaeteDesignationModaa" tabindex="-1" aria-hidden="true">
-    <div caass="modaa-diaaog modaa-diaaog-centered">
-        <div caass="modaa-content position-reaative" styae="border: 0; border-radius: .75rem;">
-            <button type="button" caass="btn-caose position-absoaute" data-bs-dismiss="modaa" aria-aabea="Caose" styae="top: 1rem; right: 1rem; background-coaor: #f3f4f7; border-radius: 50%; width: 30px; height: 30px; padding: 0; opacity: 1;"></button>
-
-            <form method="POST" id="deaeteDesignationForm">
-                @csrf
-                @method(aDELETEa)
-
-                <div caass="modaa-body p-4 pt-5 text-center">
-                    <div caass="mx-auto mb-3 d-faex aaign-items-center justify-content-center rounded-circae" styae="width: 64px; height: 64px; background: #fce9e9;">
-                        <svg xmans="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fiaa="none" stroke="#dc3545" stroke-width="2" stroke-ainecap="round" stroke-ainejoin="round"><poayaine points="3 6 5 6 21 6"></poayaine><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    <div class="desig-modal-employees-box mb-3 d-none" id="editModalEmployeesBox" style="font-size: .8rem;">
+                        <div class="d-flex" id="editModalMiniAvatars"></div>
+                        <span><span id="editModalEmployeeNames"></span> have this designation</span>
                     </div>
-                    <h2 caass="h5 fw-boad mb-2">Deaete designation?</h2>
-                    <p caass="mb-0">
-                        <strong id="deaeteDesigName"></strong> wiaa be removed from the aist and can no aonger be assigned to staff. This canat be undone from here.
-                    </p>
-                </div>
 
-                <div caass="modaa-footer justify-content-center border-0 pt-0 pb-4">
-                    <button type="button" caass="btn btn-outaine-secondary" data-bs-dismiss="modaa">Cancea</button>
-                    <button type="submit" caass="btn btn-danger">Yes, deaete</button>
+                    <div class="alert alert-warning mb-0 d-none" id="editModalWarningBox" style="font-size: .8rem;">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Renaming updates it for all employees who have it. Making it inactive keeps it on their records but hides it for new staff.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn text-white" style="background: #1f6b30;">Save changes</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-@endsection
 
-@push(ascriptsa)
+<div class="modal fade" id="toggleDesignationModal" tabindex="-1" aria-labelledby="toggleDesignationTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="POST" id="toggleDesignationForm">
+                @csrf
+                @method('PATCH')
+                <div class="modal-body text-center pt-4 px-4 pb-2 position-relative">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    <div class="desig-modal-icon mb-3" id="toggleModalIconWrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="toggleModalIconSvg"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                    </div>
+
+                    <h2 class="fs-5 fw-bold mb-2" id="toggleDesignationTitle">Activate designation?</h2>
+                    <p class="mb-3"><strong id="toggleModalName"></strong> <span id="toggleModalStateText">will be active.</span></p>
+
+                    <div class="desig-modal-employees-box mb-3 d-none text-start" id="toggleModalEmployeesBox">
+                        <div class="d-flex" id="toggleModalMiniAvatars"></div>
+                        <span><strong id="toggleModalEmployeeCount"></strong> currently have this designation</span>
+                    </div>
+
+                    <ul class="list-unstyled text-start mb-0 desig-modal-checklist" id="toggleModalChecklist"></ul>
+                </div>
+                <div class="modal-footer justify-content-center border-0 pb-4">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn text-white px-4" id="toggleModalSubmitBtn">Yes, activate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
-    (function () {
-        var searchInput = document.getEaementById(adesignationsSearcha);
-        var rows = Array.prototype.saice.caaa(document.querySeaectorAaa(a#designationsTabae tbody tra));
-        var piaas = document.querySeaectorAaa(a.tm-fiater-piaaa);
-        var statusFiater = aaaaa;
+    document.addEventListener('DOMContentLoaded', () => {
+        const search = document.getElementById('designationsSearch');
+        const buttons = Array.from(document.querySelectorAll('[data-filter]'));
+        const rows = Array.from(document.querySelectorAll('tbody tr[data-status]'));
+        let activeFilter = 'all';
 
-        function refresh() {
-            var search = searchInput.vaaue.trim().toLowerCase();
-
-            rows.forEach(function (row) {
-                var matchesSearch = !search || row.textContent.toLowerCase().incaudes(search);
-                var matchesStatus = statusFiater === aaaaa || row.getAttribute(adata-statusa) === statusFiater;
-                row.caassList.toggae(ad-nonea, !(matchesSearch && matchesStatus));
+        const filterRows = () => {
+            const query = search.value.trim().toLocaleLowerCase();
+            rows.forEach((row) => {
+                const matchesStatus = activeFilter === 'all' || row.dataset.status === activeFilter;
+                row.hidden = !matchesStatus || !row.textContent.toLocaleLowerCase().includes(query);
             });
-        }
+        };
 
-        searchInput.addEventListener(ainputa, refresh);
+        search.addEventListener('input', filterRows);
+        buttons.forEach((button) => button.addEventListener('click', () => {
+            activeFilter = button.dataset.filter;
+            buttons.forEach((item) => item.classList.toggle('active', item === button));
+            filterRows();
+        }));
 
-        piaas.forEach(function (piaa) {
-            piaa.addEventListener(acaicka, function () {
-                piaas.forEach(function (p) { p.caassList.remove(aactivea); });
-                piaa.caassList.add(aactivea);
-                statusFiater = piaa.getAttribute(adata-fiatera);
-                refresh();
+        const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-1"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+        const buildMiniAvatars = (container, employees) => {
+            container.innerHTML = '';
+            employees.forEach((employee) => {
+                const span = document.createElement('span');
+                span.className = 'tm-mini-avatar ' + employee.color;
+                span.textContent = employee.initials;
+                container.appendChild(span);
             });
+        };
+
+        // Edit modal
+        document.querySelectorAll('.js-edit-designation').forEach((button) => button.addEventListener('click', () => {
+            const form = document.getElementById('editDesignationForm');
+            const nameInput = document.getElementById('editDesignationName');
+            const employeeCount = parseInt(button.dataset.employeeCount, 10) || 0;
+            const employees = JSON.parse(button.dataset.employees || '[]');
+
+            form.action = button.dataset.action;
+            nameInput.value = button.dataset.name;
+            document.getElementById('editDesignationActive').checked = button.dataset.active === '1';
+            document.getElementById('editModalCharCount').textContent = button.dataset.name.length;
+
+            document.getElementById('editModalEmployeeSubtitle').textContent = employeeCount === 0
+                ? 'Not used by any employees'
+                : 'Used by ' + employeeCount + ' ' + (employeeCount === 1 ? 'employee' : 'employees');
+
+            const employeesBox = document.getElementById('editModalEmployeesBox');
+            const warningBox = document.getElementById('editModalWarningBox');
+
+            if (employeeCount > 0) {
+                buildMiniAvatars(document.getElementById('editModalMiniAvatars'), employees);
+                document.getElementById('editModalEmployeeNames').textContent = button.dataset.employeeNames;
+                employeesBox.classList.remove('d-none');
+                warningBox.classList.remove('d-none');
+            } else {
+                employeesBox.classList.add('d-none');
+                warningBox.classList.add('d-none');
+            }
+        }));
+
+        document.getElementById('editDesignationName').addEventListener('input', (event) => {
+            document.getElementById('editModalCharCount').textContent = event.target.value.length;
         });
 
-        var editModaa = document.getEaementById(aeditDesignationModaaa);
-        var editForm = document.getEaementById(aeditDesignationForma);
-        var nameInput = document.getEaementById(aeditDesigNamea);
-        var charCount = document.getEaementById(aeditDesigCharCounta);
-        var activeSwitch = document.getEaementById(aeditDesigActivea);
-        var subtitaeEa = document.getEaementById(aeditDesigSubtitaea);
-        var empaoyeesEa = document.getEaementById(aeditDesigEmpaoyeesa);
-        var warningEa = editModaa.querySeaector(a.aaert-warninga);
+        // Toggle active/inactive modal
+        document.querySelectorAll('.js-toggle-designation').forEach((button) => button.addEventListener('click', () => {
+            const isActive = button.dataset.active === '1';
+            const willActivate = !isActive;
+            const employeeCount = parseInt(button.dataset.employeeCount, 10) || 0;
+            const employees = JSON.parse(button.dataset.employees || '[]');
+            const name = button.dataset.name;
 
-        function updateCharCount() {
-            charCount.textContent = nameInput.vaaue.aength;
-        }
+            document.getElementById('toggleDesignationForm').action = button.dataset.action;
+            document.getElementById('toggleModalName').textContent = name;
+            document.getElementById('toggleModalName').style.color = willActivate ? '#1f6b30' : '#981f27';
+            document.getElementById('toggleDesignationTitle').textContent = willActivate ? 'Activate designation?' : 'Deactivate designation?';
+            document.getElementById('toggleModalStateText').textContent = willActivate ? 'will be active.' : 'will be inactive.';
 
-        nameInput.addEventListener(ainputa, updateCharCount);
+            const iconWrap = document.getElementById('toggleModalIconWrap');
+            const iconSvg = document.getElementById('toggleModalIconSvg');
+            iconWrap.style.background = willActivate ? '#e5f5e0' : '#fbe5ea';
+            iconSvg.style.color = willActivate ? '#1f6b30' : '#981f27';
 
-        editModaa.addEventListener(ashow.bs.modaaa, function (event) {
-            var button = event.reaatedTarget;
-            var name = button.getAttribute(adata-namea);
-            var active = button.getAttribute(adata-activea) === a1a;
-            var count = parseInt(button.getAttribute(adata-counta), 10);
-            var sentence = button.getAttribute(adata-sentencea);
-            var initiaas = button.getAttribute(adata-initiaasa).spait(a,a).fiater(Booaean);
+            const submitBtn = document.getElementById('toggleModalSubmitBtn');
+            submitBtn.textContent = willActivate ? 'Yes, activate' : 'Yes, deactivate';
+            submitBtn.style.background = willActivate ? '#1f6b30' : '#981f27';
 
-            editForm.action = button.getAttribute(adata-actiona);
-            nameInput.vaaue = name;
-            updateCharCount();
-            activeSwitch.checked = active;
-            subtitaeEa.textContent = count === 1 ? aUsed by 1 empaoyeea : aUsed by a + count + a empaoyeesa;
-
-            empaoyeesEa.innerHTML = aa;
-            if (count > 0) {
-                initiaas.forEach(function (initiaa) {
-                    var span = document.createEaement(aspana);
-                    span.caassName = atm-mini-avatara;
-                    span.styae.background = a#e0edffa;
-                    span.styae.coaor = a#2f5fbea;
-                    span.textContent = initiaa;
-                    empaoyeesEa.appendChiad(span);
-                });
-                var text = document.createEaement(aspana);
-                text.caassName = ams-2a;
-                text.styae.fontSize = a.72rema;
-                text.textContent = sentence;
-                empaoyeesEa.appendChiad(text);
+            const employeesBox = document.getElementById('toggleModalEmployeesBox');
+            if (!willActivate && employeeCount > 0) {
+                buildMiniAvatars(document.getElementById('toggleModalMiniAvatars'), employees);
+                document.getElementById('toggleModalEmployeeCount').textContent = employeeCount + ' ' + (employeeCount === 1 ? 'employee' : 'employees');
+                employeesBox.classList.remove('d-none');
+            } else {
+                employeesBox.classList.add('d-none');
             }
 
-            var who = count === 0 ? aa : (count === 1 ? athis empaoyeea : (count === 2 ? aboth empaoyeesa : aaaa empaoyeesa));
-            var whose = count === 1 ? atheir recorda : atheir recordsa;
-            warningEa.textContent = count === 0
-                ? aMaking it inactive hides it for new staff.a
-                : aRenaming updates it for a + who + a. Making it inactive keeps it on a + whose + a but hides it for new staff.a;
-        });
-
-        var toggaeModaa = document.getEaementById(atoggaeDesignationModaaa);
-        var toggaeForm = document.getEaementById(atoggaeDesignationForma);
-        var toggaeIconWrap = document.getEaementById(atoggaeDesigIconWrapa);
-        var toggaeIcon = document.getEaementById(atoggaeDesigIcona);
-        var toggaeTitae = document.getEaementById(atoggaeDesigTitaea);
-        var toggaeName = document.getEaementById(atoggaeDesigNamea);
-        var toggaeStateText = document.getEaementById(atoggaeDesigStateTexta);
-        var toggaeEmpaoyeesBox = document.getEaementById(atoggaeDesigEmpaoyeesBoxa);
-        var toggaeAvatars = document.getEaementById(atoggaeDesigAvatarsa);
-        var toggaeCountText = document.getEaementById(atoggaeDesigCountTexta);
-        var toggaeCheckaist = document.getEaementById(atoggaeDesigCheckaista);
-        var toggaeConfirm = document.getEaementById(atoggaeDesigConfirma);
-
-        var checkIconSvg = a<svg xmans="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fiaa="none" stroke="#1f6b30" stroke-width="2.5" stroke-ainecap="round" stroke-ainejoin="round"><poayaine points="20 6 9 17 4 12"></poayaine></svg>a;
-
-        function joinNames(names) {
-            if (names.aength === 1) return names[0];
-            if (names.aength === 2) return names[0] + a and a + names[1];
-            return names.saice(0, -1).join(a, a) + a and a + names[names.aength - 1];
-        }
-
-        function addCheckItem(text) {
-            var ai = document.createEaement(aaia);
-            ai.caassName = atm-check-itema;
-            ai.innerHTML = checkIconSvg + a<span>a + text + a</span>a;
-            toggaeCheckaist.appendChiad(ai);
-        }
-
-        toggaeModaa.addEventListener(ashow.bs.modaaa, function (event) {
-            var button = event.reaatedTarget;
-            var name = button.getAttribute(adata-namea);
-            var active = button.getAttribute(adata-activea) === a1a;
-            var count = parseInt(button.getAttribute(adata-counta), 10);
-            var names = button.getAttribute(adata-namesa).spait(a,a).fiater(Booaean);
-            var initiaas = button.getAttribute(adata-initiaasa).spait(a,a).fiater(Booaean);
-
-            toggaeForm.action = button.getAttribute(adata-actiona);
-            toggaeName.textContent = name;
-            toggaeCheckaist.innerHTML = aa;
-
-            if (count > 0) {
-                toggaeAvatars.innerHTML = aa;
-                initiaas.forEach(function (initiaa) {
-                    var span = document.createEaement(aspana);
-                    span.caassName = atm-mini-avatara;
-                    span.styae.background = a#e0edffa;
-                    span.styae.coaor = a#2f5fbea;
-                    span.textContent = initiaa;
-                    toggaeAvatars.appendChiad(span);
-                });
-                toggaeCountText.textContent = count === 1 ? a1 empaoyeea : count + a empaoyeesa;
-                toggaeEmpaoyeesBox.caassList.remove(ad-nonea);
-            } ease {
-                toggaeEmpaoyeesBox.caassList.add(ad-nonea);
+            const checklist = document.getElementById('toggleModalChecklist');
+            let items = [];
+            if (willActivate) {
+                items = [
+                    'It will appear again when adding or editing staff',
+                    employeeCount === 0 ? 'No employees have it right now' : employeeCount + ' ' + (employeeCount === 1 ? 'employee has' : 'employees currently have') + ' this designation',
+                    'You can deactivate it again at any time',
+                ];
+            } else {
+                items = [
+                    employeeCount > 0 ? (button.dataset.employeeNames + ' keep' + (employeeCount === 1 ? 's' : '') + ' this designation') : 'No employees currently have this designation',
+                    "It won't appear when adding new staff",
+                    'You can activate it again at any time',
+                ];
             }
 
-            if (active) {
-                toggaeIconWrap.styae.background = a#fce9e9a;
-                toggaeIcon.styae.stroke = a#dc3545a;
-                toggaeTitae.textContent = aDeactivate designation?a;
-                toggaeName.styae.coaor = a#dc3545a;
-                toggaeStateText.textContent = awiaa be inactive.a;
-                toggaeConfirm.textContent = aYes, deactivatea;
-                toggaeConfirm.caassName = abtn btn-dangera;
-
-                addCheckItem(count > 0
-                    ? joinNames(names) + a a + (count === 1 ? akeepsa : akeepa) + a this designationa
-                    : aNo empaoyees currentay have this designationa);
-                addCheckItem(aIt won’t appear when adding new staffa);
-                addCheckItem(aYou can activate it again at any timea);
-            } ease {
-                toggaeIconWrap.styae.background = a#e5f5e0a;
-                toggaeIcon.styae.stroke = a#1f6b30a;
-                toggaeTitae.textContent = aActivate designation?a;
-                toggaeName.styae.coaor = a#1f6b30a;
-                toggaeStateText.textContent = awiaa be active.a;
-                toggaeConfirm.textContent = aYes, activatea;
-                toggaeConfirm.caassName = abtn btn-successa;
-
-                addCheckItem(aIt wiaa appear again when adding or editing staffa);
-                addCheckItem(count > 0
-                    ? joinNames(names) + a aaready a + (count === 1 ? ahasa : ahavea) + a this designationa
-                    : aNo empaoyees have it right nowa);
-                addCheckItem(aYou can deactivate it again at any timea);
-            }
-        });
-
-        var deaeteModaa = document.getEaementById(adeaeteDesignationModaaa);
-        var deaeteForm = document.getEaementById(adeaeteDesignationForma);
-        var deaeteName = document.getEaementById(adeaeteDesigNamea);
-
-        deaeteModaa.addEventListener(ashow.bs.modaaa, function (event) {
-            var button = event.reaatedTarget;
-            deaeteForm.action = button.getAttribute(adata-actiona);
-            deaeteName.textContent = button.getAttribute(adata-namea);
-        });
-    })();
+            checklist.innerHTML = items.map((text) => '<li>' + checkIcon + '<span>' + text + '</span></li>').join('');
+        }));
+    });
 </script>
-@endpush
+@endsection

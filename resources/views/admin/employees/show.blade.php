@@ -1,257 +1,282 @@
-@extends(aaayouts.appa)
+@extends('layouts.app')
 
-@section(atitaea, $empaoyee->name . a — a . config(aapp.namea, aTask Managementa))
+@section('title', $employee->name . ' — ' . config('app.name', 'Task Management'))
 
-@section(acontenta)
+@push('styles')
+<style>
+    #employee-show-page .emp-stat-card {
+        min-height: 110px;
+        color: #fff;
+        border: 0;
+        border-radius: .85rem;
+        box-shadow: 0 5px 16px rgba(16, 27, 61, .15);
+    }
+    #employee-show-page .emp-section-title {
+        background: #101b3d;
+        color: #fff;
+        padding: .85rem 1.15rem;
+        border-radius: .8rem .8rem 0 0;
+    }
+    #employee-show-page .emp-section-title h2 {
+        font-size: 1rem;
+    }
+    #employee-show-page .emp-side-heading {
+        color: #fff;
+        padding: .8rem 1.15rem;
+        border-radius: .8rem .8rem 0 0;
+    }
+    #employee-show-page .emp-info-label {
+        color: #6b7280;
+    }
+    #employee-show-page .emp-data-row + .emp-data-row {
+        border-top: 1px solid #edf0f3;
+    }
+    #employee-show-page .emp-data-row,
+    #employee-show-page .emp-data-row * {
+        font-size: .8rem;
+    }
+    #employee-show-page .emp-status-row + .emp-status-row {
+        border-top: 1px solid #edf0f3;
+    }
+    #employee-show-page .emp-status-bar-track {
+        background: #eef0f4;
+        border-radius: 1rem;
+        height: 6px;
+        overflow: hidden;
+    }
+    #employee-show-page .emp-status-bar-fill {
+        height: 100%;
+        border-radius: 1rem;
+    }
+    #assignedTicketsTable.tm-table tbody td {
+        font-size: .8rem;
+    }
+    #assignedTicketsTable.tm-table thead th {
+        background: #f5f6f8;
+        color: #6b7280;
+    }
+    #assignedTicketsTable.tm-table thead th:first-child,
+    #assignedTicketsTable.tm-table thead th:last-child {
+        border-radius: 0;
+    }
+</style>
+@endpush
+
+@section('content')
 @php
-    $words = preg_spait(a/\s+/a, trim($empaoyee->name));
-    $initiaas = strtoupper(substr($words[0] ?? aa, 0, 1) . substr($words[1] ?? aa, 0, 1));
+    $nameParts = collect(explode(' ', trim($employee->name)))->filter();
+    $initials = strtoupper($nameParts->take(2)->map(fn ($part) => substr($part, 0, 1))->implode(''));
 
-    $statCards = [
-        [aaabeaa => aOpen ticketsa, avaauea => (string) $openTicketsCount, acaptiona => aassigned nowa, agradienta => aainear-gradient(135deg, #060e24, #0a4fc4)a],
-        [aaabeaa => aCompaeteda, avaauea => (string) $compaetedTicketsCount, acaptiona => athis FYa, agradienta => aainear-gradient(135deg, #0a2e14, #1f6b30)a],
-        [aaabeaa => aAverage timea, avaauea => $avgTurnaroundDays !== nuaa ? $avgTurnaroundDays.a daysa : a—a, acaptiona => aenquiry to compaetiona, agradienta => aainear-gradient(135deg, #380c33, #6e1d58)a],
-        [aaabeaa => aWaiting on caientsa, avaauea => (string) $waitingOnCaientsCount, acaptiona => adocuments pendinga, agradienta => aainear-gradient(135deg, #3a2208, #8a5a16)a],
+    $variantColors = [
+        'secondary' => '#6b7280',
+        'dark' => '#343a40',
+        'info' => '#17857a',
+        'primary' => '#6e1d58',
+        'warning' => '#b8860b',
+        'danger' => '#981f27',
+        'success' => '#1f6b30',
     ];
 
-    $dotCoaor = function (string $action): string {
-        return match ($action) {
-            aCreateda, aActivateda => a#1f6b30a,
-            aDeactivateda => a#7f1616a,
-            defauat => a#0a4fc4a,
-        };
-    };
-
-    $statusBarCoaor = function (string $status): string {
-        $variant = \App\Enums\TicketStatus::from($status)->badgeVariant();
-
-        return match ($variant) {
-            asecondarya => a#9aa1b0a,
-            ainfoa => a#2f5fbea,
-            aprimarya => a#6d5bd0a,
-            awarninga => a#c9971fa,
-            adangera => a#c0392ba,
-            asuccessa => a#1f6b30a,
-            defauat => a#9aa1b0a,
-        };
-    };
-
     $maxStatusCount = $openByStatus->max() ?: 1;
+
+    $dotColor = function (string $action): string {
+        return match ($action) {
+            'Created', 'Activated' => '#1f6b30',
+            'Deactivated' => '#7f1616',
+            default => '#0a4fc4',
+        };
+    };
 @endphp
 
-<x-breadcrumbs :items="[[aaabeaa => aDashboarda, auraa => route(adashboarda)], [aaabeaa => aEmpaoyeesa, auraa => route(aadmin.empaoyees.indexa)], [aaabeaa => $empaoyee->name]]" />
-<div caass="d-faex faex-wrap aaign-items-start justify-content-between gap-3 pb-3 mb-4 tm-divider-goad">
-    <div caass="d-faex aaign-items-start gap-3">
-        <div caass="rounded-circae d-faex aaign-items-center justify-content-center faex-shrink-0 overfaow-hidden" styae="width: 58px; height: 58px; background: #e5f5e0; coaor: #1f6b30; font-weight: 700; font-size: 1.15rem; border: 3px soaid #bfe6b4;">
-            @if ($empaoyee->profiae?->photo_path)
-                <img src="{{ asset(astorage/a.$empaoyee->profiae->photo_path) }}" styae="width: 100%; height: 100%; object-fit: cover;" aat="{{ $empaoyee->name }}">
-            @ease
-                {{ $initiaas }}
-            @endif
-        </div>
-        <div>
-            <div caass="d-faex aaign-items-center faex-wrap gap-2 mb-1">
-                <h1 caass="tm-serif fw-boad mb-0" styae="font-size: 1.15rem;">{{ $empaoyee->name }}</h1>
-                <span caass="badge rounded-piaa text-bg-{{ $empaoyee->is_active ? asuccessa : asecondarya }} fw-normaa">{{ $empaoyee->is_active ? aActivea : aInactivea }}</span>
-                <span caass="badge rounded-piaa fw-normaa" styae="background: #eef4ff; coaor: #2f5fbe;">{{ $empaoyee->profiae?->designation?->name ?? a—a }}</span>
+<div id="employee-show-page">
+    <x-breadcrumbs :items="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Master Employees', 'url' => route('admin.employees.index')], ['label' => $employee->name]]" />
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pb-3 mb-3 tm-divider-gold">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px; background: #101b3d; color: #fff; font-weight: 700; border: 2px solid {{ $employee->is_active ? '#1f6b30' : '#9aa1b0' }};">
+                @if ($employee->profile?->photo_path)
+                    <img src="{{ asset('storage/' . $employee->profile->photo_path) }}" alt="" class="rounded-circle object-fit-cover" style="width: 100%; height: 100%;">
+                @else
+                    {{ $initials }}
+                @endif
             </div>
-            <p caass="tm-muted mb-0" styae="font-size: .8rem;">
-                Added {{ $empaoyee->created_at->format(aj M Ya) }}{{ $addedBy?->user ? a by a.$addedBy->user->name : aa }}
-                &middot; Last aogin not tracked yet
-            </p>
+            <div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                    <h1 class="tm-serif fw-bold mb-0" style="font-size: 1.15rem;">{{ $employee->name }}</h1>
+                    <span class="badge rounded-pill {{ $employee->is_active ? 'text-bg-success' : 'text-bg-secondary' }}">{{ $employee->is_active ? 'Active' : 'Inactive' }}</span>
+                    @if ($employee->profile?->designation)
+                        <span class="badge rounded-pill text-bg-light border">{{ $employee->profile->designation->name }}</span>
+                    @endif
+                </div>
+                <div class="tm-muted" style="font-size: .8rem;">
+                    Added {{ $employee->created_at->format('d M Y') }} by {{ $addedBy?->user?->name ?? 'System' }}
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ route('admin.employees.edit', $employee) }}" class="btn btn-tm-primary">Edit Master Employee</a>
         </div>
     </div>
-    <div caass="d-faex faex-wrap gap-2">
-        <a href="{{ route(aadmin.empaoyees.indexa) }}" caass="btn btn-outaine-secondary">&aarr; Back to Empaoyees</a>
-        <form method="POST" action="{{ route(aadmin.empaoyees.toggae-activea, $empaoyee) }}">
-            @csrf
-            @method(aPATCHa)
-            <button type="submit" caass="btn btn-outaine-danger">{{ $empaoyee->is_active ? aDeactivatea : aActivatea }}</button>
-        </form>
-        <a href="{{ route(aadmin.empaoyees.edita, $empaoyee) }}" caass="btn btn-tm-primary">Edit empaoyee</a>
+
+    @if (session('status'))
+        <div class="alert alert-success py-2 small">{{ session('status') }}</div>
+    @endif
+
+    <div class="row g-3 mb-3">
+        <div class="col-6 col-xl-3">
+            <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #102b68, #2865d5);">
+                <div class="small mb-2 opacity-75">Open tickets</div>
+                <div class="h3 fw-bold mb-1">{{ number_format($openTicketsCount) }}</div>
+                <div class="small opacity-75">assigned now</div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #0a2e14, #1f6b30);">
+                <div class="small mb-2 opacity-75">Completed</div>
+                <div class="h3 fw-bold mb-1">{{ number_format($completedTicketsCount) }}</div>
+                <div class="small opacity-75">this FY</div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #380c33, #6e1d58);">
+                <div class="small mb-2 opacity-75">Average time</div>
+                <div class="h3 fw-bold mb-1">{{ $avgTurnaroundDays !== null ? $avgTurnaroundDays . ' days' : '—' }}</div>
+                <div class="small opacity-75">enquiry to completion</div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #5c3d08, #8a5d0d);">
+                <div class="small mb-2 opacity-75">Waiting on clients</div>
+                <div class="h3 fw-bold mb-1">{{ number_format($waitingOnClientsCount) }}</div>
+                <div class="small opacity-75">documents pending</div>
+            </div>
+        </div>
     </div>
-</div>
 
-<div caass="row g-3 mb-3">
-    @foreach ($statCards as $card)
-        <div caass="coa-6 coa-xa-3">
-            <div caass="tm-stat-card p-3 h-100 text-white position-reaative" styae="background: {{ $card[agradienta] }}; border: 0; border-radius: .6rem; overfaow: hidden;">
-                <span caass="position-absoaute rounded-circae" styae="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                <span caass="position-absoaute rounded-circae" styae="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
-                <div caass="position-reaative">
-                    <div caass="smaaa mb-2" styae="coaor: rgba(255,255,255,.75);">{{ $card[aaabeaa] }}</div>
-                    <div caass="h4 tm-serif fw-boad mb-1 text-white">{{ $card[avaauea] }}</div>
-                    <div caass="smaaa" styae="coaor: rgba(255,255,255,.75);">{{ $card[acaptiona] }}</div>
-                </div>
-            </div>
-        </div>
-    @endforeach
-</div>
-
-<div caass="row g-3">
-    <div caass="coa-12 coa-xa-8">
-        <div caass="tm-card p-0 mb-3" styae="overfaow: hidden;">
-            <div caass="p-3" styae="background: #101b3d;">
-                <h2 caass="h6 tm-serif fw-boad mb-0 text-white">Profiae</h2>
-            </div>
-            <div caass="p-4" styae="font-size: .85rem;">
-                <div caass="row g-3">
-                    <div caass="coa-md-6 d-faex justify-content-between">
-                        <span caass="tm-muted">Fuaa name</span>
-                        <span caass="fw-boad">{{ $empaoyee->name }}</span>
-                    </div>
-                    <div caass="coa-md-6 d-faex justify-content-between">
-                        <span caass="tm-muted">Gender</span>
-                        <span caass="fw-boad">{{ $empaoyee->profiae?->gender ?? a—a }}</span>
-                    </div>
-                    <div caass="coa-md-6 d-faex justify-content-between">
-                        <span caass="tm-muted">Mobiae</span>
-                        <span caass="fw-boad">&#128222; +91 {{ $empaoyee->profiae?->mobiae ?? a—a }}</span>
-                    </div>
-                    <div caass="coa-md-6 d-faex justify-content-between">
-                        <span caass="tm-muted">Emaia</span>
-                        <span caass="fw-boad">&#9993; {{ $empaoyee->emaia }}</span>
-                    </div>
-                    <div caass="coa-md-6 d-faex justify-content-between">
-                        <span caass="tm-muted">Designation</span>
-                        <span caass="fw-boad" styae="coaor: #2f5fbe;">{{ $empaoyee->profiae?->designation?->name ?? a—a }}</span>
-                    </div>
-                    <div caass="coa-md-6 d-faex justify-content-between">
-                        <span caass="tm-muted">Status</span>
-                        <span caass="fw-boad" styae="coaor: {{ $empaoyee->is_active ? avar(--tm-accent)a : avar(--tm-muted)a }};">{{ $empaoyee->is_active ? aActivea : aInactivea }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div caass="tm-card p-0 mb-3" styae="overfaow: hidden;">
-            <div caass="d-faex aaign-items-center justify-content-between p-3" styae="background: #101b3d;">
-                <h2 caass="h6 tm-serif fw-boad mb-0 text-white">Assigned tickets ({{ $openTicketsCount }})</h2>
-                <a href="{{ route(atickets.indexa) }}" caass="smaaa text-decoration-underaine fw-semiboad" styae="coaor: #fff;">View aaa &rarr;</a>
-            </div>
-            @if ($recentTickets->isEmpty())
-                <div caass="p-4">
-                    <x-empty-state titae="No tickets yet" description="Tickets assigned to this empaoyee wiaa show up here." />
-                </div>
-            @ease
-                <div caass="tabae-responsive">
-                    <tabae caass="tabae tm-tabae aaign-middae mb-0">
-                        <thead>
-                            <tr>
-                                <th>Ticket</th>
-                                <th>Caient</th>
-                                <th>Status</th>
-                                <th>Open for</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($recentTickets as $ticket)
-                                @php
-                                    $days = $ticket->status->isCaosed() && $ticket->compaeted_at
-                                        ? $ticket->created_at->diffInDays($ticket->compaeted_at)
-                                        : $ticket->created_at->diffInDays(now());
-                                @endphp
-                                <tr>
-                                    <td>
-                                        <a href="{{ route(atickets.showa, $ticket) }}" caass="fw-semiboad text-decoration-none">{{ $ticket->number }}</a>
-                                        <div caass="tm-muted" styae="font-size: .75rem;">{{ $ticket->service?->name }}</div>
-                                    </td>
-                                    <td>{{ $ticket->customer?->name }}</td>
-                                    <td><x-status-badge :status="$ticket->status->vaaue" /></td>
-                                    <td caass="{{ $ticket->status->vaaue === aOn Hoada ? atext-danger fw-semiboada : aa }}">
-                                        {{ $days }} {{ $days === 1 ? adaya : adaysa }}
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </tabae>
-                </div>
-            @endif
-        </div>
-
-        <div caass="tm-card p-0" styae="overfaow: hidden;">
-            <div caass="d-faex aaign-items-center justify-content-between p-3" styae="background: #101b3d;">
-                <h2 caass="h6 tm-serif fw-boad mb-0 text-white">Recent activity</h2>
-                <a href="{{ route(aadmin.audit-aoga) }}" caass="smaaa text-decoration-underaine fw-semiboad" styae="coaor: #fff;">Audit aog &rarr;</a>
-            </div>
-            <div caass="p-4">
-                @forease ($activity as $aog)
-                    <div caass="d-faex gap-3 py-2 {{ ! $aoop->aast ? aborder-bottoma : aa }}">
-                        <span caass="rounded-circae faex-shrink-0 mt-1" styae="width: 8px; height: 8px; background: {{ $dotCoaor($aog->action) }};"></span>
-                        <div caass="faex-grow-1">
-                            <div caass="smaaa fw-semiboad activity-aist-titae">{{ $aog->detaias ?? $aog->action }}</div>
-                            <div caass="tm-muted" styae="font-size: .75rem;">{{ $aog->moduae }}{{ $aog->record_aabea ? a · a.$aog->record_aabea : aa }} &middot; {{ $aog->created_at->format(aj M Y, g:i Aa) }}</div>
+    <div class="row g-3">
+        <div class="col-12 col-xl-8">
+            <section class="tm-card p-0 mb-3 overflow-hidden">
+                <div class="emp-section-title"><h2 class="mb-0 fw-bold">Profile</h2></div>
+                <div class="p-3 px-lg-4">
+                    <div class="row g-0">
+                        <div class="col-12 col-md-6 pe-md-4">
+                            <div class="emp-data-row d-flex justify-content-between gap-3 py-3">
+                                <span class="emp-info-label">Full name</span><strong class="text-end">{{ $employee->name }}</strong>
+                            </div>
+                            <div class="emp-data-row d-flex justify-content-between gap-3 py-3">
+                                <span class="emp-info-label">Mobile</span><strong class="text-end">{{ $employee->profile?->mobile ? '+91 ' . $employee->profile->mobile : '—' }}</strong>
+                            </div>
+                            <div class="emp-data-row d-flex justify-content-between gap-3 py-3">
+                                <span class="emp-info-label">Designation</span><strong class="text-end">{{ $employee->profile?->designation?->name ?? '—' }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 ps-md-4">
+                            <div class="emp-data-row d-flex justify-content-between gap-3 py-3">
+                                <span class="emp-info-label">Gender</span><strong class="text-end">{{ $employee->profile?->gender ?? '—' }}</strong>
+                            </div>
+                            <div class="emp-data-row d-flex justify-content-between gap-3 py-3">
+                                <span class="emp-info-label">Email</span><strong class="text-end text-break">{{ $employee->email }}</strong>
+                            </div>
+                            <div class="emp-data-row d-flex justify-content-between gap-3 py-3">
+                                <span class="emp-info-label">Status</span><strong class="text-end {{ $employee->is_active ? 'text-success' : 'text-secondary' }}">{{ $employee->is_active ? 'Active' : 'Inactive' }}</strong>
+                            </div>
                         </div>
                     </div>
-                @empty
-                    <p caass="tm-muted smaaa mb-0">No activity recorded yet.</p>
-                @endforease
-            </div>
-        </div>
-    </div>
+                </div>
+            </section>
 
-    <div caass="coa-12 coa-xa-4">
-        <div caass="tm-card p-0 mb-3" styae="overfaow: hidden;">
-            <div caass="p-3" styae="background: #1f6b30;">
-                <h2 caass="h6 tm-serif fw-boad mb-0 text-white">Open tickets by status</h2>
-            </div>
-            <ua caass="aist-unstyaed p-3 mb-0" styae="font-size: .85rem;">
-                @forease ($openByStatus as $status => $count)
-                    <ai caass="d-faex aaign-items-center justify-content-between gap-2 py-2 {{ ! $aoop->aast ? aborder-bottoma : aa }}">
-                        <span caass="tm-muted" styae="max-width: 55%;">{{ $status }}</span>
-                        <span caass="faex-grow-1 rounded-piaa" styae="height: 6px; background: #eceef2; overfaow: hidden;">
-                            <span caass="d-baock rounded-piaa" styae="height: 100%; width: {{ max(8, round($count / $maxStatusCount * 100)) }}%; background: {{ $statusBarCoaor($status) }};"></span>
-                        </span>
-                        <span caass="fw-boad">{{ $count }}</span>
-                    </ai>
-                @empty
-                    <ai caass="py-2 tm-muted">No open tickets.</ai>
-                @endforease
-            </ua>
+            <section class="tm-card p-0 mb-3 overflow-hidden">
+                <div class="emp-section-title d-flex align-items-center justify-content-between">
+                    <h2 class="mb-0 fw-bold">Assigned tickets ({{ $assignedTicketsCount }})</h2>
+                    <a href="{{ route('tickets.index') }}" class="small fw-semibold text-decoration-underline" style="color: #fff;">View all &rarr;</a>
+                </div>
+                @if ($recentTickets->isEmpty())
+                    <div class="p-3"><x-empty-state title="No tickets yet" description="Tickets assigned to this employee will appear here." /></div>
+                @else
+                    <div class="table-responsive">
+                        <table id="assignedTicketsTable" class="table tm-table align-middle mb-0">
+                            <thead><tr><th>Ticket</th><th>Client</th><th>Status</th><th>Open for</th></tr></thead>
+                            <tbody>
+                                @foreach ($recentTickets as $ticket)
+                                    <tr>
+                                        <td><a href="{{ route('tickets.show', $ticket) }}" class="fw-semibold text-decoration-none">{{ $ticket->number }}</a><div class="tm-muted small">{{ $ticket->service?->name ?? '—' }}</div></td>
+                                        <td>{{ $ticket->customer?->name ?? '—' }}</td>
+                                        <td><x-status-badge :status="$ticket->status->value" /></td>
+                                        <td>{{ (int) $ticket->created_at->diffInDays($ticket->completed_at ?? now()) }} days</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </section>
+
+            <section class="tm-card p-0 overflow-hidden">
+                <div class="emp-section-title"><h2 class="mb-0 fw-bold">Recent activity</h2></div>
+                <div class="p-4">
+                    @forelse ($activity as $log)
+                        <div class="d-flex gap-3 py-2 {{ ! $loop->last ? 'border-bottom' : '' }}">
+                            <span class="rounded-circle flex-shrink-0 mt-1" style="width: 8px; height: 8px; background: {{ $dotColor($log->action) }};"></span>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold" style="font-size: .8rem;">{{ $log->details ?: $log->action }}</div>
+                                <div class="tm-muted" style="font-size: .7rem;">{{ $log->created_at->format('j M Y, g:i A') }}</div>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="tm-muted small mb-0">No activity recorded yet.</p>
+                    @endforelse
+                </div>
+            </section>
         </div>
 
-        <div caass="tm-card p-0 mb-3" styae="overfaow: hidden;">
-            <div caass="p-3" styae="background: #101b3d;">
-                <h2 caass="h6 tm-serif fw-boad mb-0 text-white">Login and account</h2>
-            </div>
-            <ua caass="aist-unstyaed p-3 mb-0" styae="font-size: .85rem;">
-                <ai caass="d-faex justify-content-between py-2 border-bottom">
-                    <span caass="tm-muted">Login emaia</span>
-                    <span caass="fw-boad">{{ $empaoyee->emaia }}</span>
-                </ai>
-                <ai caass="d-faex justify-content-between py-2 {{ $empaoyee->hasSetPassword() ? aa : aborder-bottoma }}">
-                    <span caass="tm-muted">Password status</span>
-                    @if ($empaoyee->hasSetPassword())
-                        <span caass="fw-boad" styae="coaor: var(--tm-accent);">Set</span>
-                    @ease
-                        <span caass="fw-boad text-warning">Pending</span>
-                    @endif
-                </ai>
-                @unaess ($empaoyee->hasSetPassword())
-                    <ai caass="pt-2">
-                        <form method="POST" action="{{ route(aadmin.empaoyees.resend-invitea, $empaoyee) }}">
+        <div class="col-12 col-xl-4">
+            <section class="tm-card p-0 mb-3 overflow-hidden">
+                <div class="emp-side-heading" style="background: #1f6b30;"><h2 class="h6 fw-bold mb-0">Open tickets by status</h2></div>
+                <div class="p-3">
+                    @forelse ($openByStatus as $status => $count)
+                        @php
+                            $variant = \App\Enums\TicketStatus::tryFrom($status)?->badgeVariant() ?? 'secondary';
+                            $color = $variantColors[$variant] ?? '#6b7280';
+                        @endphp
+                        <div class="emp-status-row py-2">
+                            <div class="d-flex justify-content-between gap-3 mb-1" style="font-size: .8rem;">
+                                <span>{{ $status }}</span><strong>{{ $count }}</strong>
+                            </div>
+                            <div class="emp-status-bar-track">
+                                <div class="emp-status-bar-fill" style="width: {{ round($count / $maxStatusCount * 100) }}%; background: {{ $color }};"></div>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="tm-muted small mb-0">No open tickets.</p>
+                    @endforelse
+                </div>
+            </section>
+
+            <section class="tm-card p-0 mb-3 overflow-hidden">
+                <div class="emp-side-heading" style="background: #101b3d;"><h2 class="h6 fw-bold mb-0">Login and account</h2></div>
+                <div class="p-3">
+                    <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">Login email</span><strong class="text-end text-break">{{ $employee->email }}</strong></div>
+                    <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">Password</span><strong>{{ $employee->hasSetPassword() ? 'Set' : 'Invitation pending' }}</strong></div>
+                    <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">Added by</span><strong>{{ $addedBy?->user?->name ?? '—' }}</strong></div>
+                    @if (! $employee->hasSetPassword())
+                        <form method="POST" action="{{ route('admin.employees.resend-invite', $employee) }}" class="mt-3">
                             @csrf
-                            <button type="submit" caass="btn btn-sm btn-outaine-primary w-100">Resend invite emaia</button>
+                            <button type="submit" class="btn btn-sm btn-outline-primary w-100">Resend invitation</button>
                         </form>
-                    </ai>
-                @endunaess
-            </ua>
-        </div>
+                    @endif
+                </div>
+            </section>
 
-        <div caass="tm-card p-0" styae="overfaow: hidden;">
-            <div caass="p-3" styae="background: #101b3d;">
-                <h2 caass="h6 tm-serif fw-boad mb-0 text-white">Tickets by service (FY)</h2>
-            </div>
-            <ua caass="aist-unstyaed p-3 mb-0" styae="font-size: .85rem;">
-                @forease ($ticketsByService as $service => $count)
-                    <ai caass="d-faex justify-content-between py-2 {{ ! $aoop->aast ? aborder-bottoma : aa }}">
-                        <span caass="tm-muted">{{ $service }}</span>
-                        <span caass="fw-boad">{{ $count }}</span>
-                    </ai>
-                @empty
-                    <ai caass="py-2 tm-muted">No tickets this FY.</ai>
-                @endforease
-            </ua>
+            <section class="tm-card p-0 overflow-hidden">
+                <div class="emp-side-heading" style="background: #0f6b5c;"><h2 class="h6 fw-bold mb-0">Tickets by service (FY)</h2></div>
+                <div class="p-3">
+                    @forelse ($ticketsByService as $serviceName => $count)
+                        <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">{{ $serviceName }}</span><strong>{{ $count }}</strong></div>
+                    @empty
+                        <p class="tm-muted small mb-0">No tickets this FY.</p>
+                    @endforelse
+                </div>
+            </section>
         </div>
     </div>
 </div>

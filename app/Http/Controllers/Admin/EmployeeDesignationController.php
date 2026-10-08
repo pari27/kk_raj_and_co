@@ -17,7 +17,7 @@ class EmployeeDesignationController extends Controller
         $designations = EmployeeDesignation::query()
             ->where('is_deleted', false)
             ->with('employees')
-            ->orderBy('name')
+            ->latest('created_at')
             ->get();
 
         return view('admin.designations.index', compact('designations'));
