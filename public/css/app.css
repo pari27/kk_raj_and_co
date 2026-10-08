@@ -1,0 +1,1096 @@
+/* ==========================================================================
+   Task Management — shared application stylesheet.
+   Every page's styling lives here instead of inline <style> blocks per view.
+   ========================================================================== */
+
+/* ---- Design tokens -------------------------------------------------- */
+:root {
+    --tm-bg: #f3f4f7;
+    --tm-sidebar: #101b3d;
+    --tm-sidebar-active: rgba(255, 255, 255, .07);
+    --tm-surface: #ffffff;
+    --tm-surface-border: #e5e7ec;
+    --tm-field: #ffffff;
+    --tm-text: #1f2430;
+    --tm-muted: #6b7280;
+    --tm-accent: #4a9b3e;
+    --tm-accent-soft: rgba(74, 155, 62, .12);
+    --tm-navy: #101b3d;
+}
+
+body {
+    background-color: var(--tm-bg);
+    color: var(--tm-text);
+    min-height: 100vh;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, .tm-serif {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* ---- App shell: sidebar + topbar ------------------------------------- */
+.tm-sidebar {
+    width: 250px;
+    min-height: 100vh;
+    background: var(--tm-sidebar);
+    flex-shrink: 0;
+}
+
+.tm-brand-logo {
+    height: 34px;
+    width: auto;
+    display: block;
+}
+
+.tm-nav-link {
+    color: #a9b2cc;
+    border-radius: .55rem;
+    padding: .55rem .85rem;
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    font-size: .89rem;
+    border-left: 3px solid transparent;
+    text-decoration: none;
+    transition: padding-left .15s ease, color .15s ease, background-color .15s ease;
+}
+
+.tm-nav-link:hover {
+    color: #fff;
+    background: var(--tm-sidebar-active);
+    padding-left: 1.15rem;
+}
+
+.tm-nav-link.active {
+    background: var(--tm-sidebar-active);
+    color: #fff;
+    border-left-color: var(--tm-accent);
+}
+
+.tm-nav-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--tm-accent);
+}
+
+.tm-nav-section-label {
+    color: var(--tm-accent);
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    font-weight: 600;
+    padding: .9rem .85rem .2rem;
+}
+
+.tm-topbar {
+    background: var(--tm-navy);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.tm-icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: .6rem;
+    border: 1px solid rgba(255,255,255,.15);
+    background: rgba(255,255,255,.06);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.tm-icon-btn:hover {
+    background: var(--tm-accent);
+    border-color: var(--tm-accent);
+    color: #101b3d;
+}
+
+.tm-menu-toggle {
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.tm-menu-toggle:hover,
+.tm-menu-toggle:focus {
+    background: var(--tm-accent);
+    border-color: var(--tm-accent);
+    color: #101b3d;
+}
+
+.tm-topbar .dropdown-menu {
+    font-size: .85rem;
+    min-width: 220px;
+}
+
+.tm-dropdown-item {
+    transition: padding-left .15s ease;
+}
+
+.tm-dropdown-item:hover {
+    padding-left: 1.1rem;
+    font-weight: 600;
+}
+
+.tm-search {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: .6rem;
+}
+
+.tm-search input {
+    background: transparent;
+    border: 0;
+    outline: none;
+    color: #fff;
+    width: 100%;
+    font-size: .875rem;
+}
+
+.tm-search input::placeholder {
+    color: rgba(255,255,255,.5);
+}
+
+.tm-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--tm-accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: .85rem;
+}
+
+/* ---- Cards, tables, fields (used across almost every page) ---------- */
+.tm-card {
+    background: var(--tm-surface);
+    border: 1px solid var(--tm-surface-border);
+    border-radius: .85rem;
+    box-shadow: 0 2px 8px rgba(16, 27, 61, .06);
+}
+
+.tm-card-hover {
+    box-shadow: 0 4px 14px rgba(16, 27, 61, .12);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.tm-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(16, 27, 61, .2);
+}
+
+.tm-stat-card {
+    box-shadow: 0 4px 14px rgba(16, 27, 61, .18);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.tm-stat-card:hover {
+    transform: translateY(-4px) scale(1.015);
+    box-shadow: 0 16px 32px rgba(16, 27, 61, .28);
+}
+
+.tm-muted {
+    color: var(--tm-muted);
+}
+
+.tm-divider-gold {
+    border-bottom: 2px solid var(--tm-accent);
+}
+
+.tm-table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--tm-text);
+    --bs-table-border-color: var(--tm-surface-border);
+    font-size: .875rem;
+}
+
+.tm-table thead th {
+    background: #101b3d;
+    color: #fff;
+    border-bottom: 0;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 600;
+    padding: .6rem 1rem;
+    white-space: nowrap;
+}
+
+.tm-table thead th:first-child {
+    border-top-left-radius: .6rem;
+}
+
+.tm-table thead th:last-child {
+    border-top-right-radius: .6rem;
+}
+
+.tm-table tbody td {
+    padding: .3rem 1rem;
+    vertical-align: middle;
+}
+
+.tm-field {
+    background: var(--tm-field);
+    border: 1px solid var(--tm-surface-border);
+    color: var(--tm-text);
+    font-size: .8rem;
+}
+
+.tm-field:focus {
+    background: var(--tm-field);
+    border-color: var(--tm-accent);
+    color: var(--tm-text);
+    box-shadow: 0 0 0 .2rem var(--tm-accent-soft);
+}
+
+.tm-field::placeholder {
+    font-size: .8rem;
+}
+
+.invalid-feedback {
+    font-size: .72rem;
+    font-style: italic;
+}
+
+.tm-field-label {
+    color: #000;
+    font-weight: 700;
+    font-size: .8rem;
+    margin-bottom: .35rem;
+}
+
+.form-text {
+    font-size: .78rem;
+}
+
+.btn {
+    font-size: .85rem;
+}
+
+.btn-tm-primary {
+    background: var(--tm-navy);
+    border-color: var(--tm-navy);
+    color: #fff;
+}
+
+.btn-tm-primary:hover {
+    background: #1a2a5c;
+    border-color: #1a2a5c;
+    color: #fff;
+}
+
+.tm-progress {
+    height: 6px;
+    border-radius: 999px;
+    background: #eef0f4;
+}
+
+.tm-progress > span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+}
+
+@media (max-width: 767.98px) {
+    .tm-sidebar {
+        width: 100%;
+        min-height: auto;
+    }
+}
+
+/* ---- DataTables look & feel (Audit Log, Services, Employees, Clients, Enquiries) ---- */
+div.dataTables_wrapper div.dataTables_info,
+div.dataTables_wrapper div.dataTables_paginate {
+    font-size: .78rem;
+    font-weight: 400;
+    color: var(--tm-muted);
+}
+
+div.dataTables_wrapper .page-item.active .page-link {
+    background-color: var(--tm-accent);
+    border-color: var(--tm-accent);
+    color: #fff;
+    font-weight: 400;
+}
+
+div.dataTables_wrapper .page-link {
+    font-size: .78rem;
+    font-weight: 400;
+    color: var(--tm-text);
+}
+
+#auditLogTable.dataTable,
+#servicesTable.dataTable,
+#employeesTable.dataTable,
+#clientsTable.dataTable,
+#enquiriesTable.dataTable {
+    border-collapse: collapse !important;
+}
+
+#auditLogTable.tm-table thead th:first-child,
+#auditLogTable.tm-table thead th:last-child,
+#servicesTable.tm-table thead th:first-child,
+#servicesTable.tm-table thead th:last-child,
+#employeesTable.tm-table thead th:first-child,
+#employeesTable.tm-table thead th:last-child {
+    border-radius: 0;
+}
+
+/* ---- Filter pills + small icon buttons (Designations, Services, Enquiries lists) ---- */
+.tm-filter-pill {
+    border: 1px solid var(--tm-surface-border);
+    background: #fff;
+    color: var(--tm-muted);
+    border-radius: .5rem;
+    padding: .3rem .75rem;
+    font-size: .8rem;
+    cursor: pointer;
+}
+
+.tm-filter-pill.active {
+    background: #101b3d;
+    border-color: #101b3d;
+    color: #fff;
+}
+
+.tm-icon-btn-sm {
+    width: 30px;
+    height: 30px;
+    border-radius: .5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--tm-surface-border);
+    background: #fff;
+    transition: background-color .15s ease;
+}
+
+.tm-icon-btn-sm:hover {
+    background: #f3f4f7;
+}
+
+.tm-contact-line {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .82rem;
+}
+
+/* ---- Navy section headers + field icons (Add/Edit Service, Add/Edit Employee) ---- */
+.tm-section-card { overflow: hidden; }
+
+.tm-section-title {
+    background: #101b3d;
+    color: #fff;
+    padding: .85rem 1.25rem;
+    font-weight: 700;
+    font-size: .95rem;
+}
+
+.tm-side-card-header {
+    padding: .85rem 1.25rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.tm-field-icon { position: relative; }
+.tm-field-icon svg {
+    position: absolute;
+    left: .8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9aa1b0;
+    pointer-events: none;
+}
+.tm-field-icon input { padding-left: 2.3rem; }
+
+/* ---- Service form: segmented toggles + document rows ---------------- */
+.tm-blue-switch:checked {
+    background-color: #0a4fc4;
+    border-color: #0a4fc4;
+}
+
+.tm-segmented {
+    display: inline-flex;
+    border: 1px solid var(--tm-surface-border);
+    border-radius: .5rem;
+    overflow: hidden;
+}
+
+.tm-segmented button {
+    border: 0;
+    background: #fff;
+    padding: .375rem 1rem;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--tm-muted);
+}
+
+.tm-segmented button.active {
+    background: #101b3d;
+    color: #fff;
+}
+
+.tm-segmented-sm button {
+    padding: .3rem .7rem;
+    font-size: .78rem;
+}
+
+.tm-doc-row {
+    border: 1px solid var(--tm-surface-border);
+    border-radius: .6rem;
+    padding: .75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: .6rem;
+}
+
+.tm-doc-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: .5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tm-doc-name-input {
+    border: 0;
+    background: transparent;
+    font-weight: 700;
+    padding: 0;
+    font-size: .82rem;
+    width: 100%;
+}
+
+.tm-doc-name-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.tm-doc-sub-input {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    font-size: .7rem;
+    color: var(--tm-muted);
+}
+
+.tm-doc-sub-input:focus {
+    outline: none;
+    box-shadow: none;
+    color: var(--tm-text);
+}
+
+.tm-doc-drag {
+    cursor: grab;
+    color: #c3c8d3;
+    flex-shrink: 0;
+}
+
+.tm-remove-doc {
+    border: 0;
+    background: #fbe5ea;
+    color: #c0392b;
+    width: 28px;
+    height: 28px;
+    border-radius: .4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ---- Employee form: photo upload, gender pills, mobile field --------- */
+.tm-photo-dropzone {
+    border: 1.5px dashed var(--tm-surface-border);
+    border-radius: .6rem;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.tm-photo-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #eef2fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.tm-photo-circle img { width: 100%; height: 100%; object-fit: cover; }
+
+.tm-gender-options { display: flex; gap: .6rem; }
+
+.tm-gender-option {
+    flex: 1;
+    border: 1.5px solid var(--tm-surface-border);
+    border-radius: .5rem;
+    padding: .55rem .75rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    cursor: pointer;
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--tm-text);
+}
+
+.tm-gender-option:has(input:checked) {
+    border-color: #101b3d;
+    background: #eef2fb;
+}
+
+.tm-mobile-group {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--tm-surface-border);
+    border-radius: .5rem;
+    overflow: hidden;
+    background: var(--tm-field);
+}
+
+.tm-mobile-prefix {
+    padding: 0 .75rem;
+    display: flex;
+    align-items: center;
+    font-size: .85rem;
+    color: var(--tm-muted);
+    border-right: 1px solid var(--tm-surface-border);
+    background: #f3f4f7;
+}
+
+.tm-mobile-group input {
+    border: 0;
+    box-shadow: none;
+}
+
+.tm-validation-hint {
+    font-size: .76rem;
+    margin-top: .3rem;
+    display: none;
+}
+
+.tm-validation-hint.is-visible { display: flex; align-items: center; gap: .3rem; color: #1f6b30; font-style: italic; }
+.tm-validation-hint.is-invalid-hint { color: #c0392b; font-style: italic; }
+
+/* ---- Employees list: avatar + workload bar --------------------------- */
+.tm-employee-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: .6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: .8rem;
+    flex-shrink: 0;
+}
+
+.tm-workload-track {
+    height: 5px;
+    border-radius: 3px;
+    background: #e9ecef;
+    overflow: hidden;
+    min-width: 100px;
+}
+
+.tm-workload-fill {
+    height: 100%;
+    border-radius: 3px;
+}
+
+/* ---- Services list: avatar -------------------------------------------- */
+.tm-service-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: .6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: .8rem;
+    flex-shrink: 0;
+}
+
+/* ---- Clients list: avatar ---------------------------------------------- */
+.tm-client-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: .6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: .8rem;
+    flex-shrink: 0;
+}
+
+/* ---- Enquiries list: progress bar -------------------------------------- */
+.tm-progress-track {
+    height: 5px;
+    border-radius: 3px;
+    background: #e9ecef;
+    overflow: hidden;
+    min-width: 90px;
+}
+
+.tm-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: #1f6b30;
+}
+
+/* ---- Employee Designations list ---------------------------------------- */
+.tm-designation-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: .6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tm-mini-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .62rem;
+    font-weight: 700;
+    border: 2px solid #fff;
+    margin-left: -8px;
+}
+
+.tm-mini-avatar:first-child {
+    margin-left: 0;
+}
+
+.tm-check-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: .6rem;
+    margin-bottom: .6rem;
+    font-size: .78rem;
+}
+
+.tm-check-item svg {
+    flex-shrink: 0;
+    margin-top: .15rem;
+}
+
+/* ---- Change password page ---------------------------------------------- */
+.tm-password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.tm-password-field > svg:first-child {
+    position: absolute;
+    left: .75rem;
+    color: #9aa1b0;
+    pointer-events: none;
+}
+
+.tm-password-field input {
+    padding-left: 2.1rem;
+    padding-right: 2.4rem;
+}
+
+.tm-password-toggle {
+    position: absolute;
+    right: .6rem;
+    border: 0;
+    background: none;
+    padding: 0;
+    color: #9aa1b0;
+    display: flex;
+}
+
+.tm-strength-track {
+    display: flex;
+    gap: 4px;
+    height: 5px;
+}
+
+.tm-strength-track span {
+    flex: 1;
+    border-radius: 3px;
+    background: #e9ecef;
+    transition: background-color .2s ease;
+}
+
+.tm-requirements li {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: .55rem;
+    color: #000;
+}
+
+.tm-requirements li.tm-req-met {
+    color: #1f6b30;
+}
+
+.tm-req-icon {
+    display: inline-flex;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+/* ---- Tickets page -------------------------------------------------------- */
+.tm-ticket-tab {
+    border: 0;
+    background: none;
+    padding: .5rem 0;
+    font-size: .92rem;
+    font-weight: 600;
+    color: #6b7280;
+    border-bottom: 2px solid transparent;
+}
+
+.tm-ticket-tab.active {
+    color: #101b3d;
+    border-bottom-color: var(--tm-accent);
+}
+
+.tm-doc-track {
+    height: 5px;
+    border-radius: 3px;
+    background: #e9ecef;
+    overflow: hidden;
+}
+
+.tm-doc-fill {
+    height: 100%;
+    border-radius: 3px;
+}
+
+#pendingTable thead th:first-child,
+#pendingTable thead th:last-child,
+#historyTable thead th:first-child,
+#historyTable thead th:last-child {
+    border-radius: 0;
+}
+
+.tm-th-sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 1.75rem !important;
+}
+
+.tm-sort-icons {
+    position: absolute;
+    right: .85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    flex-direction: column;
+    line-height: .6;
+}
+
+.tm-sort-icons span {
+    font-size: .5rem;
+    color: rgba(255, 255, 255, .35);
+}
+
+.tm-th-sortable.tm-sort-active-asc .tm-sort-asc,
+.tm-th-sortable.tm-sort-active-desc .tm-sort-desc {
+    color: #fff;
+}
+
+/* ==========================================================================
+   Flash toast notification
+   ========================================================================== */
+
+.tm-toast-wrap {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 2000;
+}
+
+.tm-toast {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    min-width: 320px;
+    max-width: 420px;
+    background: #fff;
+    border-radius: .6rem;
+    padding: .9rem 1.1rem;
+    box-shadow: 0 12px 32px rgba(16, 27, 61, .22), 0 2px 8px rgba(16, 27, 61, .12);
+    border-left: 5px solid var(--tm-accent);
+    position: relative;
+    overflow: hidden;
+    animation: tm-toast-in .35s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.tm-toast-error {
+    border-left-color: #c0392b;
+}
+
+.tm-toast-hide {
+    animation: tm-toast-out .3s ease forwards;
+}
+
+.tm-toast-icon {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(74, 155, 62, .12);
+    color: var(--tm-accent);
+}
+
+.tm-toast-error .tm-toast-icon {
+    background: rgba(192, 57, 43, .12);
+    color: #c0392b;
+}
+
+.tm-toast-message {
+    flex-grow: 1;
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--tm-text);
+    line-height: 1.3;
+}
+
+.tm-toast-close {
+    flex-shrink: 0;
+    border: 0;
+    background: transparent;
+    color: #9aa1b0;
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0 0 0 .4rem;
+    cursor: pointer;
+}
+
+.tm-toast-close:hover {
+    color: var(--tm-text);
+}
+
+.tm-toast-bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--tm-accent);
+    animation: tm-toast-countdown 4s linear forwards;
+}
+
+.tm-toast-error .tm-toast-bar {
+    background: #c0392b;
+}
+
+@keyframes tm-toast-in {
+    from { transform: translateX(110%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes tm-toast-out {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(110%); opacity: 0; }
+}
+
+@keyframes tm-toast-countdown {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+.tm-muted.service-details-subtitle {
+    color: #000;
+    font-size: .89rem;
+}
+.service-tickets-link {
+    font-size: .8rem;
+}
+.tm-card h2,
+.tm-card h3,
+.tm-section-title,
+.tm-side-card-header,
+.ticket-panel-heading h2,
+.client-section-title h2,
+.client-side-heading h2 {
+    font-size: .87rem !important;
+}
+.enquiry-client-name {
+    font-size: .8rem;
+}
+.enquiry-view-client-link {
+    font-size: .8rem;
+}
+.enquiry-ticket-number {
+    font-size: .8rem;
+}
+
+.enquiry-ticket-service {
+    font-size: .75rem;
+}
+.enquiry-ticket-assignee {
+    font-size: .8rem;
+}
+.py-2 {
+    padding-top: .4rem !important;
+    padding-bottom: .4rem !important;
+}
+.activity-list-title,
+.ticket-timeline-title {
+    color: #202b3e;
+    font-size: .8rem;
+    font-weight: 700;
+}
+.enquiry-ticket-heading-note {
+    font-size: .8rem;
+}
+a.enquiry-make-payment-button {
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 600;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+
+a.enquiry-make-payment-button:hover,
+a.enquiry-make-payment-button:focus {
+    color: rgba(255, 255, 255, .8);
+}
+/* Enquiry Details payment popup, matching the Payments page dialog. */
+.enquiry-payment-modal-dialog {
+    max-width: 560px;
+}
+
+.enquiry-payment-modal-content {
+    border: 0;
+    border-radius: .75rem;
+    overflow: hidden;
+}
+
+.enquiry-payment-modal-header {
+    align-items: flex-start;
+    background: #101b3d;
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.enquiry-payment-currency-icon {
+    align-items: center;
+    background: rgba(255, 255, 255, .12);
+    border-radius: .5rem;
+    color: #fff;
+    display: flex;
+    flex: 0 0 36px;
+    height: 36px;
+    justify-content: center;
+}
+
+.enquiry-payment-modal-subtitle {
+    color: rgba(255, 255, 255, .7);
+}
+
+.enquiry-payment-summary {
+    background: #eef9ef;
+    border: 1px solid #cdeccb;
+    border-radius: .75rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+}
+
+.enquiry-payment-ticket {
+    color: #2f5fbe;
+    font-size: .82rem;
+    font-weight: 600;
+    margin-top: .25rem;
+}
+
+.enquiry-payment-balance {
+    background: #fff;
+    border-radius: .5rem;
+    color: #7f1616;
+    margin-top: .75rem;
+    padding: .55rem .7rem;
+}
+
+.enquiry-payment-amount-field {
+    position: relative;
+}
+
+.enquiry-payment-amount-field > span {
+    color: #9aa1b0;
+    left: .8rem;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.enquiry-payment-amount-field input {
+    padding-left: 1.8rem;
+}
+
+.enquiry-payment-mode-button {
+    flex: 1 1 auto;
+    font-size: .8rem;
+}
+
+.enquiry-payment-partial-note {
+    background: #eef9ef;
+    border: 1px solid #cdeccb;
+    border-radius: .5rem;
+    color: #344054;
+    font-size: .82rem;
+    padding: .75rem;
+}
+
+.enquiry-details-list {
+    font-size: .8rem;
+}
+
+#historyTable.tm-table tbody td {
+    font-size: .8rem;
+}
+
+.client-record-caption {
+    font-size: .7rem;
+    font-style: italic;
+}
+
+.tm-service-doc-chip {
+    display: inline-flex;
+    background: #eef4ff;
+    color: #2f5fbe;
+    border: 1px solid #cfe0ff;
+    border-radius: 999px;
+    padding: .15rem .55rem;
+    font-size: .62rem;
+    font-weight: 400;
+    margin: .2rem .3rem .2rem 0;
+}
+
+.js-assign-toggle:hover,
+.js-assign-toggle:focus,
+.js-assign-toggle:active,
+.js-assign-toggle.show {
+    color: #000;
+}
