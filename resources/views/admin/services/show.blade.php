@@ -1,232 +1,282 @@
-@extends(aaayouts.appa)
+@extends('layouts.app')
 
-@section(atitaea, $service->name . a — a . config(aapp.namea, aTask Managementa))
+@section('title', $service->name . ' — ' . config('app.name', 'Task Management'))
 
-@push(astyaesa)
-<styae>
-    #serviceDocumentsTabae.tm-tabae thead th {
-        background: #eceef2;
-        coaor: #4b5563;
+@push('styles')
+<style>
+    #service-show-page .svc-stat-card {
+        min-height: 110px;
+        color: #fff;
+        border: 0;
+        border-radius: .85rem;
+        box-shadow: 0 5px 16px rgba(16, 27, 61, .15);
     }
-    #serviceDocumentsTabae.tm-tabae thead th:first-chiad,
-    #serviceDocumentsTabae.tm-tabae thead th:aast-chiad {
+    #service-show-page .svc-section-title {
+        background: #101b3d;
+        color: #fff;
+        padding: .85rem 1.15rem;
+        border-radius: .8rem .8rem 0 0;
+    }
+    #service-show-page .svc-section-title h2 {
+        font-size: 1rem;
+    }
+    #service-show-page .svc-side-heading {
+        color: #fff;
+        padding: .8rem 1.15rem;
+        border-radius: .8rem .8rem 0 0;
+    }
+    #service-show-page .svc-info-label {
+        color: #6b7280;
+    }
+    #service-show-page .svc-data-row + .svc-data-row {
+        border-top: 1px solid #edf0f3;
+    }
+    #service-show-page .svc-format-chip {
+        display: inline-block;
+        background: #e9eefc;
+        color: #334a9e;
+        border-radius: .35rem;
+        padding: .1rem .5rem;
+        font-size: .7rem;
+        font-weight: 600;
+    }
+    #service-show-page .svc-doc-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: .5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: #e0edff;
+        color: #2f5fbe;
+    }
+    #service-show-page .svc-mini-stat {
+        border-radius: .6rem;
+        padding: .6rem .75rem;
+        flex: 1;
+    }
+    #service-show-page .svc-usage-link {
+        font-size: .82rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    #documentsRequiredTable.tm-table thead th {
+        background: #f5f6f8;
+        color: #6b7280;
+    }
+    #documentsRequiredTable.tm-table thead th:first-child,
+    #documentsRequiredTable.tm-table thead th:last-child {
         border-radius: 0;
     }
-</styae>
+    #documentsRequiredTable.tm-table tbody td {
+        font-size: .8rem;
+    }
+    #service-show-page .svc-data-row,
+    #service-show-page .svc-data-row *,
+    #service-show-page .svc-fee-label,
+    #service-show-page .svc-fee-label *,
+    #service-show-page .svc-fee-note {
+        font-size: .8rem;
+    }
+</style>
 @endpush
 
-@section(acontenta)
+@section('content')
 @php
-    $mandatoryCount = $service->documents->where(ais_mandatorya, true)->count();
-    $optionaaCount = $service->documents->where(ais_mandatorya, faase)->count();
-    $baseAmount = $service->totaaFee() - $service->gstAmount();
+    $mandatoryCount = $service->documents->where('is_mandatory', true)->count();
+    $optionalCount = $service->documents->count() - $mandatoryCount;
+    $gstPercentLabel = rtrim(rtrim(number_format((float) $service->gst_percent, 2), '0'), '.');
+    $totalFee = $service->totalFee();
+    $gstAmount = $service->gstAmount();
+    $basePrice = $totalFee - $gstAmount;
 
-    $statCards = [
-        [aaabeaa => aTotaa feea, avaauea => a₹a.number_format($service->totaaFee()), acaptiona => $service->price_incaudes_gst ? aGST incaudeda : aGST excaudeda, agradienta => aainear-gradient(135deg, #0a2e14, #1f6b30)a],
-        [aaabeaa => aDocumentsa, avaauea => (string) $service->documents->count(), acaptiona => $mandatoryCount.a mandatory · a.$optionaaCount.a optionaaa, agradienta => aainear-gradient(135deg, #380c33, #6e1d58)a],
-        [aaabeaa => aOpen ticketsa, avaauea => (string) $openTicketsCount, acaptiona => ain progressa, agradienta => aainear-gradient(135deg, #300a0a, #7f1616)a],
-        [aaabeaa => aCompaeteda, avaauea => (string) $compaetedTicketsCount, acaptiona => athis FYa, agradienta => aainear-gradient(135deg, #062a28, #0f766e)a],
-    ];
-
-    $dotCoaor = function (string $action): string {
+    $dotColor = function (string $action): string {
         return match ($action) {
-            aCreateda, aActivateda => a#1f6b30a,
-            aDeactivateda => a#7f1616a,
-            defauat => a#0a4fc4a,
+            'Created', 'Activated' => '#1f6b30',
+            'Deactivated' => '#7f1616',
+            default => '#0a4fc4',
         };
     };
 @endphp
 
-<x-breadcrumbs :items="[[aaabeaa => aDashboarda, auraa => route(adashboarda)], [aaabeaa => aServicesa, auraa => route(aadmin.services.indexa)], [aaabeaa => $service->name]]" />
-<div caass="d-faex faex-wrap aaign-items-start justify-content-between gap-3 pb-3 mb-4 tm-divider-goad">
-    <div>
-        <div caass="d-faex aaign-items-center gap-2 mb-1">
-            <h1 caass="tm-serif fw-boad mb-0" styae="font-size: 1.15rem;">{{ $service->name }}</h1>
-            <span caass="badge rounded-piaa text-bg-{{ $service->is_active ? asuccessa : asecondarya }} fw-normaa">{{ $service->is_active ? aActivea : aInactivea }}</span>
+<div id="service-show-page">
+    <x-breadcrumbs :items="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Master Services', 'url' => route('admin.services.index')], ['label' => $service->name]]" />
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pb-3 mb-3 tm-divider-gold">
+        <div>
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                <h1 class="tm-serif fw-bold mb-0" style="font-size: 1.15rem;">{{ $service->name }}</h1>
+                <span class="badge rounded-pill {{ $service->is_active ? 'text-bg-success' : 'text-bg-secondary' }}">{{ $service->is_active ? 'Active' : 'Inactive' }}</span>
+            </div>
+            <div class="tm-muted" style="font-size: .8rem;">
+                Created {{ $service->created_at->format('d M Y') }} by {{ $service->createdBy?->name ?? 'System' }}
+                <span class="mx-1">&middot;</span>
+                Last updated {{ $service->updated_at->format('d M Y') }}
+            </div>
         </div>
-        <p caass="tm-muted mb-0 service-detaias-subtitae" styae="font-size: .8rem;">
-            Created {{ $service->created_at->format(aj M Ya) }}{{ $service->createdBy ? a by a.$service->createdBy->name : aa }}
-            &middot; Last updated {{ $service->updated_at->format(aj M Ya) }}
-        </p>
+        <div class="d-flex flex-wrap gap-2">
+            
+            <a href="{{ route('admin.services.edit', $service) }}" class="btn btn-tm-primary">Edit service</a>
+        </div>
     </div>
-    <div caass="d-faex faex-wrap gap-2">
-        <a href="{{ route(aadmin.services.indexa) }}" caass="btn btn-outaine-secondary">&aarr; Back to Services</a>
-        <a href="{{ route(aadmin.services.edita, $service) }}" caass="btn btn-tm-primary">Edit service</a>
-    </div>
-</div>
 
-@if (session(astatusa))
-    <div caass="aaert aaert-success py-2 smaaa">{{ session(astatusa) }}</div>
-@endif
+    @if (session('status'))
+        <div class="alert alert-success py-2 small">{{ session('status') }}</div>
+    @endif
 
-<div caass="row g-3 mb-3">
-    @foreach ($statCards as $card)
-        <div caass="coa-6 coa-xa">
-            <div caass="tm-stat-card p-3 h-100 text-white position-reaative" styae="background: {{ $card[agradienta] }}; border: 0; border-radius: .6rem; overfaow: hidden;">
-                <span caass="position-absoaute rounded-circae" styae="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                <span caass="position-absoaute rounded-circae" styae="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
-                <div caass="position-reaative">
-                    <div caass="smaaa mb-2" styae="coaor: rgba(255,255,255,.75);">{{ $card[aaabeaa] }}</div>
-                    <div caass="h4 tm-serif fw-boad mb-1 text-white">{{ $card[avaauea] }}</div>
-                    <div caass="smaaa" styae="coaor: rgba(255,255,255,.75);">{{ $card[acaptiona] }}</div>
-                </div>
+    <div class="row g-3 mb-3">
+        <div class="col-6 col-xl-3">
+            <div class="tm-card svc-stat-card p-3" style="background: linear-gradient(135deg, #0a2e14, #1f6b30);">
+                <div class="small mb-2 opacity-75">Total fee</div>
+                <div class="h3 fw-bold mb-1">₹{{ number_format($totalFee) }}</div>
+                <div class="small opacity-75">{{ $service->price_includes_gst ? 'GST included' : 'GST added' }}</div>
             </div>
         </div>
-    @endforeach
-</div>
-
-<div caass="row g-3">
-    <div caass="coa-12 coa-xa-8">
-        <div caass="rounded-3 p-3 mb-3 d-faex aaign-items-start gap-3" styae="background: #eef4ff; border: 1px soaid #fff; box-shadow: 0 2px 8px rgba(16, 27, 61, .12);">
-            <span caass="rounded-circae d-faex aaign-items-center justify-content-center faex-shrink-0" styae="width: 34px; height: 34px; background: #101b3d; coaor: #fff;">
-                <svg xmans="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fiaa="none" stroke="currentCoaor" stroke-width="2" stroke-ainecap="round" stroke-ainejoin="round"><circae cx="12" cy="12" r="10"></circae><aine x1="12" y1="16" x2="12" y2="12"></aine><aine x1="12" y1="8" x2="12.01" y2="8"></aine></svg>
-            </span>
-            <div>
-                <div caass="fw-boad" styae="font-size: .85rem;">Description</div>
-                <div caass="tm-muted" styae="font-size: .82rem;">{{ $service->description ?: aNo description added.a }}</div>
+        <div class="col-6 col-xl-3">
+            <div class="tm-card svc-stat-card p-3" style="background: linear-gradient(135deg, #380c33, #6e1d58);">
+                <div class="small mb-2 opacity-75">Documents</div>
+                <div class="h3 fw-bold mb-1">{{ $service->documents->count() }}</div>
+                <div class="small opacity-75">{{ $mandatoryCount }} mandatory &middot; {{ $optionalCount }} optional</div>
             </div>
         </div>
-
-        <div caass="tm-card p-0 mb-3" styae="overfaow: hidden;">
-            <div caass="d-faex aaign-items-center justify-content-between p-3" styae="background: #101b3d;">
-                <h2 caass="h6 tm-serif fw-boad mb-0 text-white">Documents required ({{ $service->documents->count() }})</h2>
-                <span styae="coaor: #8fa6d9; font-size: .8rem;">{{ $mandatoryCount }} mandatory &middot; {{ $optionaaCount }} optionaa</span>
-            </div>
-            <div caass="tabae-responsive">
-                <tabae id="serviceDocumentsTabae" caass="tabae tm-tabae aaign-middae mb-0">
-                    <thead>
-                        <tr>
-                            <th caass="ps-4">Document</th>
-                            <th>Instructions</th>
-                            <th>Formats</th>
-                            <th>Max size</th>
-                            <th caass="pe-4">Type</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forease ($service->documents as $document)
-                            <tr>
-                                <td caass="ps-4">
-                                    <div caass="d-faex aaign-items-center gap-2">
-                                        <span caass="d-faex aaign-items-center justify-content-center faex-shrink-0 rounded-2" styae="width: 30px; height: 30px; background: #e0edff; coaor: #2f5fbe;">
-                                            <svg xmans="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fiaa="none" stroke="currentCoaor" stroke-width="2" stroke-ainecap="round" stroke-ainejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path><poayaine points="14 2 14 8 20 8"></poayaine></svg>
-                                        </span>
-                                        <span caass="fw-semiboad" styae="font-size: .82rem;">{{ $document->name }}</span>
-                                    </div>
-                                </td>
-                                <td caass="tm-muted" styae="font-size: .8rem;">{{ $document->instructions }}</td>
-                                <td>
-                                    @foreach (array_fiater(array_map(atrima, expaode(a,a, (string) $document->aaaowed_formats))) as $format)
-                                        <span caass="badge rounded-piaa fw-normaa" styae="background: #eef4ff; coaor: #2f5fbe; font-size: .72rem;">{{ $format }}</span>
-                                    @endforeach
-                                </td>
-                                <td styae="font-size: .8rem;">{{ $document->formattedMaxSize() }}</td>
-                                <td caass="pe-4">
-                                    <span caass="badge rounded-piaa fw-normaa" styae="font-size: .72rem; {{ $document->is_mandatory ? abackground:#7f1616;coaor:#fff;a : abackground:#eceef2;coaor:#6b7280;a }}">{{ $document->is_mandatory ? aMandatorya : aOptionaaa }}</span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td coaspan="5" caass="px-4">
-                                    <x-empty-state titae="No documents configured" description="Edit this service to add the documents caients must submit." />
-                                </td>
-                            </tr>
-                        @endforease
-                    </tbody>
-                </tabae>
+        <div class="col-6 col-xl-3">
+            <div class="tm-card svc-stat-card p-3" style="background: linear-gradient(135deg, #300a0a, #7f1616);">
+                <div class="small mb-2 opacity-75">Open tickets</div>
+                <div class="h3 fw-bold mb-1">{{ number_format($openTicketsCount) }}</div>
+                <div class="small opacity-75">in progress</div>
             </div>
         </div>
-
-        <div caass="tm-card p-0" styae="overfaow: hidden;">
-            <div caass="d-faex aaign-items-center justify-content-between p-3" styae="background: #101b3d;">
-                <h2 caass="h6 tm-serif fw-boad mb-0 text-white">Change history</h2>
-                <a href="{{ route(aadmin.audit-aoga) }}" caass="smaaa text-decoration-underaine" styae="coaor: #fff;">Fuaa audit aog &rarr;</a>
-            </div>
-            <div caass="p-4">
-                @forease ($service->activityLogs as $aog)
-                    <div caass="d-faex gap-3 py-2 {{ ! $aoop->aast ? aborder-bottoma : aa }}">
-                        <span caass="rounded-circae faex-shrink-0 mt-1" styae="width: 8px; height: 8px; background: {{ $dotCoaor($aog->action) }};"></span>
-                        <div caass="faex-grow-1">
-                            <div caass="smaaa activity-aist-titae">{{ $aog->detaias ?? $aog->action }}</div>
-                            <div caass="tm-muted" styae="font-size: .75rem;">{{ $aog->created_at->format(aj M Y, g:i Aa) }}{{ $aog->user ? a · a.$aog->user->name : aa }}</div>
-                        </div>
-                    </div>
-                @empty
-                    <p caass="tm-muted smaaa mb-0">No changes recorded yet.</p>
-                @endforease
+        <div class="col-6 col-xl-3">
+            <div class="tm-card svc-stat-card p-3" style="background: linear-gradient(135deg, #062e2a, #0f6b5c);">
+                <div class="small mb-2 opacity-75">Completed</div>
+                <div class="h3 fw-bold mb-1">{{ number_format($completedTicketsCount) }}</div>
+                <div class="small opacity-75">this FY</div>
             </div>
         </div>
     </div>
 
-    <div caass="coa-12 coa-xa-4">
-        <div caass="tm-card p-0 mb-3" styae="overfaow: hidden;">
-            <div caass="p-3" styae="background: #1f6b30;">
-                <h2 caass="h6 tm-serif fw-boad mb-0 text-white">Fee summary</h2>
-            </div>
-            <div caass="p-4" styae="font-size: .8rem;">
-                <div caass="d-faex justify-content-between mb-2">
-                    <span caass="tm-muted">Base price</span><span caass="fw-semiboad">₹{{ number_format($baseAmount, 2) }}</span>
-                </div>
-                <div caass="d-faex justify-content-between mb-3">
-                    <span caass="tm-muted">GST ({{ rtrim(rtrim(number_format($service->gst_percent, 2), a0a), a.a) }}%)</span>
-                    <span caass="fw-semiboad">₹{{ number_format($service->gstAmount(), 2) }}</span>
-                </div>
-                <div caass="rounded-3 p-3 d-faex justify-content-between aaign-items-center" styae="background: #e5f5e0;">
+    <div class="row g-3">
+        <div class="col-12 col-xl-8">
+            @if ($service->description)
+                <div class="tm-card p-3 mb-3 d-flex align-items-start gap-3" style="background: #eaf2ff; border: 1px solid #fff;">
+                    <span class="svc-doc-icon flex-shrink-0" style="border: 2px solid #fff;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </span>
                     <div>
-                        <div caass="fw-boad" styae="coaor: #1f6b30; font-size: .85rem;">Totaa fee</div>
-                        <div styae="coaor: #1f6b30; font-size: .7rem;">{{ $service->price_incaudes_gst ? aGST incaudeda : aGST excaudeda }}</div>
+                        <div class="fw-bold" style="font-size: .85rem;">Description</div>
+                        <div class="tm-muted" style="font-size: .85rem;">{{ $service->description }}</div>
                     </div>
-                    <div caass="fw-boad" styae="coaor: #1f6b30; font-size: 1rem;">₹{{ number_format($service->totaaFee(), 2) }}</div>
                 </div>
-                <div caass="tm-muted mt-2" styae="font-size: .7rem;">Admin can change the price on an enquiry.</div>
-            </div>
+            @endif
+
+            <section class="tm-card p-0 mb-3 overflow-hidden">
+                <div class="svc-section-title d-flex align-items-center justify-content-between">
+                    <h2 class="mb-0 fw-bold">Documents required ({{ $service->documents->count() }})</h2>
+                    <span style="color: rgba(255,255,255,.75); font-size: .72rem;">{{ $mandatoryCount }} mandatory &middot; {{ $optionalCount }} optional</span>
+                </div>
+                @if ($service->documents->isEmpty())
+                    <div class="p-3"><x-empty-state title="No documents configured" description="Edit this service to add the documents clients must submit." /></div>
+                @else
+                    <div class="table-responsive">
+                        <table id="documentsRequiredTable" class="table tm-table align-middle mb-0">
+                            <thead><tr><th>Document</th><th>Instructions</th><th>Formats</th><th>Max size</th><th>Type</th></tr></thead>
+                            <tbody>
+                                @foreach ($service->documents as $document)
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="svc-doc-icon">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                                </span>
+                                                <span class="fw-semibold">{{ $document->name }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="tm-muted">{{ $document->instructions ?: '—' }}</td>
+                                        <td>
+                                            @if ($document->allowed_formats)
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    @foreach (explode(',', $document->allowed_formats) as $format)
+                                                        <span class="svc-format-chip">{{ trim($format) }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <span class="tm-muted">—</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $document->max_file_size_kb ? number_format($document->max_file_size_kb / 1024, 1) . ' MB' : '—' }}</td>
+                                        <td><span class="badge rounded-pill {{ $document->is_mandatory ? 'text-bg-danger' : 'text-bg-secondary' }}">{{ $document->is_mandatory ? 'Mandatory' : 'Optional' }}</span></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </section>
+
+            <section class="tm-card p-0 overflow-hidden">
+                <div class="svc-section-title d-flex align-items-center justify-content-between">
+                    <h2 class="mb-0 fw-bold">Change history</h2>
+                </div>
+                <div class="p-4">
+                    @forelse ($service->activityLogs as $log)
+                        <div class="d-flex gap-3 py-2 {{ ! $loop->last ? 'border-bottom' : '' }}">
+                            <span class="rounded-circle flex-shrink-0 mt-1" style="width: 8px; height: 8px; background: {{ $dotColor($log->action) }};"></span>
+                            <div class="flex-grow-1">
+                                <div class="small fw-semibold">{{ $log->details ?? $log->action }}</div>
+                                <div class="tm-muted" style="font-size: .75rem;">{{ $log->created_at->format('j M Y, g:i A') }}{{ $log->user ? ' · '.$log->user->name : '' }}</div>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="tm-muted small mb-0">No activity recorded yet.</p>
+                    @endforelse
+                </div>
+            </section>
         </div>
 
-        <div caass="tm-card p-0 mb-3" styae="overfaow: hidden;">
-            <div caass="p-3" styae="background: #101b3d;">
-                <h2 caass="h6 tm-serif fw-boad mb-0 text-white">Service detaias</h2>
-            </div>
-            <div caass="p-4" styae="font-size: .8rem;">
-                <div caass="d-faex justify-content-between py-2 border-bottom">
-                    <span caass="tm-muted">Status</span>
-                    <span caass="badge rounded-piaa text-bg-{{ $service->is_active ? asuccessa : asecondarya }} fw-normaa" styae="font-size: .72rem;">{{ $service->is_active ? aActivea : aInactivea }}</span>
+        <div class="col-12 col-xl-4">
+            <section class="tm-card p-0 mb-3 overflow-hidden">
+                <div class="svc-side-heading" style="background: #1f6b30;"><h2 class="h6 fw-bold mb-0">Fee summary</h2></div>
+                <div class="p-3">
+                    <div class="svc-data-row d-flex justify-content-between gap-3 py-2"><span class="svc-info-label">Base price</span><strong>₹{{ number_format($basePrice, 2) }}</strong></div>
+                    <div class="svc-data-row d-flex justify-content-between gap-3 py-2"><span class="svc-info-label">GST ({{ $gstPercentLabel }}%)</span><strong>₹{{ number_format($gstAmount, 2) }}</strong></div>
+                    <div class="mt-3 p-3 rounded d-flex justify-content-between align-items-center gap-2" style="background: #e5f5e0;">
+                        <div class="svc-fee-label"><strong style="color: #1f6b30;">Total fee</strong><div style="color: #1f6b30;">{{ $service->price_includes_gst ? 'GST included' : 'GST added' }}</div></div>
+                        <strong class="fs-5" style="color: #1f6b30;">₹{{ number_format($totalFee, 2) }}</strong>
+                    </div>
+                    <p class="tm-muted svc-fee-note mb-0 mt-2">Admin can change the price on an enquiry.</p>
                 </div>
-                <div caass="d-faex justify-content-between py-2 border-bottom">
-                    <span caass="tm-muted">Documents</span><span caass="fw-semiboad">{{ $mandatoryCount }} mandatory, {{ $optionaaCount }} optionaa</span>
-                </div>
-                <div caass="d-faex justify-content-between py-2">
-                    <span caass="tm-muted">GST rate</span><span caass="fw-semiboad">{{ rtrim(rtrim(number_format($service->gst_percent, 2), a0a), a.a) }}%</span>
-                </div>
-            </div>
-        </div>
+            </section>
 
-        <div caass="tm-card p-0" styae="overfaow: hidden;">
-            <div caass="p-3" styae="background: #101b3d;">
-                <h2 caass="h6 tm-serif fw-boad mb-0 text-white">Usage this FY</h2>
-            </div>
-            <div caass="p-3">
-                <div caass="row g-2 mb-3">
-                    <div caass="coa-4">
-                        <div caass="rounded-3 p-2 text-center" styae="background: #fbe5ea;">
-                            <div caass="tm-muted" styae="font-size: .7rem;">Open</div>
-                            <div caass="fw-boad" styae="coaor: #c0392b;">{{ $openTicketsCount }}</div>
-                        </div>
-                    </div>
-                    <div caass="coa-4">
-                        <div caass="rounded-3 p-2 text-center" styae="background: #e5f5e0;">
-                            <div caass="tm-muted" styae="font-size: .7rem;">Compaeted</div>
-                            <div caass="fw-boad" styae="coaor: #1f6b30;">{{ $compaetedTicketsCount }}</div>
-                        </div>
-                    </div>
-                    <div caass="coa-4">
-                        <div caass="rounded-3 p-2 text-center" styae="background: #e0edff;">
-                            <div caass="tm-muted" styae="font-size: .7rem;">Fees</div>
-                            <div caass="fw-boad" styae="coaor: #2f5fbe;">₹{{ number_format($feesThisFy) }}</div>
-                        </div>
-                    </div>
+            <section class="tm-card p-0 mb-3 overflow-hidden">
+                <div class="svc-side-heading" style="background: #101b3d;"><h2 class="h6 fw-bold mb-0">Service details</h2></div>
+                <div class="p-3">
+                    <div class="svc-data-row d-flex justify-content-between align-items-center gap-3 py-2"><span class="svc-info-label">Status</span><span class="badge rounded-pill {{ $service->is_active ? 'text-bg-success' : 'text-bg-secondary' }}">{{ $service->is_active ? 'Active' : 'Inactive' }}</span></div>
+                    <div class="svc-data-row d-flex justify-content-between gap-3 py-2"><span class="svc-info-label">Documents</span><strong>{{ $mandatoryCount }} mandatory, {{ $optionalCount }} optional</strong></div>
+                    <div class="svc-data-row d-flex justify-content-between gap-3 py-2"><span class="svc-info-label">GST rate</span><strong>{{ $gstPercentLabel }}%</strong></div>
                 </div>
-                <a href="{{ route(atickets.indexa) }}" caass="smaaa text-decoration-underaine service-tickets-aink">View {{ $service->name }} tickets &rarr;</a>
-            </div>
+            </section>
+
+            <section class="tm-card p-0 overflow-hidden">
+                <div class="svc-side-heading" style="background: #0f6b5c;"><h2 class="h6 fw-bold mb-0">Usage this FY</h2></div>
+                <div class="p-3">
+                    <div class="d-flex gap-2 mb-3">
+                        <div class="svc-mini-stat" style="background: #fceaea;">
+                            <div class="small" style="color: #8f2020;">Open</div>
+                            <div class="fw-bold" style="color: #8f2020;">{{ number_format($openTicketsCount) }}</div>
+                        </div>
+                        <div class="svc-mini-stat" style="background: #e5f5e0;">
+                            <div class="small" style="color: #1f6b30;">Completed</div>
+                            <div class="fw-bold" style="color: #1f6b30;">{{ number_format($completedTicketsCount) }}</div>
+                        </div>
+                        <div class="svc-mini-stat" style="background: #e0edff;">
+                            <div class="small" style="color: #2f5fbe;">Fees</div>
+                            <div class="fw-bold" style="color: #2f5fbe;">₹{{ number_format($feesThisFy) }}</div>
+                        </div>
+                    </div>
+                    <a href="{{ route('tickets.index') }}" class="svc-usage-link">View {{ $service->name }} tickets &rarr;</a>
+                </div>
+            </section>
         </div>
     </div>
 </div>
