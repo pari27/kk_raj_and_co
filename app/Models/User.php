@@ -75,4 +75,15 @@ class User extends Authenticatable
     {
         return $this->email_verified_at !== null;
     }
+
+    /**
+     * Where mail-channel notifications (e.g. password reset) are delivered.
+     * Redirected to the test recipient while Test mode is on.
+     */
+    public function routeNotificationForMail(): string
+    {
+        return Setting::testModeEnabled()
+            ? (string) config('mail.test_recipient')
+            : $this->email;
+    }
 }

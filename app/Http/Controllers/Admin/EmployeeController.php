@@ -11,6 +11,7 @@ use App\Mail\EmployeeInvitationMail;
 use App\Models\AuditLog;
 use App\Models\Employee;
 use App\Models\EmployeeDesignation;
+use App\Models\Setting;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Services\AuditLogger;
@@ -281,7 +282,9 @@ class EmployeeController extends Controller
             ['employee' => $employee]
         );
 
-        Mail::to($employee->email)->send(new EmployeeInvitationMail($employee, $setPasswordUrl));
+        $recipient = Setting::testModeEnabled() ? config('mail.test_recipient') : $employee->email;
+
+        Mail::to($recipient)->send(new EmployeeInvitationMail($employee, $setPasswordUrl));
     }
 
     private function log(User $employee, string $action): void

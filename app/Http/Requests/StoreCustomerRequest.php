@@ -17,15 +17,11 @@ class StoreCustomerRequest extends FormRequest
      */
     public function rules(): array
     {
-        $emailRules = ['nullable', 'email', 'max:255'];
-        if ($this->routeIs('customers.store')) {
-            $emailRules = ['required', 'email', 'max:255', Rule::unique('customers', 'email')];
-        }
-
         return [
             'name' => ['required', 'string', 'max:150'],
-            'phone' => ['required', 'digits:10'],
-            'email' => $emailRules,
+            'phone' => ['required', 'digits:10', Rule::unique('customers', 'phone')],
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('customers', 'email')],
+            'email_notifications_enabled' => ['nullable', 'boolean'],
             'is_active' => ['nullable', 'boolean'],
         ];
     }
@@ -34,6 +30,7 @@ class StoreCustomerRequest extends FormRequest
     {
         return [
             'email.unique' => 'This email is already registered.',
+            'phone.unique' => 'This mobile number is already registered to another client.',
         ];
     }
 }

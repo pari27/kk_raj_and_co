@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\EmployeeDesignationController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmployeePasswordResetController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -60,6 +61,7 @@ Route::middleware('auth')->group(function () {
         Route::get('customers/search', [CustomerController::class, 'search'])->name('customers.search');
         Route::get('customers/lookup', [CustomerController::class, 'lookupByPhone'])->name('customers.lookup');
         Route::get('customers/check-email', [CustomerController::class, 'checkEmail'])->name('customers.check-email');
+        Route::get('customers/check-phone', [CustomerController::class, 'checkPhone'])->name('customers.check-phone');
         Route::post('customers/quick-store', [CustomerController::class, 'quickStore'])->name('customers.quick-store');
         Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
         Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
@@ -120,7 +122,8 @@ Route::middleware('auth')->group(function () {
         Route::get('audit-log', [AuditLogController::class, 'index'])->name('audit-log');
         Route::get('audit-log/export', [AuditLogController::class, 'export'])->name('audit-log.export');
 
-        Route::get('settings/firm-profile', fn () => view('admin.settings.firm-profile'))->name('settings.firm-profile');
+        Route::get('settings/firm-profile', [SettingController::class, 'edit'])->name('settings.firm-profile');
+        Route::put('settings/system', [SettingController::class, 'update'])->name('settings.system.update');
         Route::get('settings/email-templates', fn () => view('admin.settings.email-templates.index'))->name('settings.email-templates.index');
         Route::get('settings/email-templates/{template}/edit', fn ($template) => view('admin.settings.email-templates.edit', compact('template')))->name('settings.email-templates.edit');
     });

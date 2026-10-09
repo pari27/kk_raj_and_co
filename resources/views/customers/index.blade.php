@@ -142,7 +142,7 @@
                             </div>
                         </td>
                         <td data-order="{{ $row['tickets_total'] }}">{{ $row['tickets_open'] }} open &middot; {{ $row['tickets_total'] }} total</td>
-                        <td>
+                        <td data-order="{{ $row['fees_pending'] }}">
                             @if ($row['fees_pending'] > 0)
                                 <span class="fw-semibold" style="color: #c0392b;">₹{{ number_format($row['fees_pending']) }}</span>
                             @else
@@ -220,6 +220,21 @@
                                 var cell = meta.settings.aoData[meta.row].anCells[meta.col];
                                 var name = $(cell).find('a.fw-semibold').text();
                                 return name || stripHtml(data);
+                            }
+                            return data;
+                        },
+                    },
+                },
+                {
+                    // Fees pending is rendered as "₹19,000", whose comma breaks a
+                    // search for "19000" and whose text sorts alphabetically, not
+                    // numerically; use the cell's data-order attribute instead.
+                    targets: [3],
+                    render: {
+                        _: function (data, type, row, meta) {
+                            if (type === 'filter' || type === 'sort') {
+                                var cell = meta.settings.aoData[meta.row].anCells[meta.col];
+                                return $(cell).attr('data-order') || '0';
                             }
                             return data;
                         },

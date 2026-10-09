@@ -181,12 +181,18 @@
                                     <input id="clientPhone" type="text" name="phone" value="{{ old('phone') }}" maxlength="10" inputmode="numeric" class="form-control tm-field client-form-control client-phone-input @error('phone') is-invalid @enderror" placeholder="10-digit mobile number" required>
                                 </div>
                                 @error('phone')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @if($message !== 'This mobile number is already registered to another client.')
+                                        <div class="invalid-feedback d-block" id="clientPhoneServerError">{{ $message }}</div>
+                                    @endif
                                 @enderror
+                                <div class="tm-validation-hint" id="clientPhoneHint" aria-live="polite">
+                                    <span id="clientPhoneHintIcon"></span>
+                                    <span id="clientPhoneHintText"></span>
+                                </div>
                             </div>
                             <div class="col-12 col-md-6">
-                                <label for="clientEmail" class="client-form-label">Email <span class="text-danger">*</span></label>
-                                <input id="clientEmail" type="email" name="email" value="{{ old('email') }}" class="form-control tm-field client-form-control @error('email') is-invalid @enderror" placeholder="name@example.com" required>
+                                <label for="clientEmail" class="client-form-label">Email <span class="tm-muted fw-normal">(optional)</span></label>
+                                <input id="clientEmail" type="email" name="email" value="{{ old('email') }}" class="form-control tm-field client-form-control @error('email') is-invalid @enderror" placeholder="name@example.com">
                                 @error('email')
                                     @if($message !== 'This email is already registered.')
                                         <div class="invalid-feedback d-block text-danger fst-italic" id="clientEmailServerError">{{ $message }}</div>
@@ -199,12 +205,17 @@
                             </div>
                         </div>
 
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" value="1" id="clientNotifyCheckbox" name="email_notifications_enabled" {{ old('email_notifications_enabled') ? 'checked' : '' }} {{ old('email') ? '' : 'disabled' }}>
+                            <label class="form-check-label fw-semibold" for="clientNotifyCheckbox" style="font-size: .85rem;">Send email notifications to this client</label>
+                        </div>
+
                         <div class="form-check form-switch d-flex align-items-center gap-2">
                             <input class="form-check-input flex-shrink-0" type="checkbox" role="switch" id="custActive" name="is_active" value="1" style="width: 2.4rem; height: 1.3rem;" {{ old('is_active', true) ? 'checked' : '' }}>
                             <label class="mb-0 small" for="custActive">Active</label>
                         </div>
 
-                        
+
                     </div>
                     <div class="client-form-footer">
                         <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary px-4 py-2 fw-semibold">Cancel</a>
@@ -252,6 +263,18 @@
     var input = document.getElementById('clientEmail');
     var hint = document.getElementById('clientEmailHint');
     if (! input || ! hint) { return; }
+
+    var notifyCheckbox = document.getElementById('clientNotifyCheckbox');
+    var syncNotifyCheckbox = function () {
+        var hasEmail = input.value.trim().length > 0;
+        notifyCheckbox.disabled = ! hasEmail;
+        if (! hasEmail) {
+            notifyCheckbox.checked = false;
+        }
+    };
+    if (notifyCheckbox) {
+        input.addEventListener('input', syncNotifyCheckbox);
+    }
 
     var error = document.getElementById('clientEmailServerError');
     var hasServerEmailError = @json($errors->has('email'));
@@ -319,6 +342,77 @@
         checkAvailability();
     });
     if (input.value.trim() !== '' && ! hasServerEmailError) { checkAvailability(); }
+})();
+
+(function () {
+    var input = document.getElementById('clientPhone');
+    var hint = document.getElementById('clientPhoneHint');
+    if (! input || ! hint) { return; }
+
+    var error = document.getElementById('clientPhoneServerError');
+    var hasServerPhoneError = @json($errors->has('phone'));
+    var icon = document.getElementById('clientPhoneHintIcon');
+    var text = document.getElementById('clientPhoneHintText');
+    var url = @json(route('customers.check-phone'));
+    var timer = null;
+    var token = 0;
+    var check = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+    var cross = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="18" x2="18" y2="6"></line></svg>';
+
+    function checkAvailability() {
+        var phone = input.value.trim();
+        window.clearTimeout(timer);
+        token++;
+        input.classList.remove('is-invalid', 'is-valid');
+
+        if (! /^[6-9]\d{9}$/.test(phone)) {
+            hint.classList.remove('is-visible', 'is-invalid-hint');
+            icon.innerHTML = '';
+            text.textContent = '';
+            return;
+        }
+
+        hint.classList.add('is-visible');
+        hint.classList.remove('is-invalid-hint');
+        icon.innerHTML = '';
+        text.textContent = 'Checking availability...';
+        var currentToken = token;
+
+        timer = window.setTimeout(function () {
+            var query = new URLSearchParams({ phone: phone });
+            fetch(url + '?' + query.toString(), { headers: { Accept: 'application/json' } })
+                .then(function (response) {
+                    if (! response.ok) { throw new Error('Availability check failed.'); }
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (currentToken !== token) { return; }
+                    if (error) { error.hidden = true; }
+                    if (data.available) {
+                        hint.classList.remove('is-invalid-hint');
+                        input.classList.add('is-valid');
+                        icon.innerHTML = check;
+                        text.textContent = 'Available';
+                    } else {
+                        hint.classList.add('is-invalid-hint');
+                        input.classList.remove('is-valid');
+                        input.classList.add('is-invalid');
+                        icon.innerHTML = cross;
+                        text.textContent = 'This mobile number is already registered to another client.';
+                    }
+                })
+                .catch(function () {
+                    if (currentToken !== token) { return; }
+                    hint.classList.remove('is-visible');
+                });
+        }, 400);
+    }
+
+    input.addEventListener('input', function () {
+        if (error) { error.hidden = true; }
+        checkAvailability();
+    });
+    if (input.value.trim() !== '' && ! hasServerPhoneError) { checkAvailability(); }
 })();
 </script>
 @endpush

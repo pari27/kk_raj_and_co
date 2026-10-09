@@ -115,4 +115,17 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Test Mode Recipient
+    |--------------------------------------------------------------------------
+    |
+    | When the app's "Test mode" setting (Admin > Settings > Firm Profile)
+    | is on, every outbound notification is redirected to this address
+    | instead of its real recipient.
+    |
+    */
+
+    'test_recipient' => env('MAIL_TEST_RECIPIENT'),
+
 ];

@@ -3,6 +3,7 @@
 @section('title', 'Payments — ' . config('app.name', 'Task Management'))
 
 @push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
 <style>
     #paymentsTicketsTable.tm-table thead th:first-child,
     #paymentsTicketsTable.tm-table thead th:last-child,
@@ -23,6 +24,13 @@
     #paymentsPendingTable .js-record-payment:hover {
         background: var(--tm-navy);
         border-color: var(--tm-navy);
+        color: #fff;
+    }
+    .daterangepicker td.active, .daterangepicker td.active:hover {
+        background-color: var(--tm-accent);
+    }
+    .daterangepicker .ranges li.active {
+        background-color: #101b3d;
         color: #fff;
     }
 </style>
@@ -83,12 +91,13 @@
 
 <div class="tm-card p-0 mb-3">
     <div class="d-flex align-items-center gap-4 px-3 pt-3">
-        <button type="button" class="tm-ticket-tab active" data-tab="received">
-            Received <span class="badge rounded-pill text-bg-light border ms-1">{{ $payments->count() }}</span>
-        </button>
-        <button type="button" class="tm-ticket-tab" data-tab="pending">
+        <button type="button" class="tm-ticket-tab active" data-tab="pending">
             Pending <span class="badge rounded-pill text-bg-light border ms-1">{{ $pendingEnquiries->count() }}</span>
         </button>
+        <button type="button" class="tm-ticket-tab" data-tab="received">
+            Received <span class="badge rounded-pill text-bg-light border ms-1">{{ $payments->count() }}</span>
+        </button>
+        
     </div>
     <hr class="mt-2 mb-0">
 
@@ -100,24 +109,36 @@
             <input type="text" id="paymentsSearch" placeholder="Search client, enquiry or reference" style="background: transparent; border: 0; outline: none; color: var(--tm-text); width: 100%; font-size: .85rem;">
         </div>
 
-        <div id="receivedFilters" class="d-flex flex-wrap gap-2">
-            <select id="modeFilter" class="form-select form-select-sm" style="width: auto; font-size: .8rem;">
-                <option value="">Mode: All</option>
-                <option value="UPI">UPI</option>
-                <option value="Bank transfer">Bank transfer</option>
-                <option value="Cash">Cash</option>
-                <option value="Cheque">Cheque</option>
-            </select>
-            <select id="receivedByFilter" class="form-select form-select-sm" style="width: auto; font-size: .8rem;">
-                <option value="">Received by: All</option>
-                @foreach ($receivedByUsers as $user)
-                    <option value="{{ $user->name }}">{{ $user->name }}</option>
-                @endforeach
-            </select>
+        <div class="d-flex flex-wrap gap-2">
+            <div style="min-width: 180px;">
+                <button type="button" id="paymentDateRangeBtn" class="btn btn-outline-secondary d-flex align-items-center gap-2 w-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span id="paymentDateRangeLabel" class="flex-grow-1 text-start" style="font-weight: 400;">All time</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <input type="hidden" id="paymentDateFrom">
+                <input type="hidden" id="paymentDateTo">
+            </div>
+
+            <div id="receivedFilters" class="d-flex flex-wrap gap-2 d-none">
+                <select id="modeFilter" class="form-select form-select-sm" style="width: auto; font-size: .8rem;">
+                    <option value="">Mode: All</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Bank transfer">Bank transfer</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Cheque">Cheque</option>
+                </select>
+                <select id="receivedByFilter" class="form-select form-select-sm" style="width: auto; font-size: .8rem;">
+                    <option value="">Received by: All</option>
+                    @foreach ($receivedByUsers as $user)
+                        <option value="{{ $user->name }}">{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
     </div>
 
-    <div id="receivedTable" class="table-responsive">
+    <div id="receivedTable" class="table-responsive d-none">
         <table id="paymentsTicketsTable" class="table tm-table align-middle mb-0 w-100">
             <thead>
                 <tr>
@@ -141,17 +162,23 @@
                     <tr
                         data-client="{{ strtolower($enquiry?->customer->name ?? '') }}"
                         data-ticket="{{ strtolower($enquiry->number ?? '') }}"
+                        data-service="{{ strtolower($services ?? '') }}"
                         data-reference="{{ strtolower($payment->reference ?? '') }}"
                         data-amount="{{ (int) $payment->amount }}"
                         data-mode="{{ $payment->mode }}"
                         data-received-by="{{ $payment->receivedBy->name ?? '' }}"
                         data-phone="{{ strtolower($enquiry?->customer->phone ?? '') }}"
                         data-date="{{ strtolower($payment->paid_at->format('j M Y')) }}"
+                        data-date-ts="{{ $payment->paid_at->timestamp }}"
                         data-payment-type="{{ $payment->is_partial ? 'partial' : 'full' }}"
                     >
                         <td class="fw-semibold">{{ $payment->paid_at->format('j M Y') }}</td>
                         <td>
-                            <div class="fw-semibold">{{ $enquiry?->customer->name ?? '—' }}</div>
+                            @if ($enquiry?->customer)
+                                <a href="{{ route('customers.show', $enquiry->customer) }}" class="fw-semibold text-decoration-none">{{ $enquiry->customer->name }}</a>
+                            @else
+                                <div class="fw-semibold">—</div>
+                            @endif
                             <div class="tm-muted" style="font-size: .75rem;">{{ $enquiry?->customer->phone ?? '' }}</div>
                         </td>
                         <td>
@@ -224,7 +251,7 @@
         </table>
     </div>
 
-    <div id="pendingTable" class="table-responsive d-none">
+    <div id="pendingTable" class="table-responsive">
         <table id="paymentsPendingTable" class="table tm-table align-middle mb-0 w-100">
             <thead>
                 <tr>
@@ -237,16 +264,33 @@
             </thead>
             <tbody>
                 @forelse ($pendingEnquiries as $enquiry)
+                    @php
+                        $pendingServices = $enquiry->tickets->pluck('service.name')->filter()->implode(', ');
+                    @endphp
                     <tr
                         data-client="{{ strtolower($enquiry->customer->name ?? '') }}"
                         data-ticket="{{ strtolower($enquiry->number) }}"
+                        data-service="{{ strtolower($pendingServices) }}"
                         data-reference=""
                         data-mode=""
                         data-received-by=""
+                        data-phone="{{ strtolower($enquiry->customer->phone ?? '') }}"
+                        data-amount="{{ (int) $enquiry->balanceDue() }}"
+                        data-date-ts="{{ $enquiry->created_at->timestamp }}"
                     >
-                        <td class="fw-semibold"><a href="{{ route('enquiries.show', $enquiry) }}" class="text-decoration-none">{{ $enquiry->number }}</a></td>
-                        <td>{{ $enquiry->customer->name ?? '—' }}</td>
-                        <td>{{ $enquiry->tickets->pluck('service.name')->filter()->implode(', ') ?: '—' }}</td>
+                        <td>
+                            <a href="{{ route('enquiries.show', $enquiry) }}" class="fw-semibold text-decoration-none">{{ $enquiry->number }}</a>
+                            <div class="tm-muted" style="font-size: .72rem;">{{ $enquiry->created_at->format('j M Y') }}</div>
+                        </td>
+                        <td>
+                            @if ($enquiry->customer)
+                                <a href="{{ route('customers.show', $enquiry->customer) }}" class="fw-semibold text-decoration-none">{{ $enquiry->customer->name }}</a>
+                            @else
+                                <div class="fw-semibold">—</div>
+                            @endif
+                            <div class="tm-muted" style="font-size: .75rem;">{{ $enquiry->customer->phone ?? '' }}</div>
+                        </td>
+                        <td>{{ $pendingServices ?: '—' }}</td>
                         <td class="text-end fw-semibold" style="color: #7f1616;">₹{{ number_format($enquiry->balanceDue()) }}</td>
                         <td class="text-end">
                             <button
@@ -586,13 +630,18 @@
 @endsection
 
 @push('scripts')
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.js"></script>
 <script>
     (function () {
         var tabs = document.querySelectorAll('.tm-ticket-tab');
         var receivedTable = document.getElementById('receivedTable');
         var pendingTable = document.getElementById('pendingTable');
         var receivedFilters = document.getElementById('receivedFilters');
-        var activeTab = 'received';
+        var activeTab = 'pending';
+        var dateFromInput = document.getElementById('paymentDateFrom');
+        var dateToInput = document.getElementById('paymentDateTo');
 
         function activeRows() {
             var table = activeTab === 'received' ? receivedTable : pendingTable;
@@ -609,6 +658,7 @@
                 var matchesSearch = !search
                     || (row.getAttribute('data-client') || '').includes(search)
                     || (row.getAttribute('data-ticket') || '').includes(search)
+                    || (row.getAttribute('data-service') || '').includes(search)
                     || (row.getAttribute('data-reference') || '').includes(search)
                     || (row.getAttribute('data-mode') || '').toLowerCase().includes(search)
                     || (row.getAttribute('data-amount') || '').includes(searchAmount)
@@ -618,7 +668,25 @@
                     || (row.getAttribute('data-payment-type') || '').includes(search);
                 var matchesMode = !mode || row.getAttribute('data-mode') === mode;
                 var matchesReceivedBy = !receivedBy || row.getAttribute('data-received-by') === receivedBy;
-                row.classList.toggle('d-none', !(matchesSearch && matchesMode && matchesReceivedBy));
+
+                var matchesDate = true;
+                var dateFrom = dateFromInput.value;
+                var dateTo = dateToInput.value;
+                if (dateFrom || dateTo) {
+                    var ts = parseInt(row.getAttribute('data-date-ts'), 10);
+                    if (!ts) {
+                        matchesDate = false;
+                    } else {
+                        if (dateFrom && ts < Math.floor(new Date(dateFrom + 'T00:00:00').getTime() / 1000)) {
+                            matchesDate = false;
+                        }
+                        if (dateTo && ts > Math.floor(new Date(dateTo + 'T23:59:59').getTime() / 1000)) {
+                            matchesDate = false;
+                        }
+                    }
+                }
+
+                row.classList.toggle('d-none', !(matchesSearch && matchesMode && matchesReceivedBy && matchesDate));
             });
         }
 
@@ -636,6 +704,34 @@
         document.getElementById('paymentsSearch').addEventListener('input', refresh);
         document.getElementById('modeFilter').addEventListener('change', refresh);
         document.getElementById('receivedByFilter').addEventListener('change', refresh);
+
+        if (window.jQuery) {
+            jQuery('#paymentDateRangeBtn').daterangepicker({
+                autoUpdateInput: false,
+                opens: 'left',
+                locale: { format: 'DD MMM YYYY', cancelLabel: 'Cancel' },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 days': [moment().subtract(29, 'days'), moment()],
+                    'This month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                },
+            }, function (start, end) {
+                dateFromInput.value = start.format('YYYY-MM-DD');
+                dateToInput.value = end.format('YYYY-MM-DD');
+                document.getElementById('paymentDateRangeLabel').textContent = start.format('D MMM') + ' – ' + end.format('D MMM YYYY');
+                refresh();
+            });
+
+            jQuery('#paymentDateRangeBtn').on('cancel.daterangepicker', function () {
+                dateFromInput.value = '';
+                dateToInput.value = '';
+                document.getElementById('paymentDateRangeLabel').textContent = 'All time';
+                refresh();
+            });
+        }
 
         var paymentEnquiries = @json($paymentEnquiriesData);
 

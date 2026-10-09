@@ -45,6 +45,7 @@ class CustomerController extends Controller
         $customer = Customer::create([
             ...$request->validated(),
             'is_active' => $request->boolean('is_active', true),
+            'email_notifications_enabled' => $request->boolean('email_notifications_enabled'),
             'created_by' => Auth::id(),
         ]);
 
@@ -69,6 +70,23 @@ class CustomerController extends Controller
 
         return response()->json([
             'available' => $email === '' || ! $customerQuery->exists(),
+        ]);
+    }
+
+    public function checkPhone(Request $request): JsonResponse
+    {
+        $this->authorize('viewAny', Customer::class);
+
+        $phone = trim((string) $request->query('phone'));
+        $ignoreCustomerId = filter_var($request->query('ignore'), FILTER_VALIDATE_INT);
+        $customerQuery = Customer::query()->where('phone', $phone);
+
+        if ($ignoreCustomerId !== false) {
+            $customerQuery->whereKeyNot($ignoreCustomerId);
+        }
+
+        return response()->json([
+            'available' => $phone === '' || ! $customerQuery->exists(),
         ]);
     }
 

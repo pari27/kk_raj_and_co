@@ -189,7 +189,7 @@ class PaymentController extends Controller
 
             foreach ($payments as $payment) {
                 fputcsv($handle, [
-                    $payment->paid_at->format('Y-m-d'),
+                    '="'.$payment->paid_at->format('Y-m-d').'"',
                     $payment->enquiry->customer->name ?? '—',
                     $payment->enquiry->number ?? '—',
                     $payment->enquiry->tickets->pluck('service.name')->filter()->implode(', ') ?: '—',

@@ -4,6 +4,7 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
 <style>
     #enquiriesTable.tm-table thead th:first-child,
     #enquiriesTable.tm-table thead th:last-child {
@@ -43,7 +44,7 @@
                 <div class="position-relative">
                     <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ number_format($card['count']) }}</div>
-                    <div class="small" style="color: rgba(255,255,255,.75);">{{ $card['caption'] }}</div>
+                    <div style="color: rgba(255,255,255,.75); font-size: .72rem;">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -56,27 +57,20 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" id="enquiriesSearch" placeholder="Search enquiry no. or client" style="background: transparent; border: 0; outline: none; color: var(--tm-text); width: 100%; font-size: .85rem;">
+            <input type="text" id="enquiriesSearch" placeholder="Search enquiry, client, service, creator, status or amount" style="background: transparent; border: 0; outline: none; color: var(--tm-text); width: 100%; font-size: .85rem;">
         </div>
 
         <div class="d-flex flex-wrap align-items-center gap-2">
-            <div class="dropdown">
-                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Created by: <span id="creatorLabel">All</span>
+            <div style="min-width: 180px;">
+                <button type="button" id="enquiryDateRangeBtn" class="btn btn-outline-secondary d-flex align-items-center gap-2 w-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span id="enquiryDateRangeLabel" class="flex-grow-1 text-start" style="font-weight: 400;">All time</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item js-creator-filter" href="#" data-creator="">All</a></li>
-                    @foreach ($creators as $creator)
-                        <li><a class="dropdown-item js-creator-filter" href="#" data-creator="{{ $creator }}">{{ $creator }}</a></li>
-                    @endforeach
-                </ul>
+                <input type="hidden" id="enquiryDateFrom">
+                <input type="hidden" id="enquiryDateTo">
             </div>
-
-            <div class="d-flex gap-1">
-                <span class="tm-filter-pill active" data-filter="all">All {{ $totalCount }}</span>
-                <span class="tm-filter-pill" data-filter="Open">Open {{ $openCount }}</span>
-                <span class="tm-filter-pill" data-filter="Closed">Closed {{ $closedCount }}</span>
-            </div>
+            
         </div>
     </div>
 
@@ -88,7 +82,7 @@
                     <th>Client</th>
                     <th>Services</th>
                     <th>Tickets</th>
-                    <th>Created by</th>
+                    <th>Created</th>
                     <th>Total</th>
                     <th>Status</th>
                     <th class="text-end">Actions</th>
@@ -101,7 +95,7 @@
                         $ticketsClosed = $enquiry->tickets->filter(fn ($t) => $t->status->isClosed())->count();
                         $ratio = $ticketsTotal > 0 ? $ticketsClosed / $ticketsTotal : 0;
                     @endphp
-                    <tr data-status="{{ $enquiry->status }}" data-creator="{{ $enquiry->createdBy?->name }}">
+                    <tr data-status="{{ $enquiry->status }}" data-creator="{{ $enquiry->createdBy?->name }}" data-created-ts="{{ $enquiry->created_at->timestamp }}">
                         <td data-order="{{ $enquiry->created_at->timestamp }}">
                             <div class="fw-semibold" style="font-size: .8rem;">{{ $enquiry->number }}</div>
                             <div class="tm-muted" style="font-size: .72rem;">{{ $enquiry->created_at->format('j M Y') }}</div>
@@ -121,7 +115,10 @@
                                 <div class="tm-progress-fill" style="width: {{ $ratio * 100 }}%;"></div>
                             </div>
                         </td>
-                        <td style="font-size: .8rem;">{{ $enquiry->createdBy?->name ?? '—' }}</td>
+                        <td>
+                            <div style="font-size: .8rem;">{{ $enquiry->createdBy?->name ?? '—' }}</div>
+                            <div class="tm-muted" style="font-size: .72rem;">{{ $enquiry->created_at->format('j M Y') }}</div>
+                        </td>
                         <td data-order="{{ $enquiry->total }}">
                             <div class="fw-semibold" style="font-size: .8rem;">₹{{ number_format((float) $enquiry->total) }}</div>
                             @if ($enquiry->discount > 0)
@@ -150,6 +147,8 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.js"></script>
 <script>
     function stripHtml(html) {
         return $('<div>').html(html).text().replace(/\s+/g, ' ').trim();
@@ -189,6 +188,8 @@
 
         var statusFilter = 'all';
         var creatorFilter = '';
+        var dateFromInput = document.getElementById('enquiryDateFrom');
+        var dateToInput = document.getElementById('enquiryDateTo');
 
         $.fn.dataTable.ext.search.push(function (settings, data, index) {
             if (settings.nTable.id !== 'enquiriesTable') {
@@ -205,6 +206,20 @@
                 return false;
             }
 
+            var dateFrom = dateFromInput.value;
+            var dateTo = dateToInput.value;
+
+            if (dateFrom || dateTo) {
+                var ts = parseInt(row.attr('data-created-ts'), 10);
+
+                if (dateFrom && ts < Math.floor(new Date(dateFrom + 'T00:00:00').getTime() / 1000)) {
+                    return false;
+                }
+                if (dateTo && ts > Math.floor(new Date(dateTo + 'T23:59:59').getTime() / 1000)) {
+                    return false;
+                }
+            }
+
             return true;
         });
 
@@ -219,6 +234,32 @@
             e.preventDefault();
             creatorFilter = $(this).data('creator');
             $('#creatorLabel').text(creatorFilter || 'All');
+            table.draw();
+        });
+
+        jQuery('#enquiryDateRangeBtn').daterangepicker({
+            autoUpdateInput: false,
+            opens: 'left',
+            locale: { format: 'DD MMM YYYY', cancelLabel: 'Cancel' },
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 days': [moment().subtract(29, 'days'), moment()],
+                'This month': [moment().startOf('month'), moment().endOf('month')],
+                'Last month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            },
+        }, function (start, end) {
+            dateFromInput.value = start.format('YYYY-MM-DD');
+            dateToInput.value = end.format('YYYY-MM-DD');
+            document.getElementById('enquiryDateRangeLabel').textContent = start.format('D MMM') + ' – ' + end.format('D MMM YYYY');
+            table.draw();
+        });
+
+        jQuery('#enquiryDateRangeBtn').on('cancel.daterangepicker', function () {
+            dateFromInput.value = '';
+            dateToInput.value = '';
+            document.getElementById('enquiryDateRangeLabel').textContent = 'All time';
             table.draw();
         });
     });
