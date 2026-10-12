@@ -21,7 +21,7 @@ class ServiceController extends Controller
     {
         $this->authorize('viewAny', Service::class);
 
-        $services = Service::query()->withCount('documents')->latest('created_at')->get();
+        $services = Service::query()->with('documents')->withCount('documents')->latest('created_at')->get();
 
         return view('admin.services.index', compact('services'));
     }

@@ -1094,3 +1094,23 @@ a.enquiry-make-payment-button:focus {
 .js-assign-toggle.show {
     color: #000;
 }
+
+/* ---- Pagination (Services, Notifications) — matches the DataTables look ---- */
+.pagination .page-link {
+    font-size: .78rem;
+    font-weight: 400;
+    color: var(--tm-text);
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--tm-accent);
+    border-color: var(--tm-accent);
+    color: #fff;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: var(--tm-muted);
+    background-color: #e9ecef;
+}

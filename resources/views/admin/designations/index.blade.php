@@ -241,7 +241,10 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="p-3 tm-muted" style="font-size: .72rem;">Showing 1–{{ $totalCount }} of {{ $totalCount }} designations</div>
+                    <div class="d-flex align-items-center justify-content-between p-3 tm-muted" style="font-size: .75rem;">
+                        <span id="designationsPaginationSummary"></span>
+                        <ul class="pagination pagination-sm mb-0" id="designationsPaginationPages"></ul>
+                    </div>
                 @endif
             </div>
         </div>
@@ -356,21 +359,77 @@
         const buttons = Array.from(document.querySelectorAll('[data-filter]'));
         const rows = Array.from(document.querySelectorAll('tbody tr[data-status]'));
         let activeFilter = 'all';
+        const PAGE_SIZE = 10;
+        let currentPage = 1;
+        const pageSummary = document.getElementById('designationsPaginationSummary');
+        const pageList = document.getElementById('designationsPaginationPages');
 
-        const filterRows = () => {
-            const query = search.value.trim().toLocaleLowerCase();
-            rows.forEach((row) => {
-                const matchesStatus = activeFilter === 'all' || row.dataset.status === activeFilter;
-                row.hidden = !matchesStatus || !row.textContent.toLocaleLowerCase().includes(query);
-            });
+        const renderPagination = (totalPages) => {
+            pageList.innerHTML = '';
+
+            const add = (label, page, disabled, active) => {
+                const item = document.createElement('li');
+                item.className = 'page-item' + (disabled ? ' disabled' : '') + (active ? ' active' : '');
+                const link = document.createElement('a');
+                link.className = 'page-link';
+                link.href = '#';
+                link.textContent = label;
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    if (!disabled && !active) {
+                        currentPage = page;
+                        filterRows(true);
+                    }
+                });
+                item.appendChild(link);
+                pageList.appendChild(item);
+            };
+
+            add('‹', currentPage - 1, currentPage <= 1, false);
+            for (let page = 1; page <= totalPages; page++) {
+                add(String(page), page, false, page === currentPage);
+            }
+            add('›', currentPage + 1, currentPage >= totalPages, false);
         };
 
-        search.addEventListener('input', filterRows);
+        function filterRows(keepPage) {
+            if (keepPage !== true) {
+                currentPage = 1;
+            }
+
+            const query = search.value.trim().toLocaleLowerCase();
+            const matched = [];
+            rows.forEach((row) => {
+                const matchesStatus = activeFilter === 'all' || row.dataset.status === activeFilter;
+                row.hidden = true;
+                if (matchesStatus && row.textContent.toLocaleLowerCase().includes(query)) {
+                    matched.push(row);
+                }
+            });
+
+            const totalPages = Math.max(1, Math.ceil(matched.length / PAGE_SIZE));
+            currentPage = Math.min(currentPage, totalPages);
+            const start = (currentPage - 1) * PAGE_SIZE;
+            matched.slice(start, start + PAGE_SIZE).forEach((row) => { row.hidden = false; });
+
+            if (!pageSummary || !pageList) {
+                return;
+            }
+
+            pageSummary.textContent = matched.length
+                ? 'Showing ' + (start + 1) + '–' + Math.min(start + PAGE_SIZE, matched.length) + ' of ' + matched.length
+                : 'No designations found';
+            renderPagination(totalPages);
+        }
+
+        search.addEventListener('input', () => filterRows());
         buttons.forEach((button) => button.addEventListener('click', () => {
             activeFilter = button.dataset.filter;
             buttons.forEach((item) => item.classList.toggle('active', item === button));
             filterRows();
         }));
+
+        filterRows();
 
         const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-1"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 

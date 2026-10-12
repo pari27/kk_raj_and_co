@@ -126,7 +126,7 @@
                             <div class="d-flex align-items-center gap-3">
                                 <div class="tm-client-avatar" style="background: {{ $palette['bg'] }}; color: {{ $palette['text'] }};">{{ $initials }}</div>
                                 <div>
-                                    <a href="{{ route('customers.show', $customer) }}" class="fw-semibold text-decoration-none" style="color: {{ $customer->is_active ? 'inherit' : 'var(--tm-muted)' }};">{{ $customer->name }}</a>
+                                    <a href="{{ route('customers.show', $customer) }}" class="fw-semibold text-decoration-none" style="font-size: .8rem; color: {{ $customer->is_active ? 'inherit' : 'var(--tm-muted)' }};">{{ $customer->name }}</a>
                                     <div class="tm-muted" style="font-size: .78rem;">Client since {{ $customer->created_at->format('M Y') }}</div>
                                 </div>
                             </div>
@@ -141,12 +141,12 @@
                                 {{ $customer->email ?? '—' }}
                             </div>
                         </td>
-                        <td data-order="{{ $row['tickets_total'] }}">{{ $row['tickets_open'] }} open &middot; {{ $row['tickets_total'] }} total</td>
+                        <td data-order="{{ $row['tickets_total'] }}" style="font-size: .8rem;">{{ $row['tickets_open'] }} open &middot; {{ $row['tickets_total'] }} total</td>
                         <td data-order="{{ $row['fees_pending'] }}">
                             @if ($row['fees_pending'] > 0)
-                                <span class="fw-semibold" style="color: #c0392b;">₹{{ number_format($row['fees_pending']) }}</span>
+                                <span class="fw-semibold" style="font-size: .8rem; color: #c0392b;">₹{{ number_format($row['fees_pending']) }}</span>
                             @else
-                                <span class="tm-muted">₹0</span>
+                                <span class="tm-muted" style="font-size: .8rem;">₹0</span>
                             @endif
                         </td>
                         <td>

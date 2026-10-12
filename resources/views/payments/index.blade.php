@@ -5,6 +5,24 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
 <style>
+    .tm-ticket-tab {
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        border-bottom: 0;
+        font-size: .8rem;
+        background-color: #6c757d;
+        color: #fff;
+    }
+    .tm-ticket-tab.active {
+        background-color: #101b3d;
+        color: #fff;
+        border-bottom: 0;
+    }
+    .tm-ticket-tab.active .badge {
+        background-color: #fff !important;
+        border-color: #fff !important;
+        color: #101b3d !important;
+    }
     #paymentsTicketsTable.tm-table thead th:first-child,
     #paymentsTicketsTable.tm-table thead th:last-child,
     #paymentsPendingTable.tm-table thead th:first-child,
@@ -313,6 +331,11 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between p-3 tm-muted" id="paymentsPaginationBar" style="font-size: .75rem;">
+        <span id="paymentsPaginationSummary"></span>
+        <ul class="pagination pagination-sm mb-0" id="paymentsPaginationPages"></ul>
     </div>
 </div>
 
@@ -640,6 +663,8 @@
         var pendingTable = document.getElementById('pendingTable');
         var receivedFilters = document.getElementById('receivedFilters');
         var activeTab = 'pending';
+        var PAGE_SIZE = 10;
+        var currentPage = 1;
         var dateFromInput = document.getElementById('paymentDateFrom');
         var dateToInput = document.getElementById('paymentDateTo');
 
@@ -648,12 +673,16 @@
             return Array.prototype.slice.call(table.querySelectorAll('tbody tr'));
         }
 
-        function refresh() {
+        function refresh() { applyFilters(false); }
+
+        function applyFilters(keepPage) {
+            if (!keepPage) { currentPage = 1; }
             var search = document.getElementById('paymentsSearch').value.trim().toLowerCase();
             var searchAmount = search.replace(/,/g, '');
             var mode = document.getElementById('modeFilter').value;
             var receivedBy = document.getElementById('receivedByFilter').value;
 
+            var matched = [];
             activeRows().forEach(function (row) {
                 var matchesSearch = !search
                     || (row.getAttribute('data-client') || '').includes(search)
@@ -686,8 +715,41 @@
                     }
                 }
 
-                row.classList.toggle('d-none', !(matchesSearch && matchesMode && matchesReceivedBy && matchesDate));
+                row.classList.add('d-none');
+                if (matchesSearch && matchesMode && matchesReceivedBy && matchesDate) { matched.push(row); }
             });
+
+            var totalPages = Math.max(1, Math.ceil(matched.length / PAGE_SIZE));
+            currentPage = Math.min(currentPage, totalPages);
+            var start = (currentPage - 1) * PAGE_SIZE;
+            matched.slice(start, start + PAGE_SIZE).forEach(function (row) { row.classList.remove('d-none'); });
+
+            document.getElementById('paymentsPaginationSummary').textContent = matched.length
+                ? 'Showing ' + (start + 1) + '–' + Math.min(start + PAGE_SIZE, matched.length) + ' of ' + matched.length
+                : 'No payments found';
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            var list = document.getElementById('paymentsPaginationPages');
+            list.innerHTML = '';
+            var add = function (label, page, disabled, active) {
+                var li = document.createElement('li');
+                li.className = 'page-item' + (disabled ? ' disabled' : '') + (active ? ' active' : '');
+                var a = document.createElement('a');
+                a.className = 'page-link';
+                a.href = '#';
+                a.textContent = label;
+                a.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (!disabled && !active) { currentPage = page; applyFilters(true); }
+                });
+                li.appendChild(a);
+                list.appendChild(li);
+            };
+            add('‹', currentPage - 1, currentPage <= 1, false);
+            for (var i = 1; i <= totalPages; i++) { add(String(i), i, false, i === currentPage); }
+            add('›', currentPage + 1, currentPage >= totalPages, false);
         }
 
         tabs.forEach(function (btn) {
@@ -704,6 +766,7 @@
         document.getElementById('paymentsSearch').addEventListener('input', refresh);
         document.getElementById('modeFilter').addEventListener('change', refresh);
         document.getElementById('receivedByFilter').addEventListener('change', refresh);
+        refresh();
 
         if (window.jQuery) {
             jQuery('#paymentDateRangeBtn').daterangepicker({

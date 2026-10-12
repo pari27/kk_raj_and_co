@@ -43,15 +43,14 @@
     <div class="p-3">
         <div class="row g-2 align-items-center">
             <div class="col-12 col-lg-5">
-                <input type="search" id="employeesSearch" class="form-control form-control-sm tm-field" placeholder="Search name, email, phone or designation" aria-label="Search employees">
+                <input type="search" id="employeesSearch" class="form-control form-control-sm tm-field" placeholder="Search by name, email, phone, designation or status" aria-label="Search by name, email, phone, designation or status">
             </div>
             <div class="col-12 col-lg-7 d-flex flex-wrap align-items-center justify-content-lg-end gap-2">
                 <div class="d-flex flex-wrap gap-1" role="group" aria-label="Filter employees by status">
-                    <button type="button" class="tm-filter-pill active" data-filter="all">All {{ $employees->count() }}</button>
-                    <button type="button" class="tm-filter-pill" data-filter="active">Active {{ $activeCount }}</button>
-                    <button type="button" class="tm-filter-pill" data-filter="inactive">Inactive {{ $inactiveCount }}</button>
+                    <button type="button" class="tm-filter-pill active" style="font-size: .8rem;" data-filter="all">All {{ $employees->count() }}</button>
+                    <button type="button" class="tm-filter-pill" style="font-size: .8rem;" data-filter="active">Active {{ $activeCount }}</button>
+                    <button type="button" class="tm-filter-pill" style="font-size: .8rem;" data-filter="inactive">Inactive {{ $inactiveCount }}</button>
                 </div>
-                <span class="tm-muted small">{{ $designationsCount }} active designations</span>
             </div>
         </div>
     </div>
@@ -100,6 +99,11 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="d-flex align-items-center justify-content-between p-3 tm-muted" style="font-size: .75rem;">
+            <span id="employeesPaginationSummary"></span>
+            <ul class="pagination pagination-sm mb-0" id="employeesPaginationPages"></ul>
+        </div>
     @endif
 </div>
 
@@ -114,21 +118,73 @@
         const buttons = Array.from(document.querySelectorAll('[data-filter]'));
         const rows = Array.from(table.querySelectorAll('tbody tr[data-status]'));
         let activeFilter = 'all';
+        const PAGE_SIZE = 10;
+        let currentPage = 1;
+        const pageSummary = document.getElementById('employeesPaginationSummary');
+        const pageList = document.getElementById('employeesPaginationPages');
 
-        const applyFilter = () => {
-            const query = queryInput.value.trim().toLocaleLowerCase();
-            rows.forEach((row) => {
-                const matchesStatus = activeFilter === 'all' || row.dataset.status === activeFilter;
-                row.hidden = !matchesStatus || !row.textContent.toLocaleLowerCase().includes(query);
-            });
+        const renderPagination = (totalPages) => {
+            pageList.innerHTML = '';
+
+            const add = (label, page, disabled, active) => {
+                const item = document.createElement('li');
+                item.className = 'page-item' + (disabled ? ' disabled' : '') + (active ? ' active' : '');
+                const link = document.createElement('a');
+                link.className = 'page-link';
+                link.href = '#';
+                link.textContent = label;
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    if (!disabled && !active) {
+                        currentPage = page;
+                        applyFilter(true);
+                    }
+                });
+                item.appendChild(link);
+                pageList.appendChild(item);
+            };
+
+            add('‹', currentPage - 1, currentPage <= 1, false);
+            for (let page = 1; page <= totalPages; page++) {
+                add(String(page), page, false, page === currentPage);
+            }
+            add('›', currentPage + 1, currentPage >= totalPages, false);
         };
 
-        queryInput.addEventListener('input', applyFilter);
+        function applyFilter(keepPage) {
+            if (keepPage !== true) {
+                currentPage = 1;
+            }
+
+            const query = queryInput.value.trim().toLocaleLowerCase();
+            const matched = [];
+            rows.forEach((row) => {
+                const matchesStatus = activeFilter === 'all' || row.dataset.status === activeFilter;
+                row.hidden = true;
+                if (matchesStatus && row.textContent.toLocaleLowerCase().includes(query)) {
+                    matched.push(row);
+                }
+            });
+
+            const totalPages = Math.max(1, Math.ceil(matched.length / PAGE_SIZE));
+            currentPage = Math.min(currentPage, totalPages);
+            const start = (currentPage - 1) * PAGE_SIZE;
+            matched.slice(start, start + PAGE_SIZE).forEach((row) => { row.hidden = false; });
+
+            pageSummary.textContent = matched.length
+                ? 'Showing ' + (start + 1) + '–' + Math.min(start + PAGE_SIZE, matched.length) + ' of ' + matched.length
+                : 'No employees found';
+            renderPagination(totalPages);
+        }
+
+        queryInput.addEventListener('input', () => applyFilter());
         buttons.forEach((button) => button.addEventListener('click', () => {
             activeFilter = button.dataset.filter;
             buttons.forEach((item) => item.classList.toggle('active', item === button));
             applyFilter();
         }));
+
+        applyFilter();
     });
 </script>
 @endsection

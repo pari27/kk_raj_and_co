@@ -56,8 +56,8 @@
                     type="search"
                     id="servicesSearch"
                     class="form-control form-control-sm tm-field"
-                    placeholder="Search services"
-                    aria-label="Search services"
+                    placeholder="Search by services name, description, fee or status"
+                    aria-label="Search by services name, description, fee or status"
                 >
             </div>
 
@@ -125,13 +125,32 @@
                                 <div class="tm-muted small">₹{{ number_format($service->totalFee(), 0) }} with {{ $gstPercent }}% GST</div>
                             </td>
                             <td>
-                                <span class="d-inline-flex align-items-center gap-1 small">
+                                @php
+                                    $documentList = $service->documents->map(fn ($document) => [
+                                        'name' => $document->name,
+                                        'mandatory' => (bool) $document->is_mandatory,
+                                        'instructions' => $document->instructions,
+                                        'formats' => $document->allowed_formats,
+                                        'size' => $document->formattedMaxSize(),
+                                    ])->values();
+                                @endphp
+                                <button
+                                    type="button"
+                                    class="btn btn-link p-0 text-decoration-none text-body d-inline-flex align-items-center gap-1 small js-show-documents"
+                                    data-service="{{ $service->name }}"
+                                    data-fee="₹{{ number_format((float) $service->default_price, 0) }}"
+                                    data-edit-url="{{ route('admin.services.edit', $service) }}"
+                                    data-documents="{{ $documentList->toJson() }}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#serviceDocumentsModal"
+                                    title="View required documents"
+                                >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path>
                                         <path d="M14 2v6h6"></path>
                                     </svg>
                                     {{ $service->documents_count }} {{ $service->documents_count === 1 ? 'document' : 'documents' }}
-                                </span>
+                                </button>
                             </td>
                             <td><span class="tm-muted small">Coming soon</span></td>
                             <td>
@@ -160,11 +179,137 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="d-flex align-items-center justify-content-between p-3 tm-muted" style="font-size: .75rem;">
+            <span id="servicesPaginationSummary"></span>
+            <ul class="pagination pagination-sm mb-0" id="servicesPaginationPages"></ul>
+        </div>
     @endif
+</div>
+
+<div class="modal fade" id="serviceDocumentsModal" tabindex="-1" aria-labelledby="serviceDocumentsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 560px;">
+        <div class="modal-content border-0" style="border-radius: 14px; overflow: hidden;">
+            <div class="d-flex align-items-center gap-3 px-4 py-3 text-white" style="background: #101b3d;">
+                <span class="d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.12);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path><path d="M14 2v6h6"></path></svg>
+                </span>
+                <div class="flex-grow-1">
+                    <h2 class="modal-title h6 fw-bold mb-0" id="serviceDocumentsTitle">Required documents</h2>
+                    <div class="small" style="color: rgba(255,255,255,.75);" id="serviceDocumentsService"></div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="d-flex border-bottom text-start">
+                <div class="flex-fill px-4 py-2 border-end"><div class="tm-muted small">Total</div><div class="fw-bold fs-5" id="serviceDocumentsTotal">0</div></div>
+                <div class="flex-fill px-4 py-2 border-end"><div class="tm-muted small">Mandatory</div><div class="fw-bold fs-5 text-danger" id="serviceDocumentsMandatory">0</div></div>
+                <div class="flex-fill px-4 py-2"><div class="tm-muted small">Optional</div><div class="fw-bold fs-5" id="serviceDocumentsOptional">0</div></div>
+            </div>
+
+            <div class="modal-body px-4 py-3" id="serviceDocumentsBody"></div>
+
+            <div class="d-flex align-items-center justify-content-between px-4 py-3" style="background: #fafbfc;">
+                <a href="#" id="serviceDocumentsEdit" class="btn btn-outline-success btn-sm">Edit documents</a>
+                <button type="button" class="btn btn-sm text-white px-3" style="background: #101b3d;" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const documentsBody = document.getElementById('serviceDocumentsBody');
+        const iconStyles = [
+            ['#e8effd', '#1d4fb8'],
+            ['#efe9fb', '#5b3fb3'],
+            ['#e3f5f1', '#15806b'],
+            ['#fdf0dc', '#b26a00'],
+        ];
+
+        const makeEl = (tag, className, text) => {
+            const el = document.createElement(tag);
+            if (className) { el.className = className; }
+            if (text !== undefined) { el.textContent = text; }
+            return el;
+        };
+
+        const renderGroup = (title, color, docs, startNumber) => {
+            if (!docs.length) { return; }
+
+            const heading = makeEl('div', 'd-inline-flex align-items-center gap-2 fw-semibold rounded-pill px-3 py-1 mb-2 mt-2 text-white');
+            heading.style.fontSize = '.8rem';
+            heading.style.background = color;
+            heading.appendChild(makeEl('span', '', title));
+            const count = makeEl('span', 'badge rounded-pill', String(docs.length));
+            count.style.cssText = 'background: #fff; color: ' + color + ';';
+            heading.appendChild(count);
+            documentsBody.appendChild(heading);
+
+            docs.forEach((doc, offset) => {
+                const number = startNumber + offset;
+                const [bg, fg] = iconStyles[(number - 1) % iconStyles.length];
+                const row = makeEl('div', 'd-flex gap-3 py-3' + (offset < docs.length - 1 ? ' border-bottom' : ''));
+
+                const iconWrap = makeEl('div', 'position-relative flex-shrink-0');
+                const icon = makeEl('span', 'd-inline-flex align-items-center justify-content-center');
+                icon.style.cssText = 'width: 40px; height: 40px; border-radius: 10px; background: ' + bg + '; color: ' + fg + ';';
+                icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path><path d="M14 2v6h6"></path></svg>';
+                iconWrap.appendChild(icon);
+
+                const info = makeEl('div', 'flex-grow-1');
+                const name = makeEl('div', 'fw-bold', doc.name);
+                name.style.fontSize = '.8rem';
+                info.appendChild(name);
+
+                if (doc.instructions) {
+                    const note = makeEl('div', 'tm-muted', doc.instructions);
+                    note.style.fontSize = '.8rem';
+                    info.appendChild(note);
+                }
+
+                const meta = makeEl('div', 'd-flex flex-wrap align-items-center gap-1 mt-1');
+                (doc.formats || '').split(',').map((format) => format.trim()).filter(Boolean).forEach((format) => {
+                    const chip = makeEl('span', 'badge fw-bold', format.toUpperCase());
+                    chip.style.cssText = 'background: #eaf0fb; color: #1d3f8f; font-size: .62rem;';
+                    meta.appendChild(chip);
+                });
+                if (doc.size) {
+                    const size = makeEl('span', 'tm-muted', '· up to ' + doc.size);
+                    size.style.fontSize = '.7rem';
+                    meta.appendChild(size);
+                }
+                info.appendChild(meta);
+
+                row.appendChild(iconWrap);
+                row.appendChild(info);
+                documentsBody.appendChild(row);
+            });
+        };
+
+        document.querySelectorAll('.js-show-documents').forEach((button) => {
+            button.addEventListener('click', () => {
+                const documents = JSON.parse(button.dataset.documents || '[]');
+                const mandatory = documents.filter((doc) => doc.mandatory);
+                const optional = documents.filter((doc) => !doc.mandatory);
+
+                document.getElementById('serviceDocumentsService').textContent = button.dataset.service + ' · ' + button.dataset.fee;
+                document.getElementById('serviceDocumentsTotal').textContent = documents.length;
+                document.getElementById('serviceDocumentsMandatory').textContent = mandatory.length;
+                document.getElementById('serviceDocumentsOptional').textContent = optional.length;
+                document.getElementById('serviceDocumentsEdit').href = button.dataset.editUrl;
+
+                documentsBody.innerHTML = '';
+
+                if (!documents.length) {
+                    documentsBody.appendChild(makeEl('div', 'tm-muted small py-2', 'No documents are required for this service.'));
+                } else {
+                    renderGroup('Mandatory', '#101b3d', mandatory, 1);
+                    renderGroup('Optional', '#6c757d', optional, mandatory.length + 1);
+                }
+
+            });
+        });
         const table = document.getElementById('servicesTable');
 
         if (!table) {
@@ -177,6 +322,10 @@
         const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
         const rows = Array.from(body.querySelectorAll('tr[data-status]'));
         let activeFilter = 'all';
+        const PAGE_SIZE = 10;
+        let currentPage = 1;
+        const summary = document.getElementById('servicesPaginationSummary');
+        const pages = document.getElementById('servicesPaginationPages');
 
         const sortRows = () => {
             const [key, direction] = sortSelect.value.split('-');
@@ -195,20 +344,67 @@
             });
 
             rows.forEach((row) => body.appendChild(row));
+            filterRows();
         };
 
-        const filterRows = () => {
+        const renderPagination = (totalPages) => {
+            pages.innerHTML = '';
+
+            const add = (label, page, disabled, active) => {
+                const item = document.createElement('li');
+                item.className = 'page-item' + (disabled ? ' disabled' : '') + (active ? ' active' : '');
+                const link = document.createElement('a');
+                link.className = 'page-link';
+                link.href = '#';
+                link.textContent = label;
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    if (!disabled && !active) {
+                        currentPage = page;
+                        filterRows(true);
+                    }
+                });
+                item.appendChild(link);
+                pages.appendChild(item);
+            };
+
+            add('‹', currentPage - 1, currentPage <= 1, false);
+            for (let page = 1; page <= totalPages; page++) {
+                add(String(page), page, false, page === currentPage);
+            }
+            add('›', currentPage + 1, currentPage >= totalPages, false);
+        };
+
+        function filterRows(keepPage) {
+            if (keepPage !== true) {
+                currentPage = 1;
+            }
+
             const query = searchInput.value.trim().toLocaleLowerCase();
+            const matched = [];
 
             rows.forEach((row) => {
                 const matchesStatus = activeFilter === 'all' || row.dataset.status === activeFilter;
                 const matchesSearch = row.textContent.toLocaleLowerCase().includes(query);
 
-                row.hidden = !matchesStatus || !matchesSearch;
+                row.hidden = true;
+                if (matchesStatus && matchesSearch) {
+                    matched.push(row);
+                }
             });
-        };
 
-        searchInput.addEventListener('input', filterRows);
+            const totalPages = Math.max(1, Math.ceil(matched.length / PAGE_SIZE));
+            currentPage = Math.min(currentPage, totalPages);
+            const start = (currentPage - 1) * PAGE_SIZE;
+            matched.slice(start, start + PAGE_SIZE).forEach((row) => { row.hidden = false; });
+
+            summary.textContent = matched.length
+                ? 'Showing ' + (start + 1) + '–' + Math.min(start + PAGE_SIZE, matched.length) + ' of ' + matched.length
+                : 'No services found';
+            renderPagination(totalPages);
+        }
+
+        searchInput.addEventListener('input', () => filterRows());
         sortSelect.addEventListener('change', sortRows);
 
         filterButtons.forEach((button) => {
@@ -218,6 +414,8 @@
                 filterRows();
             });
         });
+
+        filterRows();
     });
 </script>
 @endsection

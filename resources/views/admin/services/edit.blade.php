@@ -40,8 +40,8 @@
         border: 0;
         background: #fff;
         padding: .55rem 1rem;
-        font-size: .85rem;
-        font-weight: 600;
+        font-size: .72rem;
+        font-weight: 400;
         color: var(--tm-muted);
     }
     .tm-segmented button.active {
@@ -50,7 +50,7 @@
     }
     .tm-segmented-sm button {
         padding: .3rem .7rem;
-        font-size: .78rem;
+        font-size: .72rem;
     }
     .tm-doc-row {
         border: 1px solid var(--tm-surface-border);

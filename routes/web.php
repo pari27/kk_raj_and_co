@@ -56,30 +56,30 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:SuperAdmin,Admin,Employee')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
-        Route::get('customers/create', [CustomerController::class, 'create'])->name('customers.create');
-        Route::post('customers', [CustomerController::class, 'store'])->name('customers.store');
-        Route::get('customers/search', [CustomerController::class, 'search'])->name('customers.search');
-        Route::get('customers/lookup', [CustomerController::class, 'lookupByPhone'])->name('customers.lookup');
-        Route::get('customers/check-email', [CustomerController::class, 'checkEmail'])->name('customers.check-email');
-        Route::get('customers/check-phone', [CustomerController::class, 'checkPhone'])->name('customers.check-phone');
-        Route::post('customers/quick-store', [CustomerController::class, 'quickStore'])->name('customers.quick-store');
-        Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
-        Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
-        Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
+        Route::get('clients', [CustomerController::class, 'index'])->name('customers.index');
+        Route::get('clients/create', [CustomerController::class, 'create'])->name('customers.create');
+        Route::post('clients', [CustomerController::class, 'store'])->name('customers.store');
+        Route::get('clients/search', [CustomerController::class, 'search'])->name('customers.search');
+        Route::get('clients/lookup', [CustomerController::class, 'lookupByPhone'])->name('customers.lookup');
+        Route::get('clients/check-email', [CustomerController::class, 'checkEmail'])->name('customers.check-email');
+        Route::get('clients/check-phone', [CustomerController::class, 'checkPhone'])->name('customers.check-phone');
+        Route::post('clients/quick-store', [CustomerController::class, 'quickStore'])->name('customers.quick-store');
+        Route::get('clients/{customer}', [CustomerController::class, 'show'])->name('customers.show');
+        Route::get('clients/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
+        Route::put('clients/{customer}', [CustomerController::class, 'update'])->name('customers.update');
 
         Route::get('enquiries', [EnquiryController::class, 'index'])->name('enquiries.index');
         Route::get('enquiries/create', [EnquiryController::class, 'create'])->name('enquiries.create');
         Route::post('enquiries', [EnquiryController::class, 'store'])->name('enquiries.store');
         Route::get('enquiries/{enquiry}', [EnquiryController::class, 'show'])->name('enquiries.show');
 
-        Route::get('tickets', [TicketController::class, 'index'])->name('tickets.index');
-        Route::get('tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
-        Route::patch('tickets/{ticket}/status', [TicketController::class, 'updateStatus'])->name('tickets.update-status');
-        Route::patch('tickets/{ticket}/reassign', [TicketController::class, 'reassign'])->name('tickets.reassign');
-        Route::post('tickets/{ticket}/documents', [TicketDocumentController::class, 'store'])->name('tickets.documents.store');
-        Route::patch('tickets/{ticket}/documents/{document}/verify', [TicketDocumentController::class, 'verify'])->name('tickets.documents.verify');
-        Route::patch('tickets/{ticket}/documents/{document}/reject', [TicketDocumentController::class, 'reject'])->name('tickets.documents.reject');
+        Route::get('services', [TicketController::class, 'index'])->name('tickets.index');
+        Route::get('services/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
+        Route::patch('services/{ticket}/status', [TicketController::class, 'updateStatus'])->name('tickets.update-status');
+        Route::patch('services/{ticket}/reassign', [TicketController::class, 'reassign'])->name('tickets.reassign');
+        Route::post('services/{ticket}/documents', [TicketDocumentController::class, 'store'])->name('tickets.documents.store');
+        Route::patch('services/{ticket}/documents/{document}/verify', [TicketDocumentController::class, 'verify'])->name('tickets.documents.verify');
+        Route::patch('services/{ticket}/documents/{document}/reject', [TicketDocumentController::class, 'reject'])->name('tickets.documents.reject');
 
         Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');
         Route::post('payments', [PaymentController::class, 'store'])->name('payments.store');
@@ -137,11 +137,11 @@ Route::middleware('auth')->group(function () {
 
 // Customer portal â€” UI only for now. These will move behind the dedicated `customer`
 // guard/middleware once the customer-portal backend module is approved and built.
-Route::prefix('customer')->name('customer.')->group(function () {
+Route::prefix('client')->name('customer.')->group(function () {
     Route::get('login', fn () => view('customer.auth.login'))->name('login');
     Route::get('verify-otp', fn () => view('customer.auth.verify-otp'))->name('verify-otp');
     Route::get('set-password', fn () => view('customer.auth.set-password'))->name('set-password');
     Route::get('dashboard', fn () => view('customer.dashboard'))->name('dashboard');
-    Route::get('tickets', fn () => view('customer.tickets.index'))->name('tickets.index');
-    Route::get('tickets/{ticket}', fn ($ticket) => view('customer.tickets.show', compact('ticket')))->name('tickets.show');
+    Route::get('services', fn () => view('customer.tickets.index'))->name('tickets.index');
+    Route::get('services/{ticket}', fn ($ticket) => view('customer.tickets.show', compact('ticket')))->name('tickets.show');
 });

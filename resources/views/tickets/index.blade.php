@@ -5,6 +5,31 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
 <style>
+    .tm-ticket-tab {
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        border-bottom: 0;
+        font-size: .8rem;
+        background-color: #6c757d;
+        color: #fff;
+    }
+    .tm-ticket-tab.active {
+        background-color: #101b3d;
+        color: #fff;
+        border-bottom: 0;
+    }
+    .tm-ticket-tab.active .badge {
+        background-color: #fff !important;
+        border-color: #fff !important;
+        color: #101b3d !important;
+    }
+    #paginationBar {
+        font-size: .75rem;
+    }
+    #pendingTable tbody td,
+    #historyTable tbody td {
+        font-size: .8rem;
+    }
     #ticketDateRangeBtn {
         font-size: .78rem;
         font-weight: 600;
@@ -247,11 +272,7 @@
 
     <div class="d-flex align-items-center justify-content-between p-3 small tm-muted" id="paginationBar">
         <span id="paginationSummary"></span>
-        <span>
-            <a href="#" id="paginationPrev" class="text-decoration-none">‹</a>
-            Page <span id="paginationCurrent">1</span> of <span id="paginationTotal">1</span>
-            <a href="#" id="paginationNext" class="text-decoration-none">›</a>
-        </span>
+        <ul class="pagination pagination-sm mb-0" id="paginationPages"></ul>
     </div>
 </div>
 
@@ -261,7 +282,7 @@
 <script src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.js"></script>
 <script>
     (function () {
-        var PAGE_SIZE = 6;
+        var PAGE_SIZE = 10;
         var subtitles = {
             pending: {{ Illuminate\Support\Js::from($isAdmin ? 'All services in progress, from new to awaiting final payment' : 'Services assigned to you, from new to awaiting final payment') }},
             history: {{ Illuminate\Support\Js::from('Closed services') }},
@@ -283,10 +304,7 @@
         var searchInput = document.getElementById('ticketSearch');
         var sortOrder = document.getElementById('sortOrder');
         var paginationSummary = document.getElementById('paginationSummary');
-        var paginationCurrent = document.getElementById('paginationCurrent');
-        var paginationTotal = document.getElementById('paginationTotal');
-        var paginationPrev = document.getElementById('paginationPrev');
-        var paginationNext = document.getElementById('paginationNext');
+        var paginationPages = document.getElementById('paginationPages');
         var dateRangeWrap = document.getElementById('ticketDateRangeWrap');
         var dateFromInput = document.getElementById('ticketDateFrom');
         var dateToInput = document.getElementById('ticketDateTo');
@@ -371,8 +389,28 @@
             paginationSummary.textContent = visibleRows.length
                 ? 'Showing ' + (start + 1) + '–' + Math.min(start + PAGE_SIZE, visibleRows.length) + ' of ' + visibleRows.length
                 : 'No services found';
-            paginationCurrent.textContent = currentPage;
-            paginationTotal.textContent = totalPages;
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            paginationPages.innerHTML = '';
+            var add = function (label, page, disabled, active) {
+                var li = document.createElement('li');
+                li.className = 'page-item' + (disabled ? ' disabled' : '') + (active ? ' active' : '');
+                var a = document.createElement('a');
+                a.className = 'page-link';
+                a.href = '#';
+                a.textContent = label;
+                a.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (!disabled && !active) { currentPage = page; render(); }
+                });
+                li.appendChild(a);
+                paginationPages.appendChild(li);
+            };
+            add('‹', currentPage - 1, currentPage <= 1, false);
+            for (var i = 1; i <= totalPages; i++) { add(String(i), i, false, i === currentPage); }
+            add('›', currentPage + 1, currentPage >= totalPages, false);
         }
 
         function switchTab(tab) {
@@ -427,17 +465,6 @@
                     render();
                 }
             });
-        });
-
-        paginationPrev.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (currentPage > 1) { currentPage--; render(); }
-        });
-
-        paginationNext.addEventListener('click', function (e) {
-            e.preventDefault();
-            currentPage++;
-            render();
         });
 
         if (window.jQuery) {
