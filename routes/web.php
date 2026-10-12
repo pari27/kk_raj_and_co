@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\SetEmployeePasswordController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EnquiryController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfilePasswordController;
 use App\Http\Controllers\ReportController;
@@ -85,6 +86,11 @@ Route::middleware('auth')->group(function () {
         Route::get('payments/export', [PaymentController::class, 'export'])->name('payments.export');
         Route::put('payments/{payment}', [PaymentController::class, 'update'])->name('payments.update');
         Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
+
+        Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+        Route::put('notifications/preferences', [NotificationController::class, 'updatePreferences'])->name('notifications.preferences');
+        Route::get('notifications/{notification}/open', [NotificationController::class, 'open'])->name('notifications.open');
 
         Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');

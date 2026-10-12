@@ -37,10 +37,6 @@
     </div>
 
     <div class="col-12 col-xl-5">
-        @if (session('status'))
-            <div class="alert alert-success py-2 small">{{ session('status') }}</div>
-        @endif
-
         <div class="tm-card p-0 overflow-hidden">
             <div class="tm-section-title">Email settings</div>
             <form method="POST" action="{{ route('admin.settings.system.update') }}">

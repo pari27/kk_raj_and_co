@@ -119,13 +119,46 @@
                     </ul>
                 </div>
 
-                <button class="tm-icon-btn position-relative" type="button" title="Notifications" style="width: 31px; height: 31px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: .55rem;">5</span>
-                </button>
+                <div class="dropdown">
+                    <button class="tm-icon-btn position-relative" type="button" title="Notifications" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" style="width: 31px; height: 31px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        @if ($tmUnreadCount > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: .55rem;">{{ $tmUnreadCount > 99 ? '99+' : $tmUnreadCount }}</span>
+                        @endif
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end p-0 overflow-hidden" style="width: 380px; max-width: 92vw;">
+                        <div class="d-flex align-items-center justify-content-between px-3 py-2 text-white" style="background: #101b3d;">
+                            <span class="fw-bold">Notifications
+                                @if ($tmUnreadCount > 0)<span class="badge rounded-pill bg-danger ms-1">{{ $tmUnreadCount }} new</span>@endif
+                            </span>
+                            <form method="POST" action="{{ route('notifications.read-all') }}">
+                                @csrf
+                                <button type="submit" class="btn btn-link btn-sm p-0 text-white small">Mark all as read</button>
+                            </form>
+                        </div>
+                        @forelse ($tmRecentNotifications as $n)
+                            <a href="{{ route('notifications.open', $n) }}" class="d-flex gap-2 px-3 py-2 border-bottom text-decoration-none text-reset" style="{{ $n->isUnread() ? 'background: #f5f8ff;' : '' }}">
+                                @include('notifications._icon', ['notification' => $n, 'size' => 36])
+                                <div class="flex-grow-1" style="min-width: 0;">
+                                    <div class="d-flex justify-content-between gap-2">
+                                        <span class="fw-bold small">{{ $n->title }}</span>
+                                        <span class="d-flex align-items-center gap-1 tm-muted flex-shrink-0" style="font-size: .7rem;">
+                                            {{ $n->created_at->diffForHumans(short: true) }} ago
+                                            @if ($n->isUnread())<span class="rounded-circle bg-success d-inline-block" style="width: 7px; height: 7px;"></span>@endif
+                                        </span>
+                                    </div>
+                                    <div class="small tm-muted" style="font-size: .75rem;">{{ $n->renderBody() }}</div>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="text-center tm-muted small py-4">No notifications yet.</div>
+                        @endforelse
+                        <a href="{{ route('notifications.index') }}" class="d-block text-center py-2 fw-bold small text-decoration-none">View all notifications →</a>
+                    </div>
+                </div>
 
                 <div class="dropdown">
                     <button class="btn d-flex align-items-center gap-2 p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">

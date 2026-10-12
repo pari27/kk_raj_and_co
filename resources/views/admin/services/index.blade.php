@@ -48,10 +48,6 @@
     @endforeach
 </div>
 
-@if (session('status'))
-    <div class="alert alert-success py-2 small">{{ session('status') }}</div>
-@endif
-
 <div class="tm-card p-0">
     <div class="p-3">
         <div class="row g-2 align-items-center">

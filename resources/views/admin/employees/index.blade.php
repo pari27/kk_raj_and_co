@@ -35,9 +35,6 @@
     @endforeach
 </div>
 
-@if (session('status'))
-    <div class="alert alert-success py-2 small">{{ session('status') }}</div>
-@endif
 @if (session('error'))
     <div class="alert alert-danger py-2 small">{{ session('error') }}</div>
 @endif

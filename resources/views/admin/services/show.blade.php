@@ -121,10 +121,6 @@
         </div>
     </div>
 
-    @if (session('status'))
-        <div class="alert alert-success py-2 small">{{ session('status') }}</div>
-    @endif
-
     <div class="row g-3 mb-3">
         <div class="col-6 col-xl-3">
             <div class="tm-card svc-stat-card p-3" style="background: linear-gradient(135deg, #0a2e14, #1f6b30);">
