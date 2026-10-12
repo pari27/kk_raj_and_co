@@ -58,7 +58,7 @@ class EmployeeDashboardService
 
         $statCards = [
             [
-                'label' => 'My open tickets',
+                'label' => 'My open services',
                 'count' => $openTickets->count(),
                 'prefix' => '',
                 'trend' => 'Currently assigned to you',
@@ -69,7 +69,7 @@ class EmployeeDashboardService
                 'label' => 'Awaiting my action',
                 'count' => $awaitingActionTickets->count(),
                 'prefix' => '',
-                'trend' => 'Excludes tickets waiting for clients',
+                'trend' => 'Excludes services waiting for clients',
                 'trendColor' => '#ffffff',
                 'gradient' => 'linear-gradient(135deg, #300a0a, #7f1616)',
             ],
@@ -85,7 +85,7 @@ class EmployeeDashboardService
                 'label' => 'Documents to verify',
                 'count' => $documentsToVerify,
                 'prefix' => '',
-                'trend' => 'On your assigned tickets',
+                'trend' => 'On your assigned services',
                 'trendColor' => '#ffffff',
                 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)',
             ],

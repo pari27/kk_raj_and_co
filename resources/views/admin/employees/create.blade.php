@@ -140,10 +140,10 @@
             <div class="tm-card p-0" style="overflow: hidden;">
                 <div class="tm-side-card-header" style="background: #1f6b30;">What employee can do</div>
                 <ul class="list-unstyled p-3 mb-0" style="font-size: .82rem;">
-                    <li class="d-flex gap-2 mb-2"><span class="text-success">&#10003;</span> See and work on tickets assigned to them</li>
+                    <li class="d-flex gap-2 mb-2"><span class="text-success">&#10003;</span> See and work on services assigned to them</li>
                     <li class="d-flex gap-2 mb-2"><span class="text-success">&#10003;</span> Add clients and create enquiries</li>
                     <li class="d-flex gap-2 mb-2"><span class="text-success">&#10003;</span> Upload, verify and reject documents</li>
-                    <li class="d-flex gap-2 mb-2"><span class="text-success">&#10003;</span> Update ticket status with comments</li>
+                    <li class="d-flex gap-2 mb-2"><span class="text-success">&#10003;</span> Update service status with comments</li>
                     <li class="d-flex gap-2 mb-2"><span class="text-danger">&#10007;</span> Change prices or give discounts</li>
                     <li class="d-flex gap-2 mb-2"><span class="text-danger">&#10007;</span> Record final payments</li>
                     <li class="d-flex gap-2 mb-0"><span class="text-danger">&#10007;</span> Manage masters or other staff</li>

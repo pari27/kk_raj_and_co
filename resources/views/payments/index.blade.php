@@ -366,7 +366,7 @@
                             <div style="font-size: .72rem; color: {{ $enquiry->amountPaid() > 0 ? '#b9650a' : '#7f1616' }};">
                                 {{ $enquiry->amountPaid() > 0
                                     ? 'Part paid, ₹'.number_format($enquiry->balanceDue()).' balance'
-                                    : $enquiry->tickets->count().' ticket(s)' }}
+                                    : $enquiry->tickets->count().' service(s)' }}
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-2">
@@ -765,7 +765,7 @@
             enquiryCard.classList.remove('d-none');
             document.getElementById('paymentCardClient').textContent = info.client;
             var statusBadge = document.getElementById('paymentCardStatus');
-            statusBadge.textContent = info.ticketCount + (info.ticketCount === 1 ? ' ticket' : ' tickets');
+            statusBadge.textContent = info.ticketCount + (info.ticketCount === 1 ? ' service' : ' services');
             statusBadge.classList.toggle('text-bg-success', info.allClosed);
             statusBadge.classList.toggle('text-bg-secondary', !info.allClosed);
             document.getElementById('paymentCardTicket').textContent = info.enquiry;

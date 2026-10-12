@@ -85,7 +85,7 @@
                         <th>Service</th>
                         <th>Fee</th>
                         <th>Requirements</th>
-                        <th>Tickets</th>
+                        <th>Services</th>
                         <th>Status</th>
                         <th class="text-end">Actions</th>
                     </tr>

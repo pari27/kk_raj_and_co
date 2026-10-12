@@ -45,7 +45,7 @@
         'payments' => 'Payments',
         'staff-performance' => 'Staff performance',
         'client-history' => 'Client history',
-        'open-tickets' => 'Open tickets',
+        'open-tickets' => 'Open services',
         'pending-documents' => 'Pending documents',
         'gst-summary' => 'GST summary',
     ];
@@ -54,44 +54,44 @@
     $statCards = match ($tab) {
         'payments' => [
             ['Received', $money($paid), 'in selected period', 'linear-gradient(135deg,#164f29,#2e8747)'],
-            ['Pending', $money($pending), $tickets->filter(fn ($ticket) => $ticket->balanceDue() > 0)->count().' tickets', 'linear-gradient(135deg,#4a1010,#8b1d1d)'],
-            ['Average ticket fee', $money($tickets->count() ? $billed / $tickets->count() : 0), 'billed amount per ticket', 'linear-gradient(135deg,#123c80,#2457b5)'],
+            ['Pending', $money($pending), $tickets->filter(fn ($ticket) => $ticket->balanceDue() > 0)->count().' services', 'linear-gradient(135deg,#4a1010,#8b1d1d)'],
+            ['Average service fee', $money($tickets->count() ? $billed / $tickets->count() : 0), 'billed amount per service', 'linear-gradient(135deg,#123c80,#2457b5)'],
             ['Partial payments', (string) $payments->where('is_partial', true)->count(), 'payments in selection', 'linear-gradient(135deg,#583500,#99620c)'],
         ],
         'client-history' => [
-            ['Total tickets', (string) $clientTickets->count(), 'for selected client', 'linear-gradient(135deg,#123c80,#2457b5)'],
+            ['Total services', (string) $clientTickets->count(), 'for selected client', 'linear-gradient(135deg,#123c80,#2457b5)'],
             ['Fees billed', $money($clientTickets->sum('total')), 'in selected period', 'linear-gradient(135deg,#541747,#7b2869)'],
-            ['Fees paid', $money($clientTickets->pluck('enquiry')->filter()->unique('id')->sum(fn ($enquiry) => $enquiry->amountPaid())), 'across selected tickets', 'linear-gradient(135deg,#164f29,#2e8747)'],
+            ['Fees paid', $money($clientTickets->pluck('enquiry')->filter()->unique('id')->sum(fn ($enquiry) => $enquiry->amountPaid())), 'across selected services', 'linear-gradient(135deg,#164f29,#2e8747)'],
             ['Pending', $money($clientTickets->pluck('enquiry')->filter()->unique('id')->sum(fn ($enquiry) => $enquiry->balanceDue())), 'outstanding balance', 'linear-gradient(135deg,#4a1010,#8b1d1d)'],
         ],
         'open-tickets' => [
-            ['Open tickets', (string) $openTickets->count(), 'not yet closed', 'linear-gradient(135deg,#123c80,#2457b5)'],
+            ['Open services', (string) $openTickets->count(), 'not yet closed', 'linear-gradient(135deg,#123c80,#2457b5)'],
             ['Waiting for client', (string) $statusCounts['Documents Pending'], 'documents pending', 'linear-gradient(135deg,#583500,#99620c)'],
             ['Open over 30 days', (string) $openTickets->filter(fn ($ticket) => $ticket->created_at?->diffInDays(now()) > 30)->count(), 'need follow-up', 'linear-gradient(135deg,#4a1010,#8b1d1d)'],
             ['Ready for payment', (string) $tickets->filter(fn ($ticket) => $ticket->status?->value === 'Task Completed' && $ticket->balanceDue() > 0)->count(), 'task completed, balance due', 'linear-gradient(135deg,#164f29,#2e8747)'],
         ],
         'pending-documents' => [
             ['Pending documents', (string) $pendingDocuments->count(), 'awaiting review', 'linear-gradient(135deg,#123c80,#2457b5)'],
-            ['Affected tickets', (string) $pendingDocuments->pluck('ticket.id')->unique()->count(), 'with documents to check', 'linear-gradient(135deg,#583500,#99620c)'],
-            ['Open tickets', (string) $openTickets->count(), 'currently in progress', 'linear-gradient(135deg,#164f29,#2e8747)'],
+            ['Affected services', (string) $pendingDocuments->pluck('ticket.id')->unique()->count(), 'with documents to check', 'linear-gradient(135deg,#583500,#99620c)'],
+            ['Open services', (string) $openTickets->count(), 'currently in progress', 'linear-gradient(135deg,#164f29,#2e8747)'],
             ['Unassigned', (string) $openTickets->whereNull('assigned_to')->count(), 'need staff assignment', 'linear-gradient(135deg,#4a1010,#8b1d1d)'],
         ],
         'gst-summary' => [
-            ['GST billed', $money($tickets->sum('gst_amount')), 'selected ticket period', 'linear-gradient(135deg,#123c80,#2457b5)'],
+            ['GST billed', $money($tickets->sum('gst_amount')), 'selected service period', 'linear-gradient(135deg,#123c80,#2457b5)'],
             ['GST received', $money($gstPaid), 'allocated by payment share', 'linear-gradient(135deg,#164f29,#2e8747)'],
-            ['GST pending', $money($gstPending), 'remaining GST on ticket balances', 'linear-gradient(135deg,#4a1010,#8b1d1d)'],
+            ['GST pending', $money($gstPending), 'remaining GST on service balances', 'linear-gradient(135deg,#4a1010,#8b1d1d)'],
             ['Taxable value', $money($tickets->sum('price')), 'before GST', 'linear-gradient(135deg,#541747,#7b2869)'],
         ],
         'staff-performance' => [
-            ['Tickets', (string) $tickets->count(), 'in selected period', 'linear-gradient(135deg,#123c80,#2457b5)'],
-            ['Completed', (string) $tickets->filter(fn ($ticket) => $ticket->status?->isClosed())->count(), 'closed tickets', 'linear-gradient(135deg,#164f29,#2e8747)'],
-            ['Fees received', $money($paid), 'from selected tickets', 'linear-gradient(135deg,#541747,#7b2869)'],
-            ['Open tickets', (string) $openTickets->count(), 'assigned work', 'linear-gradient(135deg,#4a1010,#8b1d1d)'],
+            ['Services', (string) $tickets->count(), 'in selected period', 'linear-gradient(135deg,#123c80,#2457b5)'],
+            ['Completed', (string) $tickets->filter(fn ($ticket) => $ticket->status?->isClosed())->count(), 'closed services', 'linear-gradient(135deg,#164f29,#2e8747)'],
+            ['Fees received', $money($paid), 'from selected services', 'linear-gradient(135deg,#541747,#7b2869)'],
+            ['Open services', (string) $openTickets->count(), 'assigned work', 'linear-gradient(135deg,#4a1010,#8b1d1d)'],
         ],
         default => [
             ['Fees received', $money($paid), 'in selected period', 'linear-gradient(135deg,#164f29,#2e8747)'],
-            ['Fees billed', $money($billed), $tickets->count().' tickets', 'linear-gradient(135deg,#123c80,#2457b5)'],
-            ['Still to collect', $money($pending), 'across selected tickets', 'linear-gradient(135deg,#4a1010,#8b1d1d)'],
+            ['Fees billed', $money($billed), $tickets->count().' services', 'linear-gradient(135deg,#123c80,#2457b5)'],
+            ['Still to collect', $money($pending), 'across selected services', 'linear-gradient(135deg,#4a1010,#8b1d1d)'],
             ['Collection rate', ($billed > 0 ? (int) round($paid / $billed * 100) : 0).'%', 'received of billed', 'linear-gradient(135deg,#541747,#7b2869)'],
         ],
     };
@@ -161,7 +161,7 @@
                 <div><div class="fw-bold">{{ $selectedClient->name }}</div><div class="text-secondary small">{{ $selectedClient->phone }} Â· {{ $selectedClient->email }} Â· Client since {{ $selectedClient->created_at?->format('M Y') }}</div></div>
             </div>
         @else
-            <div class="fw-semibold">Choose a client to view their ticket and payment history.</div>
+            <div class="fw-semibold">Choose a client to view their service and payment history.</div>
         @endif
     </div>
 @endif
@@ -194,7 +194,7 @@
                 @forelse ($serviceBreakdown as $row)
                     @php $share = $serviceBreakdown->max('received') > 0 ? $row['received'] / $serviceBreakdown->max('received') * 100 : 0; @endphp
                     <div class="mb-3"><div class="d-flex justify-content-between gap-2 small fw-semibold mb-1"><span>{{ $row['service'] }}</span><span>{{ $money($row['received']) }}</span></div><div class="report-progress"><span style="width:{{ $share }}%;background:#24569c"></span></div></div>
-                @empty <p class="text-secondary small mb-0">No ticket revenue in this period.</p> @endforelse
+                @empty <p class="text-secondary small mb-0">No service revenue in this period.</p> @endforelse
             </div></section>
         </div>
     </div>
@@ -226,12 +226,12 @@
         @forelse ($payments as $payment)<tr><td>{{ $payment->paid_at?->format('j M Y') }}</td><td>{{ $payment->enquiry?->customer?->name ?? 'â€”' }}</td><td><a href="{{ route('enquiries.show', $payment->enquiry) }}">{{ $payment->enquiry?->number }}</a><div class="text-secondary small">{{ $payment->enquiry?->tickets->pluck('service.name')->filter()->implode(', ') }}</div></td><td>{{ $payment->mode }}</td><td>{{ $payment->receivedBy?->name ?? 'â€”' }}</td><td class="text-end fw-bold text-success">{{ $money($payment->amount) }}</td></tr>@empty<tr><td colspan="6" class="text-center text-secondary p-4">No payments match these filters.</td></tr>@endforelse
     </tbody></table></div></section>
 @elseif ($tab === 'client-history')
-    <section class="report-card mb-3"><div class="report-card-title">All tickets for this client</div><div class="table-responsive"><table class="table report-table"><thead><tr><th>Date</th><th>Ticket</th><th>Staff</th><th>Status</th><th class="text-end">Fee</th><th class="text-end">Paid</th></tr></thead><tbody>
-        @forelse ($clientTickets as $ticket)<tr><td>{{ $ticket->created_at?->format('j M Y') }}</td><td><a href="{{ route('tickets.show', $ticket) }}" class="fw-bold">{{ $ticket->number }}</a><div class="text-secondary small">{{ $ticket->service?->name }}</div></td><td>{{ $ticket->assignedTo?->name ?? 'â€”' }}</td><td><span class="report-badge">{{ $ticket->status?->value }}</span></td><td class="text-end fw-bold">{{ $money($ticket->total) }}</td><td class="text-end fw-bold text-success">{{ $money($ticket->amountPaid()) }}</td></tr>@empty<tr><td colspan="6" class="text-center text-secondary p-4">Select a client with matching tickets.</td></tr>@endforelse
+    <section class="report-card mb-3"><div class="report-card-title">All services for this client</div><div class="table-responsive"><table class="table report-table"><thead><tr><th>Date</th><th>Service</th><th>Staff</th><th>Status</th><th class="text-end">Fee</th><th class="text-end">Paid</th></tr></thead><tbody>
+        @forelse ($clientTickets as $ticket)<tr><td>{{ $ticket->created_at?->format('j M Y') }}</td><td><a href="{{ route('tickets.show', $ticket) }}" class="fw-bold">{{ $ticket->number }}</a><div class="text-secondary small">{{ $ticket->service?->name }}</div></td><td>{{ $ticket->assignedTo?->name ?? 'â€”' }}</td><td><span class="report-badge">{{ $ticket->status?->value }}</span></td><td class="text-end fw-bold">{{ $money($ticket->total) }}</td><td class="text-end fw-bold text-success">{{ $money($ticket->amountPaid()) }}</td></tr>@empty<tr><td colspan="6" class="text-center text-secondary p-4">Select a client with matching services.</td></tr>@endforelse
     </tbody></table></div></section>
 @elseif ($tab === 'open-tickets')
     <div class="row g-3 mb-3">
-        <div class="col-12 col-xl-7"><section class="report-card"><div class="report-card-title">Open tickets by status</div><div class="p-3">
+        <div class="col-12 col-xl-7"><section class="report-card"><div class="report-card-title">Open services by status</div><div class="p-3">
             @foreach ($statusCounts as $status => $count)
                 @php $maxCount = max(1, $statusCounts->max()); @endphp
                 <div class="mb-2"><div class="d-flex justify-content-between small fw-semibold mb-1"><span>{{ $status }}</span><span>{{ $count }}</span></div><div class="report-progress"><span style="width:{{ $count / $maxCount * 100 }}%;background:{{ $statusColors[$status] ?? '#24569c' }}"></span></div></div>
@@ -244,11 +244,11 @@
     </div>
     @include('reports.partials.open-tickets')
 @elseif ($tab === 'pending-documents')
-    <section class="report-card"><div class="report-card-title">Documents awaiting review</div><div class="table-responsive"><table class="table report-table"><thead><tr><th>Ticket</th><th>Client</th><th>Document</th><th>Version</th><th>Uploaded by</th><th>Uploaded</th><th>Status</th></tr></thead><tbody>
+    <section class="report-card"><div class="report-card-title">Documents awaiting review</div><div class="table-responsive"><table class="table report-table"><thead><tr><th>Service</th><th>Client</th><th>Document</th><th>Version</th><th>Uploaded by</th><th>Uploaded</th><th>Status</th></tr></thead><tbody>
         @forelse ($pendingDocuments as $row)<tr><td><a href="{{ route('tickets.show', $row['ticket']) }}">{{ $row['ticket']->number }}</a></td><td>{{ $row['ticket']->customer?->name }}</td><td>{{ $row['document']->original_filename }}</td><td>v{{ $row['document']->version }}</td><td>{{ $row['document']->uploadedBy?->name ?? 'â€”' }}</td><td>{{ $row['document']->created_at?->format('j M Y') }}</td><td><span class="report-badge">Awaiting check</span></td></tr>@empty<tr><td colspan="7" class="text-center text-secondary p-4">No documents are awaiting review.</td></tr>@endforelse
     </tbody></table></div></section>
 @elseif ($tab === 'gst-summary')
-    <section class="report-card"><div class="report-card-title">GST service-wise breakdown</div><div class="table-responsive"><table class="table report-table"><thead><tr><th>Service</th><th class="text-end">Tickets</th><th class="text-end">Taxable value</th><th class="text-end">GST billed</th><th class="text-end">GST rate</th></tr></thead><tbody>
+    <section class="report-card"><div class="report-card-title">GST service-wise breakdown</div><div class="table-responsive"><table class="table report-table"><thead><tr><th>Service</th><th class="text-end">Services</th><th class="text-end">Taxable value</th><th class="text-end">GST billed</th><th class="text-end">GST rate</th></tr></thead><tbody>
         @forelse ($serviceBreakdown as $row)<tr><td class="fw-bold">{{ $row['service'] }}</td><td class="text-end">{{ $row['tickets'] }}</td><td class="text-end">{{ $money($tickets->where('service_id', $row['service_id'])->sum('price')) }}</td><td class="text-end fw-bold">{{ $money($row['gst']) }}</td><td class="text-end">{{ number_format((float) ($tickets->where('service_id', $row['service_id'])->avg('gst_percent') ?? 0), 0) }}%</td></tr>@empty<tr><td colspan="5" class="text-center text-secondary p-4">No GST data for these filters.</td></tr>@endforelse
     </tbody></table></div></section>
 @elseif ($tab === 'staff-performance')
@@ -256,7 +256,7 @@
         @forelse ($staff->when(auth()->user()->isEmployee(), fn ($rows) => $rows->where('id', auth()->id())) as $person)
             @php $assigned = $tickets->where('assigned_to', $person->id); @endphp
             <tr><td class="fw-bold">{{ $person->name }}</td><td class="text-end">{{ $assigned->filter(fn ($ticket) => ! $ticket->status?->isClosed())->count() }}</td><td class="text-end">{{ $assigned->filter(fn ($ticket) => $ticket->status?->isClosed())->count() }}</td><td class="text-end">{{ $money($assigned->sum('total')) }}</td><td class="text-end text-success fw-bold">{{ $money($assigned->pluck('enquiry')->filter()->unique('id')->sum(fn ($enquiry) => $enquiry->amountPaid())) }}</td></tr>
-        @empty<tr><td colspan="5" class="text-center text-secondary p-4">No staff tickets match these filters.</td></tr>@endforelse
+        @empty<tr><td colspan="5" class="text-center text-secondary p-4">No staff services match these filters.</td></tr>@endforelse
     </tbody></table></div></section>
 @endif
 @endsection

@@ -1,11 +1,11 @@
 @extends('layouts.customer')
 
-@section('title', 'Ticket — ' . config('app.name', 'Task Management'))
+@section('title', 'Service — ' . config('app.name', 'Task Management'))
 
 @section('content')
 @php
     $history = [
-        ['to' => 'Documents Pending', 'comment' => 'Ticket created from your enquiry.', 'when' => '28 Sep 2026, 9:02 AM'],
+        ['to' => 'Documents Pending', 'comment' => 'Service created from your enquiry.', 'when' => '28 Sep 2026, 9:02 AM'],
         ['to' => 'Documents Received', 'comment' => 'Thank you, we received your documents.', 'when' => '28 Sep 2026, 4:40 PM'],
         ['to' => 'Under Verification', 'comment' => 'Reviewing your documents against our checklist.', 'when' => '29 Sep 2026, 9:15 AM'],
     ];

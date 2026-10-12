@@ -307,7 +307,7 @@
                     </li>
                     <li class="d-flex gap-2 mb-0">
                         <span class="rounded-circle d-inline-block flex-shrink-0 mt-1" style="width:6px;height:6px;background:#0a4fc4;"></span>
-                        <span><strong class="d-block">Existing tickets</strong><span class="tm-muted">Keep their own document list; changes apply to new tickets</span></span>
+                        <span><strong class="d-block">Existing services</strong><span class="tm-muted">Keep their own document list; changes apply to new services</span></span>
                     </li>
                 </ul>
             </div>

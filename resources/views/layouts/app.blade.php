@@ -58,7 +58,7 @@
                         <span class="tm-nav-icon">{!! $tmIcon('user') !!}</span> Clients
                     </a>
                     <a href="{{ route('tickets.index') }}" class="tm-nav-link {{ request()->routeIs('tickets.*') ? 'active' : '' }}">
-                        <span class="tm-nav-icon">{!! $tmIcon('tag') !!}</span> Tickets
+                        <span class="tm-nav-icon">{!! $tmIcon('tag') !!}</span> Services
                     </a>
                     <a href="{{ route('payments.index') }}" class="tm-nav-link {{ request()->routeIs('payments.*') ? 'active' : '' }}">
                         <span class="tm-nav-icon">{!! $tmIcon('credit-card') !!}</span> Payments
@@ -104,7 +104,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="text" placeholder="Search ticket no., client name, phone or email" disabled>
+                    <input type="text" placeholder="Search service no., client name, phone or email" disabled>
                 </div>
 
                 <div class="d-flex align-items-center gap-3 ms-auto">

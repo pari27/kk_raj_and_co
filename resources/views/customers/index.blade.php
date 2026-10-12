@@ -48,13 +48,13 @@
 
     $statCards = [
         ['label' => 'Total clients', 'count' => $totalCount, 'caption' => 'this financial year', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
-        ['label' => 'With open tickets', 'count' => $withOpenTickets, 'caption' => 'work in progress', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
+        ['label' => 'With open services', 'count' => $withOpenTickets, 'caption' => 'work in progress', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
         ['label' => 'Fees pending', 'count' => $feesPendingTotal, 'prefix' => '₹', 'caption' => 'across ' . $feesPendingRows->count() . ' clients', 'gradient' => 'linear-gradient(135deg, #300a0a, #7f1616)'],
         ['label' => 'Portal active', 'count' => $portalActive, 'caption' => 'clients logged in', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
     ];
 @endphp
 
-<x-page-header title="Clients" subtitle="Everyone the firm works for, with their tickets and fees" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Clients']]">
+<x-page-header title="Clients" subtitle="Everyone the firm works for, with their services and fees" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Clients']]">
     <x-slot:actions>
         <a href="{{ route('customers.create') }}" class="btn btn-tm-primary">+ Add Client</a>
     </x-slot:actions>
@@ -93,8 +93,8 @@
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item js-sort" href="#" data-col="0" data-dir="asc" data-label="Name A-Z">Name A-Z</a></li>
                     <li><a class="dropdown-item js-sort" href="#" data-col="0" data-dir="desc" data-label="Name Z-A">Name Z-A</a></li>
-                    <li><a class="dropdown-item js-sort" href="#" data-col="2" data-dir="desc" data-label="Most tickets">Most tickets</a></li>
-                    <li><a class="dropdown-item js-sort" href="#" data-col="2" data-dir="asc" data-label="Fewest tickets">Fewest tickets</a></li>
+                    <li><a class="dropdown-item js-sort" href="#" data-col="2" data-dir="desc" data-label="Most services">Most services</a></li>
+                    <li><a class="dropdown-item js-sort" href="#" data-col="2" data-dir="asc" data-label="Fewest services">Fewest services</a></li>
                 </ul>
             </div>
         </div>
@@ -106,7 +106,7 @@
                 <tr>
                     <th>Client</th>
                     <th>Contact</th>
-                    <th>Tickets</th>
+                    <th>Services</th>
                     <th>Fees pending</th>
                     <th>Status</th>
                     <th class="text-end">Actions</th>

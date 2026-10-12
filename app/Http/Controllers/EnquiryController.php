@@ -197,7 +197,7 @@ class EnquiryController extends Controller
             module: 'Enquiry',
             recordLabel: $enquiry->number,
             recordUrl: route('enquiries.show', $enquiry),
-            details: "For {$customer->name} — ".count($lines).' ticket(s)',
+            details: "For {$customer->name} — ".count($lines).' service(s)',
             subject: $enquiry,
         );
 

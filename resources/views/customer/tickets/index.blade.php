@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'My Tickets — ' . config('app.name', 'Task Management'))
+@section('title', 'My Services — ' . config('app.name', 'Task Management'))
 
 @section('content')
 @php
@@ -13,7 +13,7 @@
 
 <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 pb-3 mb-4 tm-divider-gold">
     <div>
-        <h1 class="h4 tm-serif fw-bold mb-1">My Tickets</h1>
+        <h1 class="h4 tm-serif fw-bold mb-1">My Services</h1>
         <p class="tm-muted mb-0" style="font-size: .89rem;">Track the status of every service you've requested</p>
     </div>
 </div>
@@ -23,7 +23,7 @@
         <table class="table tm-table align-middle mb-0">
             <thead>
                 <tr>
-                    <th>Ticket</th>
+                    <th>Service No.</th>
                     <th>Service</th>
                     <th>Status</th>
                     <th>Created</th>

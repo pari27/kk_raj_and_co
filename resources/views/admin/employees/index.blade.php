@@ -15,7 +15,7 @@
     ];
 @endphp
 
-<x-page-header title="Employees" subtitle="Team members who work on client tickets" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Master Employees']]">
+<x-page-header title="Employees" subtitle="Team members who work on client services" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Master Employees']]">
     <x-slot:actions><a href="{{ route('admin.employees.create') }}" class="btn btn-tm-primary">+ Add Employee</a></x-slot:actions>
 </x-page-header>
 

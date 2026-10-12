@@ -138,7 +138,7 @@
         </div>
         <div class="col-6 col-xl-3">
             <div class="tm-card svc-stat-card p-3" style="background: linear-gradient(135deg, #300a0a, #7f1616);">
-                <div class="small mb-2 opacity-75">Open tickets</div>
+                <div class="small mb-2 opacity-75">Open services</div>
                 <div class="h3 fw-bold mb-1">{{ number_format($openTicketsCount) }}</div>
                 <div class="small opacity-75" style=" font-size: .72rem;">in progress</div>
             </div>
@@ -270,7 +270,7 @@
                             <div class="fw-bold" style="color: #2f5fbe;">₹{{ number_format($feesThisFy) }}</div>
                         </div>
                     </div>
-                    <a href="{{ route('tickets.index') }}" class="svc-usage-link">View {{ $service->name }} tickets &rarr;</a>
+                    <a href="{{ route('tickets.index') }}" class="svc-usage-link">View {{ $service->name }} services &rarr;</a>
                 </div>
             </section>
         </div>

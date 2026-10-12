@@ -36,7 +36,7 @@ class ReportController extends Controller
 
         return response()->streamDownload(function () use ($tickets): void {
             $output = fopen('php://output', 'w');
-            fputcsv($output, ['Ticket', 'Client', 'Service', 'Staff', 'Status', 'Created', 'Billed', 'Paid', 'Due']);
+            fputcsv($output, ['Service No.', 'Client', 'Service', 'Staff', 'Status', 'Created', 'Billed', 'Paid', 'Due']);
 
             foreach ($tickets as $ticket) {
                 fputcsv($output, [

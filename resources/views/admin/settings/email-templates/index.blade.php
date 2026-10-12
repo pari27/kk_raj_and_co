@@ -7,8 +7,8 @@
     $templates = [
         ['key' => 'employee_welcome', 'subject' => 'Your account has been created'],
         ['key' => 'customer_otp', 'subject' => 'Your one-time login code'],
-        ['key' => 'ticket_reassigned', 'subject' => 'A ticket has been reassigned to you'],
-        ['key' => 'task_completed', 'subject' => 'Your ticket has been marked completed'],
+        ['key' => 'ticket_reassigned', 'subject' => 'A service has been reassigned to you'],
+        ['key' => 'task_completed', 'subject' => 'Your service has been marked completed'],
         ['key' => 'payment_received', 'subject' => 'Payment received — thank you'],
     ];
 @endphp

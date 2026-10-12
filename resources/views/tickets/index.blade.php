@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Tickets — ' . config('app.name', 'Task Management'))
+@section('title', 'Services — ' . config('app.name', 'Task Management'))
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
@@ -32,25 +32,25 @@
     $isAdmin = auth()->user()->isSuperAdmin() || auth()->user()->isAdmin();
 
     $pendingCards = [
-        ['label' => 'Pending tickets', 'count' => $stats['pending_total'], 'caption' => $isAdmin ? 'across the firm' : 'assigned to you', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
+        ['label' => 'Pending services', 'count' => $stats['pending_total'], 'caption' => $isAdmin ? 'across the firm' : 'assigned to you', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
         ['label' => 'Waiting for client', 'count' => $stats['waiting_for_client'], 'caption' => 'documents not received', 'gradient' => 'linear-gradient(135deg, #3a2205, #8a5a10)'],
         ['label' => 'In progress', 'count' => $stats['in_progress'], 'caption' => 'being worked on', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
         ['label' => 'Awaiting payment', 'count' => $stats['awaiting_payment'], 'caption' => 'task completed', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
     ];
 
     $historyCards = [
-        ['label' => 'Closed tickets', 'count' => $stats['closed_total'], 'caption' => 'all time', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
+        ['label' => 'Closed services', 'count' => $stats['closed_total'], 'caption' => 'all time', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
         ['label' => 'Closed this month', 'count' => $stats['closed_this_month'], 'caption' => now()->format('F'), 'gradient' => 'linear-gradient(135deg, #062a28, #0f766e)'],
-        ['label' => 'Fees collected', 'count' => $stats['fees_collected'], 'prefix' => '₹', 'caption' => $isAdmin ? 'across the firm' : 'on your tickets', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
+        ['label' => 'Fees collected', 'count' => $stats['fees_collected'], 'prefix' => '₹', 'caption' => $isAdmin ? 'across the firm' : 'on your services', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
         ['label' => 'Average time', 'count' => $stats['avg_days'], 'suffix' => ' days', 'caption' => 'created to completed', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
     ];
 @endphp
 
-<x-breadcrumbs :items="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => $isAdmin ? 'Tickets' : 'My tickets']]" />
+<x-breadcrumbs :items="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => $isAdmin ? 'Services' : 'My services']]" />
 <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 pb-3 mb-4 tm-divider-gold">
     <div>
-        <h1 class="tm-serif fw-bold mb-1" style="font-size: 1.15rem;">{{ $isAdmin ? 'Tickets' : 'My tickets' }}</h1>
-        <p class="tm-muted mb-0" id="ticketsSubtitle" style="font-size: .8rem;">{{ $isAdmin ? 'All tickets in progress, from new to awaiting final payment' : 'Tickets assigned to you, from new to awaiting final payment' }}</p>
+        <h1 class="tm-serif fw-bold mb-1" style="font-size: 1.15rem;">{{ $isAdmin ? 'Services' : 'My services' }}</h1>
+        <p class="tm-muted mb-0" id="ticketsSubtitle" style="font-size: .8rem;">{{ $isAdmin ? 'All services in progress, from new to awaiting final payment' : 'Services assigned to you, from new to awaiting final payment' }}</p>
     </div>
     <a href="{{ route('enquiries.create') }}" class="btn btn-tm-primary">+ New Enquiry</a>
 </div>
@@ -90,7 +90,7 @@
 <div class="tm-card p-0">
     <div class="d-flex align-items-center gap-4 px-3 pt-3">
         <button type="button" class="tm-ticket-tab active" data-tab="pending">
-            Open Tickets <span class="badge rounded-pill text-bg-light border ms-1">{{ $pending->count() }}</span>
+            Open Services <span class="badge rounded-pill text-bg-light border ms-1">{{ $pending->count() }}</span>
         </button>
         <button type="button" class="tm-ticket-tab" data-tab="history">
             Completed <span class="badge rounded-pill text-bg-light border ms-1">{{ $history->count() }}</span>
@@ -100,7 +100,7 @@
 
     <div class="p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
         <div class="flex-grow-1" style="max-width: 320px;">
-            <input type="text" id="ticketSearch" class="form-control tm-field" placeholder="Search ticket no., client, phone or status">
+            <input type="text" id="ticketSearch" class="form-control tm-field" placeholder="Search service no., client, phone or status">
         </div>
         <div class="d-flex flex-wrap gap-2">
             <div id="ticketDateRangeWrap" class="d-none" style="min-width: 220px;">
@@ -123,7 +123,7 @@
         <table class="table tm-table align-middle mb-0" id="pendingTable">
             <thead>
                 <tr>
-                    <th class="tm-th-sortable" data-sort-key="number" data-sort-type="text">Ticket<x-tm-sort-icon /></th>
+                    <th class="tm-th-sortable" data-sort-key="number" data-sort-type="text">Service<x-tm-sort-icon /></th>
                     <th class="tm-th-sortable" data-sort-key="client" data-sort-type="text">Client<x-tm-sort-icon /></th>
                     @if ($isAdmin)
                         <th class="tm-th-sortable" data-sort-key="employee" data-sort-type="text">Assigned to<x-tm-sort-icon /></th>
@@ -186,7 +186,7 @@
                 @empty
                     <tr>
                         <td colspan="7">
-                            <x-empty-state title="No open tickets" description="Tickets created from enquiries will show up here." />
+                            <x-empty-state title="No open services" description="Services created from enquiries will show up here." />
                         </td>
                     </tr>
                 @endforelse
@@ -198,7 +198,7 @@
         <table class="table tm-table align-middle mb-0" id="historyTable">
             <thead>
                 <tr>
-                    <th class="tm-th-sortable" data-sort-key="number" data-sort-type="text">Ticket<x-tm-sort-icon /></th>
+                    <th class="tm-th-sortable" data-sort-key="number" data-sort-type="text">Service<x-tm-sort-icon /></th>
                     <th class="tm-th-sortable" data-sort-key="client" data-sort-type="text">Client<x-tm-sort-icon /></th>
                     <th class="tm-th-sortable" data-sort-key="service" data-sort-type="text">Service<x-tm-sort-icon /></th>
                     @if ($isAdmin)
@@ -237,7 +237,7 @@
                 @empty
                     <tr>
                         <td colspan="9">
-                            <x-empty-state title="No completed tickets yet" description="Tickets marked Task Completed will show up here." />
+                            <x-empty-state title="No completed services yet" description="Services marked Task Completed will show up here." />
                         </td>
                     </tr>
                 @endforelse
@@ -263,8 +263,8 @@
     (function () {
         var PAGE_SIZE = 6;
         var subtitles = {
-            pending: {{ Illuminate\Support\Js::from($isAdmin ? 'All tickets in progress, from new to awaiting final payment' : 'Tickets assigned to you, from new to awaiting final payment') }},
-            history: {{ Illuminate\Support\Js::from('Closed tickets') }},
+            pending: {{ Illuminate\Support\Js::from($isAdmin ? 'All services in progress, from new to awaiting final payment' : 'Services assigned to you, from new to awaiting final payment') }},
+            history: {{ Illuminate\Support\Js::from('Closed services') }},
         };
 
         var activeTab = 'pending';
@@ -370,7 +370,7 @@
 
             paginationSummary.textContent = visibleRows.length
                 ? 'Showing ' + (start + 1) + '–' + Math.min(start + PAGE_SIZE, visibleRows.length) + ' of ' + visibleRows.length
-                : 'No tickets found';
+                : 'No services found';
             paginationCurrent.textContent = currentPage;
             paginationTotal.textContent = totalPages;
         }

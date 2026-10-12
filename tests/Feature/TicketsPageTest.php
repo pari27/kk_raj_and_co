@@ -41,7 +41,7 @@ class TicketsPageTest extends TestCase
         $response = $this->actingAs($admin)->get(route('tickets.index'));
 
         $response->assertOk();
-        $response->assertSee('Tickets');
+        $response->assertSee('Services');
         $response->assertSee('Assigned to');
         // Tickets belonging to employees other than any single employee are visible to Admin.
         $response->assertSee('Rahul Sen');
@@ -61,7 +61,7 @@ class TicketsPageTest extends TestCase
         $response = $this->actingAs($employee)->get(route('tickets.index'));
 
         $response->assertOk();
-        $response->assertSee('My tickets');
+        $response->assertSee('My services');
         $response->assertDontSee('Assigned to');
         $response->assertDontSee('Rahul Sen');
         $response->assertDontSee('Anita Roy');

@@ -21,7 +21,7 @@
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-4">
         <div class="tm-card p-3 h-100">
-            <div class="tm-muted small mb-2">Total tickets</div>
+            <div class="tm-muted small mb-2">Total services</div>
             <div class="h3 tm-serif fw-bold mb-0">3</div>
         </div>
     </div>
@@ -41,14 +41,14 @@
 
 <div class="tm-card p-0">
     <div class="d-flex align-items-center justify-content-between p-3 pb-0">
-        <h2 class="h6 tm-serif fw-bold mb-0">My tickets</h2>
+        <h2 class="h6 tm-serif fw-bold mb-0">My services</h2>
         <a href="{{ route('customer.tickets.index') }}" class="small text-decoration-underline">View all</a>
     </div>
     <div class="table-responsive">
         <table class="table tm-table align-middle mb-0">
             <thead>
                 <tr>
-                    <th>Ticket</th>
+                    <th>Service No.</th>
                     <th>Service</th>
                     <th>Status</th>
                 </tr>

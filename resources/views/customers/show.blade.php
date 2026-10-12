@@ -153,7 +153,7 @@
         <div class="col-6 col-xl-3">
             <div class="tm-card client-stat-card p-3" style="background: linear-gradient(135deg, #102b68, #2865d5);">
                 <div class="position-relative" style="z-index: 1;">
-                    <div class="small mb-2">Open tickets</div>
+                    <div class="small mb-2">Open services</div>
                     <div class="h3 fw-bold mb-1">{{ $pendingTickets->count() }}</div>
                     <div class="small opacity-75" style="font-size: .72rem;">in progress</div>
                 </div>
@@ -164,7 +164,7 @@
                 <div class="position-relative" style="z-index: 1;">
                     <div class="small mb-2">Completed</div>
                     <div class="h3 fw-bold mb-1">{{ $historyTickets->count() }}</div>
-                    <div class="small opacity-75" style="font-size: .72rem;">closed tickets</div>
+                    <div class="small opacity-75" style="font-size: .72rem;">closed services</div>
                 </div>
             </div>
         </div>
@@ -215,10 +215,10 @@
             </section>
 
             <section class="tm-card p-0 mb-3 overflow-hidden">
-                <div class="client-section-title"><h2 class="mb-0 fw-bold">Pending Tickets</h2></div>
+                <div class="client-section-title"><h2 class="mb-0 fw-bold">Pending Services</h2></div>
                 <div class="table-responsive">
                     <table class="table tm-table client-ticket-table align-middle mb-0">
-                        <thead><tr><th>Ticket</th><th>Assigned to</th><th>Status</th><th class="text-end">Fee</th></tr></thead>
+                        <thead><tr><th>Service</th><th>Assigned to</th><th>Status</th><th class="text-end">Fee</th></tr></thead>
                         <tbody>
                             @forelse ($pendingTickets as $ticket)
                                 <tr>
@@ -228,7 +228,7 @@
                                     <td class="text-end fw-semibold">₹{{ number_format((float) $ticket->total) }}</td>
                                 </tr>
                             @empty
-                                <tr><td colspan="4" class="text-center tm-muted py-4">No pending tickets.</td></tr>
+                                <tr><td colspan="4" class="text-center tm-muted py-4">No pending services.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -267,7 +267,7 @@
                 <div class="p-3 px-lg-4">
                     <div class="client-summary-row d-flex justify-content-between gap-3 py-3"><span class="client-info-label">Total billed</span><strong>₹{{ number_format((float) $totalBilled) }}</strong></div>
                     <div class="client-summary-row d-flex justify-content-between gap-3 py-3"><span class="client-info-label">Received</span><strong class="text-success">₹{{ number_format((float) $feesReceived) }}</strong></div>
-                    <div class="client-fee-pending mt-3 p-3 rounded d-flex justify-content-between align-items-center gap-2" style="background: #fceaea; color: #8f2020;"><div><strong>Pending</strong><div class="small">Across unpaid tickets</div></div><strong class="fs-5">₹{{ number_format((float) $feesPending) }}</strong></div>
+                    <div class="client-fee-pending mt-3 p-3 rounded d-flex justify-content-between align-items-center gap-2" style="background: #fceaea; color: #8f2020;"><div><strong>Pending</strong><div class="small">Across unpaid services</div></div><strong class="fs-5">₹{{ number_format((float) $feesPending) }}</strong></div>
                 </div>
             </section>
 

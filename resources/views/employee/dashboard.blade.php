@@ -50,7 +50,7 @@
     <div class="col-12 col-xl-8">
         <section class="tm-card tm-card-hover p-0 h-100" style="overflow:hidden">
             <div class="d-flex align-items-center justify-content-between p-3" style="background:#101b3d">
-                <h2 class="h6 tm-serif fw-bold mb-0 text-white">My ticket activity</h2>
+                <h2 class="h6 tm-serif fw-bold mb-0 text-white">My service activity</h2>
                 <span class="small text-white-50">Last 6 months</span>
             </div>
             <div class="p-3">
@@ -65,7 +65,7 @@
     <div class="col-12 col-xl-4">
         <section class="tm-card tm-card-hover p-0 h-100" style="overflow:hidden">
             <div class="p-3" style="background:#101b3d">
-                <h2 class="h6 tm-serif fw-bold mb-0 text-white">My tickets by status</h2>
+                <h2 class="h6 tm-serif fw-bold mb-0 text-white">My services by status</h2>
             </div>
             <div class="p-3">
                 @if ($statusBreakdown)
@@ -73,7 +73,7 @@
                         <canvas id="employeeTicketStatuses"></canvas>
                         <div class="position-absolute top-50 start-50 translate-middle text-center">
                             <div class="h3 tm-serif fw-bold mb-0">{{ $openTicketsTotal }}</div>
-                            <div class="small text-secondary">open tickets</div>
+                            <div class="small text-secondary">open services</div>
                         </div>
                     </div>
                     <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
@@ -85,7 +85,7 @@
                         @endforeach
                     </div>
                 @else
-                    <div class="text-center text-secondary py-5">No open tickets right now.</div>
+                    <div class="text-center text-secondary py-5">No open services right now.</div>
                 @endif
             </div>
         </section>
@@ -96,7 +96,7 @@
     <div class="col-12 col-xl-6">
         <section class="tm-card tm-card-hover p-0 h-100" style="overflow:hidden">
             <div class="p-3" style="background:#101b3d">
-                <h2 class="h6 tm-serif fw-bold mb-0 text-white">Fees received from my tickets</h2>
+                <h2 class="h6 tm-serif fw-bold mb-0 text-white">Fees received from my services</h2>
             </div>
             <div class="p-3">
                 <div style="height:230px"><canvas id="employeeFeesByMonth"></canvas></div>
@@ -106,7 +106,7 @@
     <div class="col-12 col-xl-6">
         <section class="tm-card tm-card-hover p-0 h-100" style="overflow:hidden">
             <div class="d-flex align-items-center justify-content-between p-3" style="background:#101b3d">
-                <h2 class="h6 tm-serif fw-bold mb-0 text-white">Tickets by service</h2>
+                <h2 class="h6 tm-serif fw-bold mb-0 text-white">Services by type</h2>
                 <div class="d-flex align-items-center gap-2 small text-white">
                     <span><i class="d-inline-block rounded-1 me-1" style="width:9px;height:9px;background:#0d6efd"></i>Open</span>
                     <span><i class="d-inline-block rounded-1 me-1" style="width:9px;height:9px;background:#4a9b3e"></i>Completed</span>
@@ -136,15 +136,15 @@
 <section class="tm-card p-0" style="overflow:hidden">
     <div class="d-flex align-items-center justify-content-between p-3 pb-2">
         <div>
-            <h2 class="h6 tm-serif fw-bold mb-1">My recent tickets</h2>
-            <p class="small text-secondary mb-0">Your five most recently assigned tickets</p>
+            <h2 class="h6 tm-serif fw-bold mb-1">My recent services</h2>
+            <p class="small text-secondary mb-0">Your five most recently assigned services</p>
         </div>
-        <a href="{{ route('tickets.index') }}" class="small">View all tickets</a>
+        <a href="{{ route('tickets.index') }}" class="small">View all services</a>
     </div>
     <div class="table-responsive">
         <table class="table tm-table align-middle mb-0">
             <thead>
-                <tr><th>Ticket</th><th>Client</th><th>Service</th><th>Status</th><th class="text-end">Fee</th></tr>
+                <tr><th>Service No.</th><th>Client</th><th>Service</th><th>Status</th><th class="text-end">Fee</th></tr>
             </thead>
             <tbody>
                 @forelse ($myTickets as $ticket)
@@ -156,7 +156,7 @@
                         <td class="text-end fw-semibold">{{ $currency((float) $ticket->total) }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="text-center text-secondary py-5">No tickets are assigned to you yet.</td></tr>
+                    <tr><td colspan="5" class="text-center text-secondary py-5">No services are assigned to you yet.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -167,11 +167,11 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border: 0; border-radius: .75rem; overflow: hidden;">
             <div class="p-3" style="background: #0a4fc4;">
-                <h2 class="h6 fw-bold mb-0 text-white">My open tickets ({{ $openTicketsList->count() }})</h2>
+                <h2 class="h6 fw-bold mb-0 text-white">My open services ({{ $openTicketsList->count() }})</h2>
             </div>
             <div class="modal-body p-0" style="max-height: 60vh; overflow-y: auto;">
                 <table class="table tm-table align-middle mb-0">
-                    <thead><tr><th>Ticket</th><th>Client</th><th>Service</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Service No.</th><th>Client</th><th>Service</th><th>Status</th></tr></thead>
                     <tbody>
                         @forelse ($openTicketsList as $ticket)
                             <tr>
@@ -181,7 +181,7 @@
                                 <td><x-status-badge :status="$ticket->status?->value ?? 'Unknown'" /></td>
                             </tr>
                         @empty
-                            <tr><td colspan="4" class="text-center text-secondary py-4">No open tickets right now.</td></tr>
+                            <tr><td colspan="4" class="text-center text-secondary py-4">No open services right now.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -199,7 +199,7 @@
             </div>
             <div class="modal-body p-0" style="max-height: 60vh; overflow-y: auto;">
                 <table class="table tm-table align-middle mb-0">
-                    <thead><tr><th>Ticket</th><th>Client</th><th>Service</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Service No.</th><th>Client</th><th>Service</th><th>Status</th></tr></thead>
                     <tbody>
                         @forelse ($awaitingActionList as $ticket)
                             <tr>
@@ -227,7 +227,7 @@
             </div>
             <div class="modal-body p-0" style="max-height: 60vh; overflow-y: auto;">
                 <table class="table tm-table align-middle mb-0">
-                    <thead><tr><th>Ticket</th><th>Client</th><th>Service</th><th>Status</th><th>Completed</th></tr></thead>
+                    <thead><tr><th>Service No.</th><th>Client</th><th>Service</th><th>Status</th><th>Completed</th></tr></thead>
                     <tbody>
                         @forelse ($completedThisMonthList as $ticket)
                             <tr>
@@ -256,7 +256,7 @@
             </div>
             <div class="modal-body p-0" style="max-height: 60vh; overflow-y: auto;">
                 <table class="table tm-table align-middle mb-0">
-                    <thead><tr><th>Ticket</th><th>Client</th><th>Document</th><th>Uploaded</th></tr></thead>
+                    <thead><tr><th>Service</th><th>Client</th><th>Document</th><th>Uploaded</th></tr></thead>
                     <tbody>
                         @forelse ($documentsToVerifyList as $row)
                             <tr>

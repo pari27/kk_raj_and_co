@@ -18,12 +18,12 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($user)->get(route('dashboard'));
 
         $response->assertOk();
-        $response->assertSee('Enquiries vs completed tickets');
-        $response->assertSee('Open tickets by status');
+        $response->assertSee('Enquiries vs completed services');
+        $response->assertSee('Open services by status');
         $response->assertSee('Fees by month');
         $response->assertSee('Fee collection');
         $response->assertSee('Employee workload');
-        $response->assertSee('Tickets by service');
+        $response->assertSee('Services by type');
     }
 
     public function test_admin_sees_the_admin_dashboard(): void
@@ -33,7 +33,7 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($user)->get(route('dashboard'));
 
         $response->assertOk();
-        $response->assertSee('Enquiries vs completed tickets');
+        $response->assertSee('Enquiries vs completed services');
     }
 
     public function test_employee_sees_their_own_dashboard_at_the_same_url(): void
@@ -43,8 +43,8 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($user)->get(route('dashboard'));
 
         $response->assertOk();
-        $response->assertSee('My tickets');
-        $response->assertDontSee('Enquiries vs completed tickets');
+        $response->assertSee('My services');
+        $response->assertDontSee('Enquiries vs completed services');
     }
 
     public function test_guest_is_redirected_to_login(): void

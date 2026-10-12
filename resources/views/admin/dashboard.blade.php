@@ -43,7 +43,7 @@
 
     $statCards = [
         ['label' => 'New enquiries (Sep)', 'count' => 27, 'prefix' => '', 'trend' => '+12% vs Aug', 'trendColor' => '#ffffff', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)', 'url' => route('enquiries.index')],
-        ['label' => 'Open tickets', 'count' => $openTicketsTotal, 'prefix' => '', 'trend' => '6 more than last week', 'trendColor' => 'rgba(255,255,255,.75)', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)', 'url' => route('tickets.index')],
+        ['label' => 'Open services', 'count' => $openTicketsTotal, 'prefix' => '', 'trend' => '6 more than last week', 'trendColor' => 'rgba(255,255,255,.75)', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)', 'url' => route('tickets.index')],
         ['label' => 'Completed (Sep)', 'count' => 23, 'prefix' => '', 'trend' => '+5% vs Aug', 'trendColor' => '#ffffff', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)', 'url' => route('tickets.index')],
         ['label' => 'Fees pending', 'count' => 42500, 'prefix' => '₹', 'trend' => 'Across 14 clients', 'trendColor' => '#ffffff', 'gradient' => 'linear-gradient(135deg, #300a0a, #7f1616)', 'url' => route('payments.index')],
         ['label' => 'Fees received (Sep)', 'count' => 186000, 'prefix' => '₹', 'trend' => '+18% vs Aug', 'trendColor' => '#ffffff', 'gradient' => 'linear-gradient(135deg, #062a28, #0f766e)', 'url' => route('payments.index')],
@@ -94,7 +94,7 @@
         <div class="tm-card tm-card-hover p-0 h-100" style="overflow: hidden;">
             <div class="d-flex align-items-start justify-content-between px-3 pt-3 pb-3" style="background: #101b3d;">
                 <div>
-                    <h2 class="tm-serif fw-bold mb-0 text-white" style="font-size: .88rem;">Enquiries vs completed tickets</h2>
+                    <h2 class="tm-serif fw-bold mb-0 text-white" style="font-size: .88rem;">Enquiries vs completed services</h2>
                 </div>
                 <div class="d-flex align-items-center gap-2" style="font-size: .72rem;">
                     <span class="badge rounded-pill fw-normal" style="border: 1px solid #3b82f6; color: #fff; background: #3b82f6;">New enquiries</span>
@@ -110,7 +110,7 @@
     <div class="col-12 col-xl-5">
         <div class="tm-card tm-card-hover p-0 h-100" style="overflow: hidden;">
             <div class="p-3" style="background: #101b3d;">
-                <h2 class="h6 tm-serif fw-bold mb-0 text-white" style="font-size: .88rem;">Open tickets by status</h2>
+                <h2 class="h6 tm-serif fw-bold mb-0 text-white" style="font-size: .88rem;">Open services by status</h2>
             </div>
             <div class="p-3 d-flex align-items-center gap-3">
                 <div style="width: 140px; height: 140px; flex-shrink: 0;">
@@ -191,7 +191,7 @@
 
 <div class="tm-card tm-card-hover p-0" style="overflow: hidden;">
     <div class="d-flex align-items-center justify-content-between p-3" style="background: #101b3d;">
-        <h2 class="h6 tm-serif fw-bold mb-0 text-white">Tickets by service</h2>
+        <h2 class="h6 tm-serif fw-bold mb-0 text-white">Services by type</h2>
         <div class="d-flex align-items-center gap-2" style="font-size: .72rem;">
             <span class="badge rounded-pill fw-normal" style="border: 1px solid #3b82f6; color: #fff; background: #3b82f6;">Open</span>
             <span class="badge rounded-pill fw-normal" style="background: #4a9b3e; color: #fff;">Completed</span>
@@ -206,8 +206,8 @@
                         <div class="d-flex align-items-center gap-3 mb-3">
                             <div style="width: 170px; font-size: .78rem;">{{ $row['name'] }}</div>
                             <div class="tm-progress flex-grow-1" style="background: #e5e7ec; overflow: hidden;">
-                                <span title="{{ $row['completed'] }} completed tickets" style="display:block;height:100%;float:left;border-radius:0;width: {{ (int) round($row['completed'] / $rowTotal * 100) }}%; background:#4a9b3e; cursor: default;"></span>
-                                <span title="{{ $row['open'] }} pending tickets" style="display:block;height:100%;float:left;border-radius:0;width: {{ (int) round($row['open'] / $rowTotal * 100) }}%; background:#0d6efd; cursor: default;"></span>
+                                <span title="{{ $row['completed'] }} completed services" style="display:block;height:100%;float:left;border-radius:0;width: {{ (int) round($row['completed'] / $rowTotal * 100) }}%; background:#4a9b3e; cursor: default;"></span>
+                                <span title="{{ $row['open'] }} pending services" style="display:block;height:100%;float:left;border-radius:0;width: {{ (int) round($row['open'] / $rowTotal * 100) }}%; background:#0d6efd; cursor: default;"></span>
                             </div>
                             <div class="fw-semibold text-end" style="width: 30px; font-size: .78rem;">{{ $rowTotal }}</div>
                         </div>
@@ -352,7 +352,7 @@
                     ctx.fillText('{{ $openTicketsTotal }}', width / 2, height / 2 - 8);
                     ctx.font = '11px "Helvetica Neue", Arial, sans-serif';
                     ctx.fillStyle = '#6b7280';
-                    ctx.fillText('open tickets', width / 2, height / 2 + 12);
+                    ctx.fillText('open services', width / 2, height / 2 + 12);
                     ctx.restore();
                 },
             }],

@@ -23,13 +23,13 @@
 
     $statCards = [
         ['label' => 'Enquiries this month', 'count' => $stats['enquiries_this_month'], 'caption' => now()->format('F'), 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
-        ['label' => 'Tickets created', 'count' => $stats['tickets_created'], 'caption' => 'from these enquiries', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
+        ['label' => 'Services created', 'count' => $stats['tickets_created'], 'caption' => 'from these enquiries', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
         ['label' => 'Enquiry value', 'count' => $stats['enquiry_value'], 'prefix' => '₹', 'caption' => 'this month, including GST', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
-        ['label' => 'Open enquiries', 'count' => $stats['open_enquiries'], 'caption' => 'tickets still in progress', 'gradient' => 'linear-gradient(135deg, #3a2205, #8a5a10)'],
+        ['label' => 'Open enquiries', 'count' => $stats['open_enquiries'], 'caption' => 'services still in progress', 'gradient' => 'linear-gradient(135deg, #3a2205, #8a5a10)'],
     ];
 @endphp
 
-<x-page-header title="Enquiries" :subtitle="$isAdmin ? 'Every client request, with the tickets created from it' : 'Enquiries with at least one ticket assigned to you'" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Enquiries']]">
+<x-page-header title="Enquiries" :subtitle="$isAdmin ? 'Every client request, with the services created from it' : 'Enquiries with at least one service assigned to you'" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Enquiries']]">
     <x-slot:actions>
         <a href="{{ route('enquiries.create') }}" class="btn btn-tm-primary">+ New Enquiry</a>
     </x-slot:actions>
@@ -81,7 +81,7 @@
                     <th>Enquiry</th>
                     <th>Client</th>
                     <th>Services</th>
-                    <th>Tickets</th>
+                    <th>Services</th>
                     <th>Created</th>
                     <th>Total</th>
                     <th>Status</th>

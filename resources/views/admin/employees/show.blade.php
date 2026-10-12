@@ -121,7 +121,7 @@
     <div class="row g-3 mb-3">
         <div class="col-6 col-xl-3">
             <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #102b68, #2865d5);">
-                <div class="small mb-2 opacity-75">Open tickets</div>
+                <div class="small mb-2 opacity-75">Open services</div>
                 <div class="h3 fw-bold mb-1">{{ number_format($openTicketsCount) }}</div>
                 <div class="small opacity-75" style="font-size: .72rem;">assigned now</div>
             </div>
@@ -183,15 +183,15 @@
 
             <section class="tm-card p-0 mb-3 overflow-hidden">
                 <div class="emp-section-title d-flex align-items-center justify-content-between">
-                    <h2 class="mb-0 fw-bold">Assigned tickets ({{ $assignedTicketsCount }})</h2>
+                    <h2 class="mb-0 fw-bold">Assigned services ({{ $assignedTicketsCount }})</h2>
                     <a href="{{ route('tickets.index') }}" class="small fw-semibold text-decoration-underline" style="color: #fff;">View all &rarr;</a>
                 </div>
                 @if ($recentTickets->isEmpty())
-                    <div class="p-3"><x-empty-state title="No tickets yet" description="Tickets assigned to this employee will appear here." /></div>
+                    <div class="p-3"><x-empty-state title="No services yet" description="Services assigned to this employee will appear here." /></div>
                 @else
                     <div class="table-responsive">
                         <table id="assignedTicketsTable" class="table tm-table align-middle mb-0">
-                            <thead><tr><th>Ticket</th><th>Client</th><th>Status</th><th>Open for</th></tr></thead>
+                            <thead><tr><th>Service</th><th>Client</th><th>Status</th><th>Open for</th></tr></thead>
                             <tbody>
                                 @foreach ($recentTickets as $ticket)
                                     <tr>
@@ -227,7 +227,7 @@
 
         <div class="col-12 col-xl-4">
             <section class="tm-card p-0 mb-3 overflow-hidden">
-                <div class="emp-side-heading" style="background: #1f6b30;"><h2 class="h6 fw-bold mb-0">Open tickets by status</h2></div>
+                <div class="emp-side-heading" style="background: #1f6b30;"><h2 class="h6 fw-bold mb-0">Open services by status</h2></div>
                 <div class="p-3">
                     @forelse ($openByStatus as $status => $count)
                         @php
@@ -243,7 +243,7 @@
                             </div>
                         </div>
                     @empty
-                        <p class="tm-muted small mb-0">No open tickets.</p>
+                        <p class="tm-muted small mb-0">No open services.</p>
                     @endforelse
                 </div>
             </section>
@@ -264,12 +264,12 @@
             </section>
 
             <section class="tm-card p-0 overflow-hidden">
-                <div class="emp-side-heading" style="background: #0f6b5c;"><h2 class="h6 fw-bold mb-0">Tickets by service (FY)</h2></div>
+                <div class="emp-side-heading" style="background: #0f6b5c;"><h2 class="h6 fw-bold mb-0">Services by type (FY)</h2></div>
                 <div class="p-3">
                     @forelse ($ticketsByService as $serviceName => $count)
                         <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">{{ $serviceName }}</span><strong>{{ $count }}</strong></div>
                     @empty
-                        <p class="tm-muted small mb-0">No tickets this FY.</p>
+                        <p class="tm-muted small mb-0">No services this FY.</p>
                     @endforelse
                 </div>
             </section>

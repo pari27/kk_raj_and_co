@@ -12,7 +12,7 @@ class AppNotification extends Model
 {
     public const TYPES = [
         'documents' => 'Documents',
-        'tickets' => 'Tickets',
+        'tickets' => 'Services',
         'payments' => 'Payments',
         'enquiries' => 'Enquiries',
         'security' => 'Security',

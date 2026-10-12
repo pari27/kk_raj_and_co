@@ -28,9 +28,9 @@
 @php
     $statCards = [
         ['label' => 'Enquiry total', 'value' => '₹'.number_format((float) $enquiry->total), 'caption' => 'including GST', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
-        ['label' => 'Tickets', 'value' => (string) $enquiry->tickets->count(), 'caption' => $closedTicketsCount.' closed', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
+        ['label' => 'Services', 'value' => (string) $enquiry->tickets->count(), 'caption' => $closedTicketsCount.' closed', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
         ['label' => 'Fees received', 'value' => '₹'.number_format($feesReceived), 'caption' => $feesReceivedCount > 0 ? $feesReceivedCount.' payment(s)' : 'no payments yet', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
-        ['label' => 'Fees pending', 'value' => '₹'.number_format($feesPending), 'caption' => 'across '.$enquiry->tickets->count().' ticket(s)', 'gradient' => 'linear-gradient(135deg, #300a0a, #7f1616)'],
+        ['label' => 'Fees pending', 'value' => '₹'.number_format($feesPending), 'caption' => 'across '.$enquiry->tickets->count().' service(s)', 'gradient' => 'linear-gradient(135deg, #300a0a, #7f1616)'],
     ];
 
     $portalLabels = [
@@ -114,19 +114,19 @@
 
         <div class="tm-card p-0 mb-3" style="overflow: hidden;">
             <div class="d-flex align-items-center justify-content-between p-3" style="background: #101b3d;">
-                <h2 class="h6 tm-serif fw-bold mb-0 text-white">Tickets in this enquiry ({{ $enquiry->tickets->count() }})</h2>
-                <span class="enquiry-ticket-heading-note" style="color: rgba(255,255,255,.7); font-size: .72rem;">One ticket per service</span>
+                <h2 class="h6 tm-serif fw-bold mb-0 text-white">Services in this enquiry ({{ $enquiry->tickets->count() }})</h2>
+                <span class="enquiry-ticket-heading-note" style="color: rgba(255,255,255,.7); font-size: .72rem;">One entry per service</span>
             </div>
             @if ($enquiry->tickets->isEmpty())
                 <div class="p-4">
-                    <x-empty-state title="No tickets yet" description="Tickets created for this enquiry will show up here." />
+                    <x-empty-state title="No services yet" description="Services created for this enquiry will show up here." />
                 </div>
             @else
                 <div class="table-responsive">
                     <table id="enquiryTicketsTable" class="table tm-table align-middle mb-0">
                         <thead>
                             <tr>
-                                <th>Ticket</th>
+                                <th>Service</th>
                                 <th>Assigned to</th>
                                 <th>Status</th>
                                 

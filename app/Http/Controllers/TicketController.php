@@ -114,7 +114,7 @@ class TicketController extends Controller
 
         return redirect()
             ->route('tickets.show', $ticket)
-            ->with('status', "Ticket {$ticket->number} is now \"{$status->value}\".");
+            ->with('status', "Service {$ticket->number} is now \"{$status->value}\".");
     }
 
     public function reassign(Ticket $ticket): RedirectResponse
@@ -146,6 +146,6 @@ class TicketController extends Controller
 
         return redirect()
             ->route('tickets.show', $ticket)
-            ->with('status', "Ticket {$ticket->number} is now assigned to {$label}.");
+            ->with('status', "Service {$ticket->number} is now assigned to {$label}.");
     }
 }

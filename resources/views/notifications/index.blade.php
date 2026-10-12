@@ -18,7 +18,7 @@
 @endphp
 
 @section('content')
-<x-page-header title="Notifications" subtitle="Updates on documents, tickets, payments and enquiries" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Notifications']]">
+<x-page-header title="Notifications" subtitle="Updates on documents, services, payments and enquiries" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Notifications']]">
     <x-slot:actions>
         <form method="POST" action="{{ route('notifications.read-all') }}">
             @csrf

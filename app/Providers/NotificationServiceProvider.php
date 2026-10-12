@@ -71,9 +71,9 @@ class NotificationServiceProvider extends ServiceProvider
             Notifier::notify(
                 [$ticket->assignedTo],
                 'tickets',
-                'Ticket assigned to you',
+                'Service assigned to you',
                 "{$actor()} assigned **{$ticket->service?->name}** for {$ticket->customer?->name} to you.",
-                route('tickets.show', $ticket), $ticket->number, 'Open ticket',
+                route('tickets.show', $ticket), $ticket->number, 'Open service',
             );
         });
 
@@ -82,9 +82,9 @@ class NotificationServiceProvider extends ServiceProvider
                 Notifier::notify(
                     [$ticket->assignedTo],
                     'tickets',
-                    'Ticket assigned to you',
+                    'Service assigned to you',
                     "{$actor()} assigned **{$ticket->service?->name}** for {$ticket->customer?->name} to you.",
-                    route('tickets.show', $ticket), $ticket->number, 'Open ticket',
+                    route('tickets.show', $ticket), $ticket->number, 'Open service',
                 );
             }
 

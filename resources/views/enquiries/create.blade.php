@@ -279,7 +279,7 @@
             <div class="tm-card tm-section-card p-0 mb-3">
                 <div class="tm-section-title d-flex align-items-center justify-content-between">
                     <span>2. Services</span>
-                    <span class="small fw-normal" style="color: rgba(255,255,255,.75);">One ticket is created for each service</span>
+                    <span class="small fw-normal" style="color: rgba(255,255,255,.75);">One entry is created for each service</span>
                 </div>
                 <div class="p-4">
                     @error('services')
@@ -309,7 +309,7 @@
 
             <div class="d-flex gap-2">
                 <a href="{{ route('enquiries.index') }}" class="btn btn-outline-secondary">Cancel</a>
-                <button type="submit" class="btn btn-tm-primary" id="submitEnquiryBtn">Create <span id="submitTicketCount">0</span> tickets</button>
+                <button type="submit" class="btn btn-tm-primary" id="submitEnquiryBtn">Create <span id="submitTicketCount">0</span> services</button>
             </div>
         </div>
 
@@ -350,7 +350,7 @@
                 <div class="fw-bold mb-2" style="color: #0a4fc4; font-size: .88rem;">What happens next</div>
                 <div class="d-flex gap-2 mb-2" style="font-size: .8rem;">
                     <span class="text-success">&check;</span>
-                    <span id="whatsNextTickets">Tickets will be created{{ auth()->user()->isEmployee() ? ' and assigned to you' : '' }}</span>
+                    <span id="whatsNextTickets">Services will be created{{ auth()->user()->isEmployee() ? ' and assigned to you' : '' }}</span>
                 </div>
                 <div class="d-flex gap-2" style="font-size: .8rem;">
                     <span class="text-primary">&#9993;</span>
@@ -434,7 +434,7 @@
             clientLookupBanner.style.background = '#eaf7ec';
             clientLookupBanner.style.border = '1px solid #cdeccb';
             var initials = customer.name.trim().split(/\s+/).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase();
-            var historyText = customer.tickets_count === 1 ? '1 past ticket' : (customer.tickets_count + ' past tickets');
+            var historyText = customer.tickets_count === 1 ? '1 past service' : (customer.tickets_count + ' past services');
             clientLookupBanner.innerHTML = '<div class="d-flex align-items-start justify-content-between gap-2">'
                 + '<div class="d-flex align-items-start gap-2">'
                 + '<span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:28px;height:28px;background:#1f6b30;color:#fff;font-size:.68rem;font-weight:700;">' + initials + '</span>'

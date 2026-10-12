@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Ticket details — ' . config('app.name', 'Task Management'))
+@section('title', 'Service details — ' . config('app.name', 'Task Management'))
 
 @push('styles')
 <style>
@@ -104,9 +104,9 @@
 @endphp
 
 <div id="ticket-show-page">
-    <x-page-header title="Ticket details" subtitle="Documents, status and payment for this ticket" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Tickets', 'url' => route('tickets.index')], ['label' => $ticket->number]]">
+    <x-page-header title="Service details" subtitle="Documents, status and payment for this service" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Services', 'url' => route('tickets.index')], ['label' => $ticket->number]]">
         <x-slot:actions>
-            <a href="{{ route('tickets.index') }}" class="btn btn-tm-primary btn-sm px-3">&larr; My tickets</a>
+            <a href="{{ route('tickets.index') }}" class="btn btn-tm-primary btn-sm px-3">&larr; My services</a>
         </x-slot:actions>
     </x-page-header>
 
@@ -131,7 +131,7 @@
             </div>
         </div>
         <div class="ticket-progress-wrap">
-            <div class="ticket-progress" aria-label="Ticket progress">
+            <div class="ticket-progress" aria-label="Service progress">
                 @foreach ($progressSteps as $index => $step)
                     <div class="ticket-progress-step {{ $index < $progressIndex ? 'is-complete' : ($index === $progressIndex ? 'is-current' : '') }}">
                         <div class="ticket-step-track">
@@ -164,7 +164,7 @@
                                 <div class="ticket-document-name">{{ $serviceDocument->name }}{{ $current ? ' v'.$current->version : '' }}</div>
                                 @if ($current)
                                     <div class="ticket-document-note">
-                                        {{ $current->version > 1 ? 'Re-uploaded' : 'Uploaded' }} by {{ $current->uploadedBy?->name ?? 'Staff' }} on ticket &middot; {{ $current->created_at->format('j M, g:i A') }}
+                                        {{ $current->version > 1 ? 'Re-uploaded' : 'Uploaded' }} by {{ $current->uploadedBy?->name ?? 'Staff' }} on service &middot; {{ $current->created_at->format('j M, g:i A') }}
                                     </div>
                                     @if ($current->status === 'Rejected' && $current->rejection_reason)
                                         <div class="ticket-document-note" style="color: #7f1616;">Reason: {{ $current->rejection_reason }}</div>
@@ -263,7 +263,7 @@
                             <label class="form-label fw-semibold small mt-3">Comment (optional)</label>
                             <textarea name="comment" class="form-control tm-field ticket-comment" rows="3" maxlength="2000" placeholder="What changed and why"></textarea>
                             <div class="d-flex justify-content-between align-items-center mt-2">
-                                <small class="tm-muted">Comments become part of the ticket timeline.</small>
+                                <small class="tm-muted">Comments become part of the service timeline.</small>
                                 <button type="submit" class="btn btn-tm-primary btn-sm px-3">Save </button>
                             </div>
                         </fieldset>
@@ -308,7 +308,7 @@
                         <strong>Payment</strong>
                         <div class="small">{{ $ticket->paymentStatus()->value }}</div>
                         @if ($ticket->enquiry->tickets->count() > 1)
-                            <div class="small tm-muted">Shared across {{ $ticket->enquiry->tickets->count() }} tickets in {{ $ticket->enquiry->number }}</div>
+                            <div class="small tm-muted">Shared across {{ $ticket->enquiry->tickets->count() }} services in {{ $ticket->enquiry->number }}</div>
                         @endif
                     </div>
                     <strong class="fs-5">&#8377;{{ number_format($ticket->paymentStatus() === \App\Enums\PaymentStatus::FullyPaid ? (float) $ticket->enquiry->total : $ticket->balanceDue(), 2) }}</strong>
@@ -323,7 +323,7 @@
                         <form method="POST" action="{{ route('tickets.reassign', $ticket) }}">
                             @csrf
                             @method('PATCH')
-                            <select name="assigned_to" class="form-select tm-field mb-2" aria-label="Assign ticket to">
+                            <select name="assigned_to" class="form-select tm-field mb-2" aria-label="Assign service to">
                                 <option value="">Unassigned</option>
                                 @foreach ($employees as $employee)
                                     <option value="{{ $employee->id }}" {{ $ticket->assigned_to === $employee->id ? 'selected' : '' }}>{{ $employee->role->label() === 'Employee' ? $employee->name : $employee->role->label().' � '.$employee->name }}</option>
@@ -332,7 +332,7 @@
                             <button type="submit" class="btn btn-outline-secondary btn-sm w-100">Reassign</button>
                         </form>
                     @else
-                        <div class="small tm-muted">Only Admin/Super Admin can reassign a ticket.</div>
+                        <div class="small tm-muted">Only Admin/Super Admin can reassign a service.</div>
                     @endif
                 </div>
             </section>
@@ -518,7 +518,7 @@
                 + '<span class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width:34px;height:34px;background:' + v.icon.bg + ';color:' + v.icon.text + ';font-size:.6rem;font-weight:700;">' + v.icon.label + '</span>'
                 + '<div>'
                 + '<div class="small">' + v.filename + ' &middot; ' + v.size + '</div>'
-                + '<div class="tm-muted" style="font-size:.75rem;">Uploaded by <strong>' + v.uploaded_by + '</strong> (Staff) via ticket &middot; ' + v.uploaded_at + '</div>'
+                + '<div class="tm-muted" style="font-size:.75rem;">Uploaded by <strong>' + v.uploaded_by + '</strong> (Staff) via service &middot; ' + v.uploaded_at + '</div>'
                 + '</div>'
                 + '</div>'
                 + '<div class="d-flex align-items-center gap-2">' + actions + verifyActions + '</div>'
