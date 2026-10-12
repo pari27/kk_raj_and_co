@@ -42,22 +42,33 @@
         @endif
 
         <div class="tm-card p-0 overflow-hidden">
-            <div class="tm-section-title">Test mode</div>
-            <div class="p-4">
-                <form method="POST" action="{{ route('admin.settings.system.update') }}">
-                    @csrf
-                    @method('PUT')
+            <div class="tm-section-title">Email settings</div>
+            <form method="POST" action="{{ route('admin.settings.system.update') }}">
+                @csrf
+                @method('PUT')
+
+                <div class="p-4 border-bottom">
                     <div class="form-check form-switch d-flex align-items-center gap-2 mb-3">
-                        <input class="form-check-input flex-shrink-0" type="checkbox" role="switch" id="testModeToggle" name="test_mode" value="1" style="width: 2.6rem; height: 1.4rem;" {{ $setting->test_mode ? 'checked' : '' }} onchange="this.form.requestSubmit()">
-                        <label class="mb-0 fw-semibold" for="testModeToggle" style="font-size: .85rem;">{{ $setting->test_mode ? 'On' : 'Off' }}</label>
+                        <input class="form-check-input flex-shrink-0" type="checkbox" role="switch" id="notificationsEnabledToggle" name="notifications_enabled" value="1" style="width: 2.6rem; height: 1.4rem;" {{ $setting->notifications_enabled ? 'checked' : '' }} onchange="this.form.requestSubmit()">
+                        <label class="mb-0 fw-semibold" for="notificationsEnabledToggle" style="font-size: .85rem;">Email notifications: {{ $setting->notifications_enabled ? 'On' : 'Off' }}</label>
                     </div>
                     <p class="tm-muted mb-0" style="font-size: .8rem;">
-                        When on, every email the app sends (employee invitations, password resets, and anything added later) is redirected to
+                        Master switch for every email this app sends (employee invitations, password resets, and anything added later). Turn off to stop all outgoing email immediately, regardless of Test mode.
+                    </p>
+                </div>
+
+                <div class="p-4">
+                    <div class="form-check form-switch d-flex align-items-center gap-2 mb-3">
+                        <input class="form-check-input flex-shrink-0" type="checkbox" role="switch" id="testModeToggle" name="test_mode" value="1" style="width: 2.6rem; height: 1.4rem;" {{ $setting->test_mode ? 'checked' : '' }} onchange="this.form.requestSubmit()">
+                        <label class="mb-0 fw-semibold" for="testModeToggle" style="font-size: .85rem;">Test mode: {{ $setting->test_mode ? 'On' : 'Off' }}</label>
+                    </div>
+                    <p class="tm-muted mb-0" style="font-size: .8rem;">
+                        When on (and email notifications are also on), every email is redirected to
                         <strong>{{ config('mail.test_recipient') ?: 'no address — set MAIL_TEST_RECIPIENT in .env' }}</strong>
                         instead of the real recipient. Turn this off before relying on real notifications going to real clients and staff.
                     </p>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

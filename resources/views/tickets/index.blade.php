@@ -80,7 +80,7 @@
                 <div class="position-relative">
                     <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ number_format($card['count']) }}{{ $card['suffix'] ?? '' }}</div>
-                    <div class="small" style="color: rgba(255,255,255,.75);">{{ $card['caption'] }}</div>
+                    <div class="small" style="color: rgba(255,255,255,.75); font-size: .72rem;">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>

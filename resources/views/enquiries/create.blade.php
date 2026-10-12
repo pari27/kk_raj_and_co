@@ -271,7 +271,7 @@
                     <div class="form-check mt-3">
                         <input class="form-check-input" type="checkbox" name="customer_email_notifications" value="1" id="clientNotifyCheckbox">
                         <label class="form-check-label fw-semibold" for="clientNotifyCheckbox" style="font-size: .85rem;">Send email notifications to this client</label>
-                        <div style="font-size: .72rem;" id="clientNotifyCaption"></div>
+                        <div style="font-size: .72rem;font-style:italic;" id="clientNotifyCaption"></div>
                     </div>
                 </div>
             </div>
@@ -347,7 +347,7 @@
             </div>
 
             <div class="tm-whats-next">
-                <div class="fw-bold mb-2" style="color: #0a4fc4;">What happens next</div>
+                <div class="fw-bold mb-2" style="color: #0a4fc4; font-size: .88rem;">What happens next</div>
                 <div class="d-flex gap-2 mb-2" style="font-size: .8rem;">
                     <span class="text-success">&check;</span>
                     <span id="whatsNextTickets">Tickets will be created{{ auth()->user()->isEmployee() ? ' and assigned to you' : '' }}</span>
@@ -577,7 +577,7 @@
             }
 
             function assignmentOptionLabel(assignee) {
-                return assignee.role === 'Employee' ? assignee.name : assignee.role + ' — ' + assignee.name;
+                return assignee.role === 'Employee' ? assignee.name : assignee.role + ' ï¿½ ' + assignee.name;
             }
 
             function assignmentLabel(assignee) {

@@ -208,6 +208,7 @@
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" value="1" id="clientNotifyCheckbox" name="email_notifications_enabled" {{ old('email_notifications_enabled') ? 'checked' : '' }} {{ old('email') ? '' : 'disabled' }}>
                             <label class="form-check-label fw-semibold" for="clientNotifyCheckbox" style="font-size: .85rem;">Send email notifications to this client</label>
+                            <div style="font-size: .72rem; font-style: italic;" id="clientNotifyCaption"></div>
                         </div>
 
                         <div class="form-check form-switch d-flex align-items-center gap-2">
@@ -265,15 +266,22 @@
     if (! input || ! hint) { return; }
 
     var notifyCheckbox = document.getElementById('clientNotifyCheckbox');
+    var notifyCaption = document.getElementById('clientNotifyCaption');
     var syncNotifyCheckbox = function () {
         var hasEmail = input.value.trim().length > 0;
         notifyCheckbox.disabled = ! hasEmail;
         if (! hasEmail) {
             notifyCheckbox.checked = false;
+            notifyCaption.textContent = "Add an email to turn this on. Without an email the client can't log in to the portal, so staff upload documents for them.";
+            notifyCaption.style.color = '#8a5a16';
+        } else {
+            notifyCaption.textContent = 'Portal link, document list, status and payment confirmation';
+            notifyCaption.style.color = '#1f6b30';
         }
     };
     if (notifyCheckbox) {
         input.addEventListener('input', syncNotifyCheckbox);
+        syncNotifyCheckbox();
     }
 
     var error = document.getElementById('clientEmailServerError');

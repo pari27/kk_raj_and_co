@@ -127,28 +127,28 @@
             <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #102b68, #2865d5);">
                 <div class="small mb-2 opacity-75">Open tickets</div>
                 <div class="h3 fw-bold mb-1">{{ number_format($openTicketsCount) }}</div>
-                <div class="small opacity-75">assigned now</div>
+                <div class="small opacity-75" style="font-size: .72rem;">assigned now</div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
             <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #0a2e14, #1f6b30);">
                 <div class="small mb-2 opacity-75">Completed</div>
                 <div class="h3 fw-bold mb-1">{{ number_format($completedTicketsCount) }}</div>
-                <div class="small opacity-75">this FY</div>
+                <div class="small opacity-75" style="font-size: .72rem;">this FY</div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
             <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #380c33, #6e1d58);">
                 <div class="small mb-2 opacity-75">Average time</div>
                 <div class="h3 fw-bold mb-1">{{ $avgTurnaroundDays !== null ? $avgTurnaroundDays . ' days' : '—' }}</div>
-                <div class="small opacity-75">enquiry to completion</div>
+                <div class="small opacity-75" style="font-size: .72rem;">enquiry to completion</div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
             <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #5c3d08, #8a5d0d);">
                 <div class="small mb-2 opacity-75">Waiting on clients</div>
                 <div class="h3 fw-bold mb-1">{{ number_format($waitingOnClientsCount) }}</div>
-                <div class="small opacity-75">documents pending</div>
+                <div class="small opacity-75" style="font-size: .72rem;">documents pending</div>
             </div>
         </div>
     </div>

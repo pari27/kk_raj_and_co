@@ -82,7 +82,7 @@
                 <div class="position-relative">
                     <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white js-count-up" data-count="{{ $card['count'] }}" data-prefix="{{ $card['prefix'] }}">{{ $card['prefix'] }}0</div>
-                    <div class="small" style="color: {{ $card['trendColor'] }};">{{ $card['trend'] }}</div>
+                    <div class="small" style="color: {{ $card['trendColor'] }}; font-size: .72rem;">{{ $card['trend'] }}</div>
                 </div>
             </a>
         </div>

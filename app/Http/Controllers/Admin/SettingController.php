@@ -21,23 +21,44 @@ class SettingController extends Controller
     public function update(Request $request): RedirectResponse
     {
         $setting = Setting::current();
+        $wasNotificationsEnabled = $setting->notifications_enabled;
+        $wasTestMode = $setting->test_mode;
+
+        $notificationsEnabled = $request->boolean('notifications_enabled');
         $testMode = $request->boolean('test_mode');
 
-        $setting->update(['test_mode' => $testMode]);
+        $setting->update([
+            'notifications_enabled' => $notificationsEnabled,
+            'test_mode' => $testMode,
+        ]);
 
-        AuditLogger::log(
-            action: 'Updated',
-            module: 'Settings',
-            recordLabel: 'Test mode',
-            details: $testMode
-                ? "Test mode turned on — notifications now go to {$this->testRecipientLabel()}"
-                : 'Test mode turned off — notifications now go to real recipients',
-            subject: $setting,
-        );
+        if ($notificationsEnabled !== $wasNotificationsEnabled) {
+            AuditLogger::log(
+                action: 'Updated',
+                module: 'Settings',
+                recordLabel: 'Email notifications',
+                details: $notificationsEnabled
+                    ? 'Email notifications turned on'
+                    : 'Email notifications turned off — no outbound email will be sent',
+                subject: $setting,
+            );
+        }
+
+        if ($testMode !== $wasTestMode) {
+            AuditLogger::log(
+                action: 'Updated',
+                module: 'Settings',
+                recordLabel: 'Test mode',
+                details: $testMode
+                    ? "Test mode turned on — notifications now go to {$this->testRecipientLabel()}"
+                    : 'Test mode turned off — notifications now go to real recipients',
+                subject: $setting,
+            );
+        }
 
         return redirect()
             ->route('admin.settings.firm-profile')
-            ->with('status', $testMode ? 'Test mode is now on.' : 'Test mode is now off.');
+            ->with('status', 'Settings updated.');
     }
 
     private function testRecipientLabel(): string

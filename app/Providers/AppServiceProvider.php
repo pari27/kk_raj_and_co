@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Setting;
 use App\Services\AuditLogger;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +30,10 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFive();
 
         $this->registerAuditLogListeners();
+
+        Event::listen(function (NotificationSending $event) {
+            return Setting::notificationsEnabled();
+        });
     }
 
     private function registerAuditLogListeners(): void

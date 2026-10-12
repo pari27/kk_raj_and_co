@@ -95,9 +95,13 @@ class EmployeeController extends Controller
 
         $this->log($employee, 'Created');
 
+        $status = Setting::notificationsEnabled()
+            ? "\"{$employee->name}\" was added and an invitation email was sent."
+            : "\"{$employee->name}\" was added. Email notifications are turned off in Settings, so no invitation was sent.";
+
         return redirect()
             ->route('admin.employees.index')
-            ->with('status', "\"{$employee->name}\" was added and an invitation email was sent.");
+            ->with('status', $status);
     }
 
     public function show(User $employee): View
@@ -269,13 +273,21 @@ class EmployeeController extends Controller
 
         $this->sendInvitation($employee);
 
+        $status = Setting::notificationsEnabled()
+            ? "Invitation email resent to {$employee->email}."
+            : 'Email notifications are turned off in Settings, so no invitation was sent.';
+
         return redirect()
             ->route('admin.employees.show', $employee)
-            ->with('status', "Invitation email resent to {$employee->email}.");
+            ->with('status', $status);
     }
 
     private function sendInvitation(User $employee): void
     {
+        if (! Setting::notificationsEnabled()) {
+            return;
+        }
+
         $setPasswordUrl = URL::temporarySignedRoute(
             'employees.set-password',
             now()->addDays(7),

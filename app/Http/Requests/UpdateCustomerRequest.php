@@ -21,8 +21,9 @@ class UpdateCustomerRequest extends FormRequest
 
         return [
             'name' => ['required', 'string', 'max:150'],
-            'phone' => ['required', 'digits:10'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('customers', 'email')->ignore($customer)],
+            'phone' => ['required', 'digits:10', Rule::unique('customers', 'phone')->ignore($customer)],
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('customers', 'email')->ignore($customer)],
+            'email_notifications_enabled' => ['nullable', 'boolean'],
             'is_active' => ['nullable', 'boolean'],
         ];
     }
@@ -31,6 +32,7 @@ class UpdateCustomerRequest extends FormRequest
     {
         return [
             'email.unique' => 'This email is already registered.',
+            'phone.unique' => 'This mobile number is already registered to another client.',
         ];
     }
 }

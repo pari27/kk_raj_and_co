@@ -130,28 +130,28 @@
             <div class="tm-card svc-stat-card p-3" style="background: linear-gradient(135deg, #0a2e14, #1f6b30);">
                 <div class="small mb-2 opacity-75">Total fee</div>
                 <div class="h3 fw-bold mb-1">₹{{ number_format($totalFee) }}</div>
-                <div class="small opacity-75">{{ $service->price_includes_gst ? 'GST included' : 'GST added' }}</div>
+                <div class="small opacity-75" style="font-size: .72rem;">{{ $service->price_includes_gst ? 'GST included' : 'GST added' }}</div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
             <div class="tm-card svc-stat-card p-3" style="background: linear-gradient(135deg, #380c33, #6e1d58);">
                 <div class="small mb-2 opacity-75">Documents</div>
                 <div class="h3 fw-bold mb-1">{{ $service->documents->count() }}</div>
-                <div class="small opacity-75">{{ $mandatoryCount }} mandatory &middot; {{ $optionalCount }} optional</div>
+                <div class="small opacity-75" style="font-size: .72rem;">{{ $mandatoryCount }} mandatory &middot; {{ $optionalCount }} optional</div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
             <div class="tm-card svc-stat-card p-3" style="background: linear-gradient(135deg, #300a0a, #7f1616);">
                 <div class="small mb-2 opacity-75">Open tickets</div>
                 <div class="h3 fw-bold mb-1">{{ number_format($openTicketsCount) }}</div>
-                <div class="small opacity-75">in progress</div>
+                <div class="small opacity-75" style=" font-size: .72rem;">in progress</div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
             <div class="tm-card svc-stat-card p-3" style="background: linear-gradient(135deg, #062e2a, #0f6b5c);">
                 <div class="small mb-2 opacity-75">Completed</div>
                 <div class="h3 fw-bold mb-1">{{ number_format($completedTicketsCount) }}</div>
-                <div class="small opacity-75">this FY</div>
+                <div class="small opacity-75" style="font-size: .72rem;">this FY</div>
             </div>
         </div>
     </div>

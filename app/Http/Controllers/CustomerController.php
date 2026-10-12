@@ -125,6 +125,7 @@ class CustomerController extends Controller
         $customer->update([
             ...$request->validated(),
             'is_active' => $request->boolean('is_active'),
+            'email_notifications_enabled' => $request->boolean('email_notifications_enabled'),
         ]);
 
         $this->log($customer, 'Updated');

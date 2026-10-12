@@ -155,7 +155,7 @@
                 <div class="position-relative" style="z-index: 1;">
                     <div class="small mb-2">Open tickets</div>
                     <div class="h3 fw-bold mb-1">{{ $pendingTickets->count() }}</div>
-                    <div class="small opacity-75">in progress</div>
+                    <div class="small opacity-75" style="font-size: .72rem;">in progress</div>
                 </div>
             </div>
         </div>
@@ -164,7 +164,7 @@
                 <div class="position-relative" style="z-index: 1;">
                     <div class="small mb-2">Completed</div>
                     <div class="h3 fw-bold mb-1">{{ $historyTickets->count() }}</div>
-                    <div class="small opacity-75">closed tickets</div>
+                    <div class="small opacity-75" style="font-size: .72rem;">closed tickets</div>
                 </div>
             </div>
         </div>
@@ -173,7 +173,7 @@
                 <div class="position-relative" style="z-index: 1;">
                     <div class="small mb-2">Fees paid</div>
                     <div class="h3 fw-bold mb-1">₹{{ number_format((float) $feesReceived) }}</div>
-                    <div class="small opacity-75">final payment received</div>
+                    <div class="small opacity-75" style="font-size: .72rem;">final payment received</div>
                 </div>
             </div>
         </div>
@@ -182,7 +182,7 @@
                 <div class="position-relative" style="z-index: 1;">
                     <div class="small mb-2">Fees pending</div>
                     <div class="h3 fw-bold mb-1">₹{{ number_format((float) $feesPending) }}</div>
-                    <div class="small opacity-75">not fully paid</div>
+                    <div class="small opacity-75" style="font-size: .72rem;">not fully paid</div>
                 </div>
             </div>
         </div>
