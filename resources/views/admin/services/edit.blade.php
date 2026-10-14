@@ -125,6 +125,7 @@
     $oldDocuments = old('documents', $service->documents->map(fn ($document) => [
         'name' => $document->name,
         'instructions' => $document->instructions,
+        'input_type' => $document->input_type,
         'allowed_formats' => $document->allowed_formats,
         'max_file_size_mb' => $document->max_file_size_kb ? rtrim(rtrim(number_format($document->max_file_size_kb / 1024, 2), '0'), '.') : '',
         'mandatory' => $document->is_mandatory ? '1' : '',
@@ -240,14 +241,16 @@
                                 </span>
                                 <div class="flex-grow-1">
                                     <input type="text" class="tm-doc-name-input d-block" name="documents[{{ $i }}][name]" value="{{ $doc['name'] ?? '' }}" placeholder="Document name">
-                                    <div class="d-flex align-items-center gap-1">
-                                        <input type="text" class="tm-doc-sub-input js-doc-formats" name="documents[{{ $i }}][allowed_formats]" value="{{ $doc['allowed_formats'] ?? '' }}" placeholder="PDF, JPG, PNG" style="width: 140px;">
-                                        <span class="tm-muted" style="font-size: .78rem;">&middot;</span>
-                                        <input type="number" class="tm-doc-sub-input js-doc-size" name="documents[{{ $i }}][max_file_size_mb]" value="{{ $doc['max_file_size_mb'] ?? '' }}" min="0.1" step="0.1" placeholder="5" style="width: 40px;">
-                                        <span class="tm-muted" style="font-size: .78rem;">MB</span>
+                                    <div class="d-flex align-items-center gap-1 js-doc-file-fields {{ ($doc['input_type'] ?? 'file') === 'text' ? 'd-none' : '' }}">
+                                        <span class="tm-muted" style="font-size: .7rem;">PDF, JPG, PNG &middot; up to 5 MB</span>
                                     </div>
                                     <input type="text" class="tm-doc-sub-input d-block mt-1" name="documents[{{ $i }}][instructions]" value="{{ $doc['instructions'] ?? '' }}" placeholder="Instructions for this document (optional)">
                                 </div>
+                                <div class="tm-segmented tm-segmented-sm js-doc-type-toggle flex-shrink-0">
+                                    <button type="button" class="js-doc-type {{ ($doc['input_type'] ?? 'file') !== 'text' ? 'active' : '' }}" data-value="file">File</button>
+                                    <button type="button" class="js-doc-type {{ ($doc['input_type'] ?? 'file') === 'text' ? 'active' : '' }}" data-value="text">Text</button>
+                                </div>
+                                <input type="hidden" name="documents[{{ $i }}][input_type]" class="js-doc-type-value" value="{{ ($doc['input_type'] ?? 'file') === 'text' ? 'text' : 'file' }}">
                                 <div class="tm-segmented tm-segmented-sm js-doc-mandatory-toggle flex-shrink-0">
                                     <button type="button" class="js-doc-mandatory {{ ! empty($doc['mandatory']) ? 'active' : '' }}" data-value="1">Mandatory</button>
                                     <button type="button" class="js-doc-optional {{ empty($doc['mandatory']) ? 'active' : '' }}" data-value="0">Optional</button>
@@ -325,14 +328,16 @@
         </span>
         <div class="flex-grow-1">
             <input type="text" class="tm-doc-name-input d-block" name="documents[__INDEX__][name]" placeholder="Document name">
-            <div class="d-flex align-items-center gap-1">
-                <input type="text" class="tm-doc-sub-input js-doc-formats" name="documents[__INDEX__][allowed_formats]" placeholder="PDF, JPG, PNG" style="width: 140px;">
-                <span class="tm-muted" style="font-size: .78rem;">&middot;</span>
-                <input type="number" class="tm-doc-sub-input js-doc-size" name="documents[__INDEX__][max_file_size_mb]" min="0.1" step="0.1" placeholder="5" style="width: 40px;">
-                <span class="tm-muted" style="font-size: .78rem;">MB</span>
+            <div class="d-flex align-items-center gap-1 js-doc-file-fields">
+                <span class="tm-muted" style="font-size: .7rem;">PDF, JPG, PNG &middot; up to 5 MB</span>
             </div>
             <input type="text" class="tm-doc-sub-input d-block mt-1" name="documents[__INDEX__][instructions]" placeholder="Instructions for this document (optional)">
         </div>
+        <div class="tm-segmented tm-segmented-sm js-doc-type-toggle flex-shrink-0">
+            <button type="button" class="js-doc-type active" data-value="file">File</button>
+            <button type="button" class="js-doc-type" data-value="text">Text</button>
+        </div>
+        <input type="hidden" name="documents[__INDEX__][input_type]" class="js-doc-type-value" value="file">
         <div class="tm-segmented tm-segmented-sm js-doc-mandatory-toggle flex-shrink-0">
             <button type="button" class="js-doc-mandatory" data-value="1">Mandatory</button>
             <button type="button" class="js-doc-optional active" data-value="0">Optional</button>
@@ -406,6 +411,18 @@
                 btn.closest('.js-document-row').remove();
                 updateDocumentsSummary();
             }
+        });
+
+        rowsBody.addEventListener('click', function (e) {
+            var typeBtn = e.target.closest('.js-doc-type');
+            if (!typeBtn) {
+                return;
+            }
+            var row = typeBtn.closest('.js-document-row');
+            var isText = typeBtn.getAttribute('data-value') === 'text';
+            row.querySelector('.js-doc-type-value').value = isText ? 'text' : 'file';
+            row.querySelectorAll('.js-doc-type').forEach(function (b) { b.classList.toggle('active', b === typeBtn); });
+            row.querySelector('.js-doc-file-fields').classList.toggle('d-none', isText);
         });
 
         // Price-is segmented toggle

@@ -19,6 +19,13 @@ class StoreTicketDocumentRequest extends FormRequest
     {
         $serviceDocument = ServiceDocument::find($this->input('service_document_id'));
 
+        if ($serviceDocument?->isText()) {
+            return [
+                'service_document_id' => ['required', 'exists:service_documents,id'],
+                'text_value' => ['required', 'string', 'max:2000'],
+            ];
+        }
+
         $fileRules = ['required', 'file'];
 
         if ($serviceDocument?->max_file_size_kb) {

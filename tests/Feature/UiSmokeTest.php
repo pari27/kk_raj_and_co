@@ -113,7 +113,11 @@ class UiSmokeTest extends TestCase
     {
         $user = User::factory()->create(['role' => UserRole::Employee]);
 
-        $this->actingAs($user)->get(route('admin.services.index'))->assertForbidden();
+        // The Master Services list is read-only for employees; everything else stays blocked.
+        $this->actingAs($user)->get(route('admin.services.index'))->assertOk();
+        $this->actingAs($user)->get(route('admin.services.create'))->assertForbidden();
+        $this->actingAs($user)->get(route('admin.designations.index'))->assertForbidden();
+        $this->actingAs($user)->get(route('admin.employees.index'))->assertForbidden();
     }
 
     public function test_employee_can_view_shared_screens(): void

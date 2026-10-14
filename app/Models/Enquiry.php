@@ -27,6 +27,16 @@ class Enquiry extends Model
         ];
     }
 
+    /**
+     * An employee only sees enquiries that have a service assigned to them.
+     */
+    public function scopeVisibleTo(\Illuminate\Database\Eloquent\Builder $query, User $user): void
+    {
+        if ($user->isEmployee()) {
+            $query->whereHas('tickets', fn ($tickets) => $tickets->where('assigned_to', $user->id));
+        }
+    }
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);

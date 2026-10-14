@@ -61,6 +61,49 @@ class SettingController extends Controller
             ->with('status', 'Settings updated.');
     }
 
+    public function updateNumbering(Request $request): RedirectResponse
+    {
+        // Compare prefixes case-insensitively: they are always stored in capitals.
+        $request->merge([
+            'service_prefix' => strtoupper((string) $request->input('service_prefix')),
+            'enquiry_prefix' => strtoupper((string) $request->input('enquiry_prefix')),
+        ]);
+
+        $validated = $request->validate([
+            'service_prefix' => ['required', 'string', 'regex:/^[A-Za-z0-9]{2,6}$/'],
+            'enquiry_prefix' => ['required', 'string', 'regex:/^[A-Za-z0-9]{2,6}$/', 'different:service_prefix'],
+        ], [
+            'service_prefix.regex' => 'Use 2 to 6 letters or numbers, with no spaces or symbols.',
+            'enquiry_prefix.regex' => 'Use 2 to 6 letters or numbers, with no spaces or symbols.',
+            'enquiry_prefix.different' => 'The enquiry prefix must be different from the service prefix.',
+        ]);
+
+        $setting = Setting::current();
+
+        foreach (['service_prefix' => 'Service', 'enquiry_prefix' => 'Enquiry'] as $field => $label) {
+            $before = $setting->{$field};
+            $prefix = strtoupper($validated[$field]);
+
+            if ($prefix === $before) {
+                continue;
+            }
+
+            $setting->{$field} = $prefix;
+
+            AuditLogger::log(
+                action: 'Updated',
+                module: 'Settings',
+                recordLabel: "{$label} number prefix",
+                details: "{$label} number prefix changed from {$before} to {$prefix}",
+                subject: $setting,
+            );
+        }
+
+        $setting->save();
+
+        return redirect()->route('admin.settings.firm-profile');
+    }
+
     private function testRecipientLabel(): string
     {
         return (string) (config('mail.test_recipient') ?: '(no MAIL_TEST_RECIPIENT configured)');

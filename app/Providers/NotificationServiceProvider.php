@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Enums\TicketStatus;
 use App\Models\AppNotification;
+use App\Models\Customer;
 use App\Models\Enquiry;
 use App\Models\Payment;
 use App\Models\Ticket;
@@ -51,6 +52,21 @@ class NotificationServiceProvider extends ServiceProvider
         });
 
         TicketDocument::updated(function (TicketDocument $document) use ($actor) {
+            if ($document->wasChanged('status') && $document->status === 'Verified') {
+                $ticket = $document->ticket;
+                $name = $document->serviceDocument?->name ?? 'a document';
+
+                Notifier::notify(
+                    [...Notifier::admins(), $ticket->assignedTo],
+                    'documents',
+                    'Document verified',
+                    "{$actor()} verified **{$name}** on {$ticket->service?->name}.",
+                    route('tickets.show', $ticket), $ticket->number,
+                );
+
+                return;
+            }
+
             if (! $document->wasChanged('status') || $document->status !== 'Rejected') {
                 return;
             }
@@ -67,33 +83,62 @@ class NotificationServiceProvider extends ServiceProvider
             );
         });
 
-        Ticket::created(function (Ticket $ticket) use ($actor) {
-            Notifier::notify(
-                [$ticket->assignedTo],
-                'tickets',
-                'Service assigned to you',
-                "{$actor()} assigned **{$ticket->service?->name}** for {$ticket->customer?->name} to you.",
-                route('tickets.show', $ticket), $ticket->number, 'Open service',
-            );
-        });
+        // Tells the new assignee, and every admin (except the assignee, who already got theirs).
+        $notifyAssignment = function (Ticket $ticket) use ($actor): void {
+            $assignee = $ticket->assignedTo;
 
-        Ticket::updated(function (Ticket $ticket) use ($actor) {
-            if ($ticket->wasChanged('assigned_to')) {
-                Notifier::notify(
-                    [$ticket->assignedTo],
-                    'tickets',
-                    'Service assigned to you',
-                    "{$actor()} assigned **{$ticket->service?->name}** for {$ticket->customer?->name} to you.",
-                    route('tickets.show', $ticket), $ticket->number, 'Open service',
-                );
+            if (! $assignee) {
+                return;
             }
 
-            if ($ticket->wasChanged('status') && in_array($ticket->status, TicketStatus::manualOptions(), true)) {
+            $service = $ticket->service?->name;
+            $client = $ticket->customer?->name;
+            $url = route('tickets.show', $ticket);
+
+            Notifier::notify(
+                [$assignee],
+                'tickets',
+                'Service assigned to you',
+                "{$actor()} assigned **{$service}** for {$client} to you.",
+                $url, $ticket->number, 'Open service',
+            );
+
+            Notifier::notify(
+                array_filter(Notifier::admins(), fn (User $admin) => $admin->id !== $assignee->id),
+                'tickets',
+                'Service assigned',
+                "{$actor()} assigned **{$service}** for {$client} to {$assignee->name}.",
+                $url, $ticket->number, 'Open service',
+            );
+        };
+
+        Ticket::created(fn (Ticket $ticket) => $notifyAssignment($ticket));
+
+        Ticket::updated(function (Ticket $ticket) use ($actor, $notifyAssignment) {
+            // Read the assignee fresh: the relation may still hold the previous one.
+            $ticket->unsetRelation('assignedTo');
+
+            if ($ticket->wasChanged('assigned_to')) {
+                $previous = $ticket->getOriginal('assigned_to') ? User::find($ticket->getOriginal('assigned_to')) : null;
+
+                // An employee reassigned away can no longer open the service, so drop their notifications about it.
+                if ($previous?->isEmployee()) {
+                    AppNotification::where('user_id', $previous->id)->where('link_text', $ticket->number)->delete();
+                }
+
+                $notifyAssignment($ticket);
+            }
+
+            if ($ticket->wasChanged('status')) {
+                $byHand = request()->routeIs('tickets.update-status');
+
                 Notifier::notify(
                     [...Notifier::admins(), $ticket->assignedTo],
                     'tickets',
                     'Status changed',
-                    "{$ticket->number} moved to **{$ticket->status->value}** by {$actor()}.",
+                    $byHand
+                        ? "{$ticket->number} moved to **{$ticket->status->value}** by {$actor()}."
+                        : "{$ticket->number} moved to **{$ticket->status->value}** automatically after document updates.",
                     route('tickets.show', $ticket), $ticket->number,
                 );
             }
@@ -109,6 +154,42 @@ class NotificationServiceProvider extends ServiceProvider
                 'Payment received',
                 "**{$amount}** by {$payment->mode} from {$enquiry?->customer?->name}.",
                 route('enquiries.show', $enquiry), $enquiry?->number,
+            );
+        });
+
+        Payment::deleted(function (Payment $payment) use ($actor) {
+            if (! Auth::user()?->isEmployee()) {
+                return;
+            }
+
+            $enquiry = $payment->enquiry;
+            $amount = '₹'.number_format((float) $payment->amount, 2);
+
+            Notifier::notify(
+                Notifier::admins(),
+                'payments',
+                'Payment deleted',
+                "{$actor()} deleted a **{$amount}** {$payment->mode} payment from {$enquiry?->customer?->name}.",
+                $enquiry ? route('enquiries.show', $enquiry) : null, $enquiry?->number,
+            );
+        });
+
+        Customer::created(function (Customer $customer) use ($actor) {
+            $creator = Auth::user();
+
+            if (! $creator?->isEmployee()) {
+                return;
+            }
+
+            $designation = $creator->profile?->designation?->name;
+            $contact = implode(', ', array_filter([$customer->phone, $customer->email]));
+
+            Notifier::notify(
+                Notifier::admins(),
+                'clients',
+                'New client added',
+                "**{$customer->name}** ({$contact}) was added by {$actor()}".($designation ? ", {$designation}" : '')." · {$creator->email}.",
+                route('customers.show', $customer), null, 'View client',
             );
         });
 

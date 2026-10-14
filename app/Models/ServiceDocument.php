@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['service_id', 'name', 'instructions', 'allowed_formats', 'max_file_size_kb', 'is_mandatory'])]
+#[Fillable(['service_id', 'name', 'instructions', 'input_type', 'allowed_formats', 'max_file_size_kb', 'is_mandatory'])]
 class ServiceDocument extends Model
 {
     /** @use HasFactory<ServiceDocumentFactory> */
@@ -19,6 +20,20 @@ class ServiceDocument extends Model
         return [
             'is_mandatory' => 'boolean',
         ];
+    }
+
+    /**
+     * Text documents are answered with a typed value (e.g. a PAN number)
+     * instead of an uploaded file.
+     */
+    public function isText(): bool
+    {
+        return $this->input_type === 'text';
+    }
+
+    public function ticketDocuments(): HasMany
+    {
+        return $this->hasMany(TicketDocument::class);
     }
 
     public function service(): BelongsTo

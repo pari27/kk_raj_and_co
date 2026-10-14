@@ -25,6 +25,7 @@ class StoreServiceRequest extends FormRequest
             'documents' => ['nullable', 'array'],
             'documents.*.name' => ['nullable', 'string', 'max:255'],
             'documents.*.instructions' => ['nullable', 'string'],
+            'documents.*.input_type' => ['nullable', 'in:file,text'],
             'documents.*.allowed_formats' => ['nullable', 'string', 'max:255'],
             'documents.*.max_file_size_mb' => ['nullable', 'numeric', 'min:0.1'],
             'documents.*.mandatory' => ['nullable', 'boolean'],

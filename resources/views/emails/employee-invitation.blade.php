@@ -15,16 +15,16 @@
                     </tr>
                     <tr>
                         <td style="padding: 28px;">
-                            <p style="font-size: 16px; color:#111; margin: 0 0 16px;">Hi {{ $employee->name }},</p>
-                            <p style="font-size: 14px; color:#444; line-height: 1.6; margin: 0 0 20px;">
-                                An account has been created for you on {{ config('app.name') }}. Click the button below to set your password and sign in.
-                            </p>
-                            <p style="text-align: center; margin: 28px 0;">
-                                <a href="{{ $setPasswordUrl }}" style="background:#4a9b3e; color:#ffffff; text-decoration:none; padding: 12px 28px; border-radius: 6px; font-size: 14px; font-weight: bold; display:inline-block;">Set your password</a>
-                            </p>
-                            <p style="font-size: 12px; color:#888; line-height: 1.6; margin: 0;">
-                                This link will expire in 7 days. If you weren't expecting this email, you can ignore it.
-                            </p>
+                            {{-- The wording comes from the "employee_welcome" email template (Settings > Email Templates). --}}
+                            @foreach (preg_split('/\R{2,}/', trim($messageBody)) as $paragraph)
+                                @if (trim($paragraph) === $setPasswordUrl)
+                                    <p style="text-align: center; margin: 28px 0;">
+                                        <a href="{{ $setPasswordUrl }}" style="background:#4a9b3e; color:#ffffff; text-decoration:none; padding: 12px 28px; border-radius: 6px; font-size: 14px; font-weight: bold; display:inline-block;">Set your password</a>
+                                    </p>
+                                @else
+                                    <p style="font-size: 14px; color:#444; line-height: 1.6; margin: 0 0 20px;">{!! nl2br(e($paragraph)) !!}</p>
+                                @endif
+                            @endforeach
                         </td>
                     </tr>
                 </table>

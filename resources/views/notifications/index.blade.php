@@ -58,7 +58,7 @@
                             <div class="d-flex justify-content-between gap-2">
                                 <span class="fw-bold">{{ $n->title }}</span>
                                 <span class="d-flex align-items-center gap-2 small tm-muted flex-shrink-0">
-                                    {{ $label === 'Today' ? $n->created_at->diffForHumans(short: true) . ' ago' : $n->created_at->format('g:i A') }}
+                                    {{ $label === 'Today' ? $n->created_at->diffForHumans(short: true) : $n->created_at->format('g:i A') }}
                                     <span class="rounded-circle {{ $n->isUnread() ? 'bg-success' : '' }}" style="width: 8px; height: 8px; display: inline-block;"></span>
                                 </span>
                             </div>

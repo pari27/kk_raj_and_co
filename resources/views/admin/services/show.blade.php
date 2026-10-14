@@ -190,7 +190,9 @@
                                         </td>
                                         <td class="tm-muted">{{ $document->instructions ?: '—' }}</td>
                                         <td>
-                                            @if ($document->allowed_formats)
+                                            @if ($document->isText())
+                                                <div class="d-flex flex-wrap gap-1"><span class="svc-format-chip">Text</span></div>
+                                            @elseif ($document->allowed_formats)
                                                 <div class="d-flex flex-wrap gap-1">
                                                     @foreach (explode(',', $document->allowed_formats) as $format)
                                                         <span class="svc-format-chip">{{ trim($format) }}</span>

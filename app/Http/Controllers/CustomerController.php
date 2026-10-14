@@ -19,9 +19,11 @@ class CustomerController extends Controller
     {
         $this->authorize('viewAny', Customer::class);
 
+        $user = auth()->user();
+
         $customers = Customer::query()
             ->with([
-                'tickets:id,customer_id,enquiry_id,status,total',
+                'tickets' => fn ($query) => $query->select('id', 'customer_id', 'enquiry_id', 'status', 'total', 'assigned_to')->visibleTo($user),
                 'tickets.enquiry:id,total',
                 'tickets.enquiry.payments:id,enquiry_id,amount',
             ])
@@ -94,7 +96,15 @@ class CustomerController extends Controller
     {
         $this->authorize('view', $customer);
 
-        $customer->load(['tickets.service', 'tickets.enquiry.payments', 'tickets.assignedTo', 'createdBy']);
+        $user = auth()->user();
+
+        $customer->load([
+            'tickets' => fn ($query) => $query->visibleTo($user),
+            'tickets.service',
+            'tickets.enquiry.payments',
+            'tickets.assignedTo',
+            'createdBy',
+        ]);
 
         if (! $customer->createdBy) {
             $createdBy = AuditLog::query()

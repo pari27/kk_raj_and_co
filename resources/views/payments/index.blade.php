@@ -33,13 +33,15 @@
     #paymentsPendingTable.tm-table tbody td {
         font-size: .8rem;
     }
-    #paymentsPendingTable .js-record-payment {
+    #paymentsPendingTable .js-record-payment,
+    .js-record-payment {
         color: var(--tm-navy);
         border-color: var(--tm-navy);
         font-size: .72rem;
         padding: .2rem .6rem;
     }
-    #paymentsPendingTable .js-record-payment:hover {
+    #paymentsPendingTable .js-record-payment:hover,
+    .js-record-payment:hover {
         background: var(--tm-navy);
         border-color: var(--tm-navy);
         color: #fff;
@@ -396,7 +398,7 @@
                             <strong style="color: #7f1616; font-size: .8rem;">₹{{ number_format($enquiry->balanceDue()) }}</strong>
                             <button
                                 type="button"
-                                class="btn btn-sm btn-outline-success js-record-payment"
+                                class="btn btn-sm js-record-payment"
                                 data-bs-toggle="modal"
                                 data-bs-target="#recordPaymentModal"
                                 data-enquiry-id="{{ $enquiry->id }}"

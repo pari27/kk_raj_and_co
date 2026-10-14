@@ -48,7 +48,7 @@
 @endphp
 
 @section('content')
-<x-page-header title="Audit Log" subtitle="System-wide record of real actions taken across the app" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Audit Log']]">
+<x-page-header title="Audit Log" subtitle="{{ $ownOnly ? 'A record of your own actions in the app' : 'System-wide record of real actions taken across the app' }}" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Audit Log']]">
     <x-slot:actions>
         <a href="{{ route('admin.audit-log.export') }}" class="btn btn-outline-secondary">
             <i class="bi bi-download me-1"></i> Export
@@ -59,32 +59,30 @@
 <div class="row g-3 mb-4">
     @foreach ($statCards as $card)
         <div class="col-6 col-xl-3">
-            <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                <span class="position-absolute rounded-circle" style="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                <span class="position-absolute rounded-circle" style="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
+            <div class="tm-stat-card px-3 py-2 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
+                <span class="position-absolute rounded-circle" style="width: 60px; height: 60px; right: -20px; bottom: -25px; background: rgba(255,255,255,.12);"></span>
+                <span class="position-absolute rounded-circle" style="width: 36px; height: 36px; right: 10px; bottom: -14px; background: rgba(255,255,255,.14);"></span>
                 <div class="position-relative">
-                    <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
-                    <div class="h3 tm-serif fw-bold mb-1 text-white">{{ number_format($card['count']) }}</div>
-                    <div class="small" style="color: rgba(255,255,255,.75);">{{ $card['caption'] }}</div>
+                    <div style="color: rgba(255,255,255,.75); font-size: .75rem;">{{ $card['label'] }}</div>
+                    <div class="fs-5 tm-serif fw-bold text-white">{{ number_format($card['count']) }}</div>
+                    <div style="color: rgba(255,255,255,.75); font-size: .68rem;">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
     @endforeach
 </div>
 
-<div class="alert d-flex align-items-start gap-2 mb-4" style="background: #fff8e1; border: 1px solid #f0d78c; color: #6b5411; border-radius: .6rem;">
-    <i class="bi bi-info-circle mt-1"></i>
-    <div style="font-size: .78rem;">Audit entries are permanent. They cannot be edited or deleted, and only reflect activity the system has actually recorded — modules that are not yet live will not appear here.</div>
-</div>
-
 <div class="tm-card p-0">
     <div class="p-3">
         <div class="row g-2 align-items-center">
             <div class="col-12 col-md-7">
-                <input type="text" id="auditLogSearch" class="form-control form-control-sm tm-field" style="font-size: .78rem;" placeholder="Search record, detail, user...">
+                <div class="position-relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="auditLogSearch" class="form-control tm-field" style="font-size: .85rem; padding-left: 2.25rem;" placeholder="Search your details here" aria-label="Search your details here">
+                </div>
             </div>
             <div class="col-12 col-md-5">
-                <button type="button" id="auditLogDateRangeBtn" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2 w-100">
+                <button type="button" id="auditLogDateRangeBtn" class="btn btn-outline-secondary d-flex align-items-center gap-2 w-100">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     <span class="text-uppercase tm-muted" style="font-size: .68rem;">Date range</span>
                     <span id="auditLogDateRangeLabel" class="flex-grow-1 text-start" style="font-weight: 400;">All time</span>

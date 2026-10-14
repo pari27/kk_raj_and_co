@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\EmailTemplateController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\EmployeeDesignationController;
 use App\Http\Controllers\Admin\ServiceController;
@@ -96,8 +97,16 @@ Route::middleware('auth')->group(function () {
         Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');
     });
 
-    Route::middleware('role:SuperAdmin,Admin')->name('admin.')->group(function () {
+    // Master Services list: read-only for employees (add/edit/activate stay admin-only below).
+    Route::middleware('role:SuperAdmin,Admin,Employee')->name('admin.')->group(function () {
         Route::get('master-services', [ServiceController::class, 'index'])->name('services.index');
+
+        // Employees see only their own entries (see AuditLogController).
+        Route::get('audit-log', [AuditLogController::class, 'index'])->name('audit-log');
+        Route::get('audit-log/export', [AuditLogController::class, 'export'])->name('audit-log.export');
+    });
+
+    Route::middleware('role:SuperAdmin,Admin')->name('admin.')->group(function () {
         Route::get('master-services/create', [ServiceController::class, 'create'])->name('services.create');
         Route::post('master-services', [ServiceController::class, 'store'])->name('services.store');
         Route::get('master-services/{service}', [ServiceController::class, 'show'])->name('services.show');
@@ -125,13 +134,12 @@ Route::middleware('auth')->group(function () {
         Route::get('admin-accounts/create', fn () => view('admin.admin-accounts.create'))->name('admin-accounts.create');
         Route::get('admin-accounts/{adminAccount}/edit', fn ($adminAccount) => view('admin.admin-accounts.edit', compact('adminAccount')))->name('admin-accounts.edit');
 
-        Route::get('audit-log', [AuditLogController::class, 'index'])->name('audit-log');
-        Route::get('audit-log/export', [AuditLogController::class, 'export'])->name('audit-log.export');
-
         Route::get('settings/firm-profile', [SettingController::class, 'edit'])->name('settings.firm-profile');
         Route::put('settings/system', [SettingController::class, 'update'])->name('settings.system.update');
-        Route::get('settings/email-templates', fn () => view('admin.settings.email-templates.index'))->name('settings.email-templates.index');
-        Route::get('settings/email-templates/{template}/edit', fn ($template) => view('admin.settings.email-templates.edit', compact('template')))->name('settings.email-templates.edit');
+        Route::put('settings/numbering', [SettingController::class, 'updateNumbering'])->name('settings.numbering.update');
+        Route::get('settings/email-templates', [EmailTemplateController::class, 'index'])->name('settings.email-templates.index');
+        Route::get('settings/email-templates/{template}/edit', [EmailTemplateController::class, 'edit'])->name('settings.email-templates.edit');
+        Route::put('settings/email-templates/{template}', [EmailTemplateController::class, 'update'])->name('settings.email-templates.update');
     });
 });
 

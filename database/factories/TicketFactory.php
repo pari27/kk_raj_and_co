@@ -19,7 +19,7 @@ class TicketFactory extends Factory
     public function definition(): array
     {
         return [
-            'number' => 'TKT-'.now()->year.'-'.fake()->unique()->numerify('####'),
+            'number' => 'SRV-'.now()->year.'-'.fake()->unique()->numerify('####'),
             'enquiry_id' => Enquiry::factory(),
             'service_id' => Service::factory(),
             'customer_id' => Customer::factory(),

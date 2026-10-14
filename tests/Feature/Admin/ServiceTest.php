@@ -27,6 +27,29 @@ class ServiceTest extends TestCase
         $response->assertSee('GST Return Filing');
     }
 
+    public function test_text_documents_drop_file_formats_and_size(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+        $this->actingAs($admin)->post(route('admin.services.store'), [
+            'name' => 'PAN Creation',
+            'default_price' => 500,
+            'gst_percent' => 18,
+            'is_active' => '1',
+            'documents' => [
+                ['name' => 'PAN number', 'input_type' => 'text', 'allowed_formats' => 'PDF', 'max_file_size_mb' => '5', 'mandatory' => '1'],
+                ['name' => 'Photo', 'input_type' => 'file', 'allowed_formats' => 'JPG', 'max_file_size_mb' => '2', 'mandatory' => '1'],
+            ],
+        ])->assertRedirect(route('admin.services.index'));
+
+        $service = Service::query()->where('name', 'PAN Creation')->firstOrFail();
+        $text = $service->documents->firstWhere('name', 'PAN number');
+        $this->assertTrue($text->isText());
+        $this->assertNull($text->allowed_formats);
+        $this->assertNull($text->max_file_size_kb);
+        $this->assertFalse($service->documents->firstWhere('name', 'Photo')->isText());
+    }
+
     public function test_admin_can_create_a_service_with_documents(): void
     {
         $admin = User::factory()->create(['role' => UserRole::Admin]);
@@ -53,7 +76,7 @@ class ServiceTest extends TestCase
 
         $panCard = $service->documents->firstWhere('name', 'PAN Card');
         $this->assertTrue($panCard->is_mandatory);
-        $this->assertSame('PDF, JPG', $panCard->allowed_formats);
+        $this->assertSame('PDF, JPG, PNG', $panCard->allowed_formats);
         $this->assertSame(5120, $panCard->max_file_size_kb);
 
         $bankStatement = $service->documents->firstWhere('name', 'Bank Statement');
@@ -246,6 +269,56 @@ class ServiceTest extends TestCase
         $response->assertSee('PAN Card');
     }
 
+    private function serviceWithUsedDocument(): array
+    {
+        $service = Service::factory()->create(['name' => 'PAN Creation']);
+        $used = ServiceDocument::factory()->create(['service_id' => $service->id, 'name' => 'PAN Card']);
+        $ticket = Ticket::factory()->create([
+            'service_id' => $service->id,
+            'customer_id' => Customer::factory()->create()->id,
+            'enquiry_id' => Enquiry::factory()->create()->id,
+        ]);
+        \App\Models\TicketDocument::factory()->create(['ticket_id' => $ticket->id, 'service_document_id' => $used->id]);
+
+        return [$service, $used];
+    }
+
+    public function test_updating_a_service_keeps_documents_that_have_uploads(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+        [$service, $used] = $this->serviceWithUsedDocument();
+
+        $this->actingAs($admin)->put(route('admin.services.update', $service), [
+            'name' => 'PAN Creation',
+            'default_price' => 500,
+            'gst_percent' => 18,
+            'is_active' => '1',
+            'documents' => [
+                ['name' => 'PAN Card', 'mandatory' => '', 'input_type' => 'file'],
+                ['name' => 'Photo', 'mandatory' => '1', 'input_type' => 'file'],
+            ],
+        ])->assertRedirect(route('admin.services.index'));
+
+        $this->assertSame($used->id, $service->documents()->where('name', 'PAN Card')->value('id'));
+        $this->assertFalse($used->fresh()->is_mandatory);
+        $this->assertTrue($service->documents()->where('name', 'Photo')->exists());
+    }
+
+    public function test_a_document_with_uploads_cannot_be_removed(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+        [$service] = $this->serviceWithUsedDocument();
+
+        $this->actingAs($admin)->put(route('admin.services.update', $service), [
+            'name' => 'PAN Creation',
+            'default_price' => 500,
+            'gst_percent' => 18,
+            'is_active' => '1',
+            'documents' => [],
+        ])->assertSessionHasErrors('documents');
+
+        $this->assertTrue($service->documents()->where('name', 'PAN Card')->exists());
+    }
     public function test_admin_can_update_a_service_and_its_documents(): void
     {
         $admin = User::factory()->create(['role' => UserRole::Admin]);
@@ -322,12 +395,24 @@ class ServiceTest extends TestCase
         $this->assertTrue($service->refresh()->is_active);
     }
 
+    public function test_employee_can_see_the_services_list_but_without_management_controls(): void
+    {
+        $employee = User::factory()->create(['role' => UserRole::Employee]);
+        Service::factory()->create(['name' => 'Visible To Staff']);
+
+        $this->actingAs($employee)->get(route('admin.services.index'))
+            ->assertOk()
+            ->assertSee('Visible To Staff')
+            ->assertDontSee('Add Master Service')
+            ->assertDontSee('Edit documents');
+    }
+
     public function test_employee_cannot_view_or_manage_services(): void
     {
         $employee = User::factory()->create(['role' => UserRole::Employee]);
         $service = Service::factory()->create();
 
-        $this->actingAs($employee)->get(route('admin.services.index'))->assertForbidden();
+        $this->actingAs($employee)->get(route('admin.services.show', $service))->assertForbidden();
         $this->actingAs($employee)->get(route('admin.services.create'))->assertForbidden();
         $this->actingAs($employee)->post(route('admin.services.store'), [
             'name' => 'Should Not Save',

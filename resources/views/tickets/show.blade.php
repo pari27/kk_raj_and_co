@@ -3,7 +3,10 @@
 @section('title', 'Service details — ' . config('app.name', 'Task Management'))
 
 @push('styles')
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
 <style>
+    .ts-wrapper.form-select { padding: 0; border: 0; background: none; }
+    .ts-control, .ts-dropdown { font-size: .8rem; }
     #ticket-show-page .ticket-summary { border-left: 5px solid #29995a; overflow: hidden; }
     #ticket-show-page .ticket-summary-main { padding: 1.25rem 1.5rem; }
     #ticket-show-page .ticket-number { color: #596579; font-size: .8rem; font-weight: 700; }
@@ -166,6 +169,9 @@
                                     <div class="ticket-document-note">
                                         {{ $current->version > 1 ? 'Re-uploaded' : 'Uploaded' }} by {{ $current->uploadedBy?->name ?? 'Staff' }} on service &middot; {{ $current->created_at->format('j M, g:i A') }}
                                     </div>
+                                    @if ($current->text_value !== null)
+                                        <div class="ticket-document-note" style="color: #000;">Value: {{ $current->text_value }}</div>
+                                    @endif
                                     @if ($current->status === 'Rejected' && $current->rejection_reason)
                                         <div class="ticket-document-note" style="color: #7f1616;">Reason: {{ $current->rejection_reason }}</div>
                                     @endif
@@ -189,7 +195,7 @@
                                 <button type="button" class="btn btn-sm btn-outline-danger js-reject-document" style="font-size: .72rem; padding: .25rem .6rem;" data-action="{{ route('tickets.documents.reject', [$ticket, $current]) }}">Reject</button>
                             @endif
 
-                            @if ($current)
+                            @if ($current && $current->file_path)
                                 <a href="{{ asset('storage/'.$current->file_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary" style="font-size: .72rem; padding: .25rem .6rem;">View</a>
                             @endif
 
@@ -206,15 +212,16 @@
                                     data-versions="{{ $row['versions']->map(fn ($v) => [
                                         'version' => $v->version,
                                         'status' => $v->status,
+                                        'text' => $v->text_value,
                                         'filename' => $v->original_filename,
-                                        'size' => $formatBytes(\Illuminate\Support\Facades\Storage::disk('public')->exists($v->file_path) ? \Illuminate\Support\Facades\Storage::disk('public')->size($v->file_path) : 0),
-                                        'icon' => $fileExtIcon($v->original_filename),
+                                        'size' => $formatBytes($v->file_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($v->file_path) ? \Illuminate\Support\Facades\Storage::disk('public')->size($v->file_path) : 0),
+                                        'icon' => $fileExtIcon((string) $v->original_filename),
                                         'uploaded_by' => $v->uploadedBy?->name ?? 'Staff',
                                         'uploaded_at' => $v->created_at->format('j M Y, g:i A'),
                                         'verified_by' => $v->verifiedBy?->name,
                                         'verified_at' => $v->verified_at?->format('j M Y, g:i A'),
                                         'rejection_reason' => $v->rejection_reason,
-                                        'url' => asset('storage/'.$v->file_path),
+                                        'url' => $v->file_path ? asset('storage/'.$v->file_path) : null,
                                         'verify_url' => route('tickets.documents.verify', [$ticket, $v]),
                                         'reject_url' => route('tickets.documents.reject', [$ticket, $v]),
                                     ])->toJson() }}"
@@ -230,9 +237,10 @@
                                     data-bs-target="#uploadDocumentModal"
                                     data-service-document-id="{{ $serviceDocument->id }}"
                                     data-name="{{ $serviceDocument->name }}"
+                                    data-input-type="{{ $serviceDocument->input_type }}"
                                     data-formats="{{ $serviceDocument->allowed_formats }}"
                                     data-max-size="{{ $serviceDocument->formattedMaxSize() }}"
-                                >{{ $current ? 'Re-upload' : 'Upload' }}</button>
+                                >{{ $serviceDocument->isText() ? ($current ? 'Re-enter' : 'Enter') : ($current ? 'Re-upload' : 'Upload') }}</button>
                             @endif
                         </div>
                     </div>
@@ -326,7 +334,7 @@
                             <select name="assigned_to" class="form-select tm-field mb-2" aria-label="Assign service to">
                                 <option value="">Unassigned</option>
                                 @foreach ($employees as $employee)
-                                    <option value="{{ $employee->id }}" {{ $ticket->assigned_to === $employee->id ? 'selected' : '' }}>{{ $employee->role->label() === 'Employee' ? $employee->name : $employee->role->label().' � '.$employee->name }}</option>
+                                    <option value="{{ $employee->id }}" {{ $ticket->assigned_to === $employee->id ? 'selected' : '' }}>{{ $employee->role->label() === 'Employee' ? $employee->name : $employee->role->label().' — '.$employee->name }}</option>
                                 @endforeach
                             </select>
                             <button type="submit" class="btn btn-outline-secondary btn-sm w-100">Reassign</button>
@@ -359,9 +367,15 @@
                     <h2 class="h6 fw-bold mb-0 text-white" id="uploadDocTitle">Upload document</h2>
                 </div>
                 <div class="modal-body p-4">
-                    <label class="tm-field-label d-block">File <span class="text-danger">*</span></label>
-                    <input type="file" name="file" class="form-control tm-field" required>
-                    <div class="form-text tm-muted" id="uploadDocHint"></div>
+                    <div id="uploadDocFileField">
+                        <label class="tm-field-label d-block">File <span class="text-danger">*</span></label>
+                        <input type="file" name="file" class="form-control tm-field" id="uploadDocFileInput" required>
+                        <div class="form-text tm-muted" id="uploadDocHint" style="font-size: .7rem; font-style: italic;"></div>
+                    </div>
+                    <div id="uploadDocTextField" class="d-none">
+                        <label class="tm-field-label d-block">Details <span class="text-danger">*</span></label>
+                        <textarea name="text_value" class="form-control tm-field" id="uploadDocTextInput" rows="3" maxlength="2000" disabled></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -435,14 +449,27 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
     (function () {
+        var assignSelect = document.querySelector('select[name="assigned_to"]');
+        if (assignSelect && window.TomSelect) {
+            new TomSelect(assignSelect, { create: false, allowEmptyOption: true, placeholder: 'Search employee...', dropdownParent: 'body' });
+        }
+
         var canVerifyDocument = @json($canVerifyDocument);
         var csrfToken = document.querySelector('#uploadDocumentForm input[name="_token"]').value;
 
-        function openUploadModal(serviceDocumentId, name, formats, maxSize) {
+        function openUploadModal(serviceDocumentId, name, formats, maxSize, isText) {
             document.getElementById('uploadDocServiceDocumentId').value = serviceDocumentId;
-            document.getElementById('uploadDocTitle').textContent = 'Upload ' + name;
+            document.getElementById('uploadDocTitle').textContent = (isText ? 'Enter ' : 'Upload ') + name;
+
+            document.getElementById('uploadDocFileField').classList.toggle('d-none', isText);
+            document.getElementById('uploadDocTextField').classList.toggle('d-none', !isText);
+            document.getElementById('uploadDocFileInput').disabled = isText;
+            document.getElementById('uploadDocFileInput').required = !isText;
+            document.getElementById('uploadDocTextInput').disabled = !isText;
+            document.getElementById('uploadDocTextInput').required = isText;
 
             var hint = [];
             if (formats) { hint.push('Allowed: ' + formats); }
@@ -458,7 +485,8 @@
                     btn.getAttribute('data-service-document-id'),
                     btn.getAttribute('data-name'),
                     btn.getAttribute('data-formats'),
-                    btn.getAttribute('data-max-size')
+                    btn.getAttribute('data-max-size'),
+                    btn.getAttribute('data-input-type') === 'text'
                 );
             });
         });
@@ -489,12 +517,17 @@
             return status === 'Verified' ? '#1f6b30' : (status === 'Rejected' ? '#7f1616' : '#9aa1b0');
         }
 
+        function escapeHtml(value) {
+            return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
         function versionCard(v, isCurrent) {
             var badge = isCurrent
                 ? '<span class="badge rounded-pill text-bg-primary fw-normal ms-2" style="font-size: .65rem;">CURRENT</span>'
                 : '';
 
-            var actions = '<a href="' + v.url + '" target="_blank" class="btn btn-sm btn-outline-secondary" style="font-size: .72rem; padding: .25rem .6rem;">View</a>'
+            var isTextVersion = v.text !== null && v.text !== undefined;
+            var actions = isTextVersion ? '' : '<a href="' + v.url + '" target="_blank" class="btn btn-sm btn-outline-secondary" style="font-size: .72rem; padding: .25rem .6rem;">View</a>'
                 + '<a href="' + v.url + '" download class="btn btn-sm btn-outline-secondary" style="font-size: .72rem; padding: .25rem .6rem;">Download</a>';
 
             var verifyActions = '';
@@ -517,7 +550,7 @@
                 + '<div class="d-flex align-items-start gap-2 mb-2">'
                 + '<span class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width:34px;height:34px;background:' + v.icon.bg + ';color:' + v.icon.text + ';font-size:.6rem;font-weight:700;">' + v.icon.label + '</span>'
                 + '<div>'
-                + '<div class="small">' + v.filename + ' &middot; ' + v.size + '</div>'
+                + '<div class="small">' + (isTextVersion ? escapeHtml(v.text) : v.filename + ' &middot; ' + v.size) + '</div>'
                 + '<div class="tm-muted" style="font-size:.75rem;">Uploaded by <strong>' + v.uploaded_by + '</strong> (Staff) via service &middot; ' + v.uploaded_at + '</div>'
                 + '</div>'
                 + '</div>'

@@ -5,9 +5,9 @@
 @section('content')
 @php
     $tickets = [
-        ['number' => 'TKT-2026-0001', 'service' => 'GST Return Filing', 'status' => 'Work In Progress'],
-        ['number' => 'TKT-2026-0002', 'service' => 'Income Tax Return Filing', 'status' => 'Task Completed'],
-        ['number' => 'TKT-2026-0003', 'service' => 'ROC Annual Filing', 'status' => 'Documents Pending'],
+        ['number' => 'SRV-2026-0001', 'service' => 'GST Return Filing', 'status' => 'Work In Progress'],
+        ['number' => 'SRV-2026-0002', 'service' => 'Income Tax Return Filing', 'status' => 'Task Completed'],
+        ['number' => 'SRV-2026-0003', 'service' => 'ROC Annual Filing', 'status' => 'Documents Pending'],
     ];
 @endphp
 

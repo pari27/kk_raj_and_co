@@ -8,8 +8,8 @@ use App\Models\User;
 class ServicePolicy
 {
     /**
-     * SuperAdmin and Admin share the same access to the Services master; Employees never
-     * reach this screen (see roles-permissions.md).
+     * SuperAdmin and Admin manage the Services master. Employees may only see the
+     * list (viewAny); they cannot open, add, edit or activate/deactivate a service.
      */
     private function isAdminLike(User $user): bool
     {
@@ -18,7 +18,7 @@ class ServicePolicy
 
     public function viewAny(User $user): bool
     {
-        return $this->isAdminLike($user);
+        return true;
     }
 
     public function view(User $user, Service $service): bool

@@ -29,14 +29,15 @@ class TicketDocumentController extends Controller
             ->max('version');
 
         $file = $request->file('file');
-        $path = $file->store('ticket-documents', 'public');
+        $path = $file?->store('ticket-documents', 'public');
 
         TicketDocument::create([
             'ticket_id' => $ticket->id,
             'service_document_id' => $serviceDocument->id,
             'version' => $nextVersion,
             'file_path' => $path,
-            'original_filename' => $file->getClientOriginalName(),
+            'original_filename' => $file?->getClientOriginalName(),
+            'text_value' => $serviceDocument->isText() ? $request->validated('text_value') : null,
             'status' => 'Awaiting check',
             'uploaded_by' => Auth::id(),
         ]);
@@ -175,7 +176,7 @@ class TicketDocumentController extends Controller
 
         AuditLogger::log(
             action: 'Updated',
-            module: 'Ticket',
+            module: 'Service',
             recordLabel: $ticket->number,
             recordUrl: route('tickets.show', $ticket),
             details: "Status {$before->value} → {$status->value}",

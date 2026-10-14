@@ -62,6 +62,13 @@
         margin-bottom: .3rem;
         display: block;
     }
+    /* Let the service list hang below its card instead of being cut off by it. */
+    .tm-section-card {
+        overflow: visible;
+    }
+    .tm-section-card > .tm-section-title {
+        border-radius: .85rem .85rem 0 0;
+    }
     .tm-service-search-wrap {
         position: relative;
     }
@@ -227,19 +234,18 @@
                 </div>
                 <div class="p-4">
                     @error('customer_id')
-                        <div class="alert alert-danger py-2 small">{{ $message }}</div>
+                        <div class="alert alert-danger py-2 small" style="font-size: .75rem; font-style: italic;">{{ $message }}</div>
                     @enderror
                     @error('customer_phone')
-                        <div class="alert alert-danger py-2 small">{{ $message }}</div>
+                        <div class="alert alert-danger py-2 small" style="font-size: .75rem; font-style: italic;">{{ $message }}</div>
                     @enderror
                     @error('customer_name')
-                        <div class="alert alert-danger py-2 small">{{ $message }}</div>
+                        <div class="alert alert-danger py-2 small" style="font-size: .75rem; font-style: italic;">{{ $message }}</div>
                     @enderror
                     @error('customer_email')
-                        <div class="alert alert-danger py-2 small">{{ $message }}</div>
+                        <div class="alert alert-danger py-2 small" style="font-size: .75rem; font-style: italic;">{{ $message }}</div>
                     @enderror
 
-                    <input type="hidden" name="customer_id" id="customerIdInput" value="{{ old('customer_id') }}">
 
                     <label class="tm-field-label d-block">Mobile number <span class="text-danger">*</span></label>
                     <div class="d-flex gap-2">
@@ -283,7 +289,7 @@
                 </div>
                 <div class="p-4">
                     @error('services')
-                        <div class="alert alert-danger py-2 small">{{ $message }}</div>
+                        <div class="alert alert-danger py-2 small" style="font-size: .75rem; font-style: italic;">{{ $message }}</div>
                     @enderror
 
                     <div id="serviceRows"></div>
@@ -326,17 +332,6 @@
                         <span class="fw-semibold" id="summaryServiceCount">0</span>
                     </div>
                     <div id="summaryServiceLines" class="mb-2"></div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="tm-muted">Discount</span>
-                        @if ($canManagePricing)
-                            <input type="number" name="discount" id="discountInput" class="form-control form-control-sm tm-field text-end" style="width: 110px;" value="{{ old('discount', 0) }}" min="0" step="0.01">
-                        @else
-                            <span class="tm-lock-note">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                Admin only
-                            </span>
-                        @endif
-                    </div>
 
                     <div class="rounded-3 p-3 mt-2" style="background: #e5f5e0;">
                         <div class="fw-bold" style="color: #1f6b30;">Total</div>
@@ -425,7 +420,7 @@
             clientEmailInput.disabled = false;
             clientNameCaption.classList.add('d-none');
             clientEmailCaption.classList.add('d-none');
-            document.getElementById('summaryClient').textContent = '—';
+            syncSummaryClient();
             updateNotifyState();
         }
 
@@ -459,6 +454,17 @@
             updateNotifyState();
         }
 
+        // Summary card: show the typed name for a new client (an existing client's name is set when it is picked).
+        function syncSummaryClient() {
+            if (customerIdInput.value !== '') {
+                return;
+            }
+
+            document.getElementById('summaryClient').textContent = clientNameInput.value.trim() || '—';
+        }
+
+        clientNameInput.addEventListener('input', syncSummaryClient);
+
         function clearLookupState() {
             customerIdInput.value = '';
             clientLookupBanner.classList.add('d-none');
@@ -467,7 +473,7 @@
             clientEmailInput.disabled = false;
             clientNameCaption.classList.add('d-none');
             clientEmailCaption.classList.add('d-none');
-            document.getElementById('summaryClient').textContent = '—';
+            syncSummaryClient();
         }
 
         function resetClientFields() {
@@ -577,7 +583,7 @@
             }
 
             function assignmentOptionLabel(assignee) {
-                return assignee.role === 'Employee' ? assignee.name : assignee.role + ' � ' + assignee.name;
+                return assignee.role === 'Employee' ? assignee.name : assignee.role + ' — ' + assignee.name;
             }
 
             function assignmentLabel(assignee) {
@@ -596,12 +602,16 @@
                 assignField = '<div class="flex-shrink-0" style="min-width: 150px;">'
                     + '<div class="tm-service-row-label">Assign to</div>'
                     + '<div class="dropdown">'
-                    + '<button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2 js-assign-toggle" data-bs-toggle="dropdown" style="font-size: .78rem; background: #fff;">'
+                    + '<button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2 js-assign-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" style="font-size: .78rem; background: #fff;">'
                     + '<span class="js-assign-avatar">' + avatarHtml(null) + '</span>'
                     + '<span class="js-assign-name">Unassigned</span>'
                     + '<span class="badge rounded-pill text-bg-success js-assign-you d-none" style="font-size: .6rem;">You</span>'
                     + '</button>'
-                    + '<ul class="dropdown-menu">' + optionsHtml + '</ul>'
+                    + '<ul class="dropdown-menu pt-0" style="max-height: 260px; overflow-y: auto; min-width: 220px;">'
+                    + '<li class="px-2 pt-2 pb-2 mb-1 border-bottom" style="position: sticky; top: 0; z-index: 1; background: #fff;"><input type="search" class="form-control form-control-sm js-assign-search" placeholder="Search..." autocomplete="off" style="font-size: .78rem;"></li>'
+                    + optionsHtml
+                    + '<li class="js-assign-empty px-3 py-1 tm-muted d-none" style="font-size: .78rem;">No match</li>'
+                    + '</ul>'
                     + '</div>'
                     + '<input type="hidden" class="js-assign-value" value="">'
                     + '</div>';
@@ -649,19 +659,16 @@
                 });
                 activeIndex = currentResults.length ? 0 : -1;
 
-                if (! q) {
-                    closeDropdown();
-                    return;
-                }
-
                 if (! currentResults.length) {
-                    dropdown.innerHTML = '<div class="tm-service-dropdown-empty">No services match "' + q + '"</div>';
+                    dropdown.innerHTML = '<div class="tm-service-dropdown-empty">' + (q ? 'No services match "' + q + '"' : 'No more services to add') + '</div>';
                     dropdown.classList.remove('d-none');
                     return;
                 }
 
                 var html = '<div class="tm-service-dropdown-header">' + currentResults.length
-                    + (currentResults.length === 1 ? ' service matches "' : ' services match "') + q + '"</div>';
+                    + (q
+                        ? (currentResults.length === 1 ? ' service matches "' : ' services match "') + q + '"'
+                        : (currentResults.length === 1 ? ' service' : ' services')) + '</div>';
                 currentResults.forEach(function (s, idx) {
                     var gstLabel = s.price_includes_gst ? 'GST incl.' : ('+' + s.gst_percent + '% GST');
                     var docsLabel = s.document_names.length === 1 ? '1 document' : (s.document_names.length + ' documents');
@@ -738,7 +745,13 @@
 
             searchInput.addEventListener('focus', function () {
                 row.classList.add('is-searching');
-                if (searchInput.value.trim()) {
+                renderResults(searchInput.value);
+            });
+
+            // Clicking the box again (after Esc or a pick elsewhere) reopens the list.
+            searchInput.addEventListener('click', function () {
+                if (dropdown.classList.contains('d-none')) {
+                    row.classList.add('is-searching');
                     renderResults(searchInput.value);
                 }
             });
@@ -793,8 +806,44 @@
                 option.addEventListener('click', function (e) {
                     e.preventDefault();
                     setAssignment(option.dataset.id || null);
+
+                    var toggle = row.querySelector('.js-assign-toggle');
+                    var instance = window.bootstrap && bootstrap.Dropdown.getInstance(toggle);
+                    if (instance) { instance.hide(); }
                 });
             });
+
+            var assignSearch = row.querySelector('.js-assign-search');
+            if (assignSearch) {
+                var assignToggle = row.querySelector('.js-assign-toggle');
+
+                // Open the list above the card (fixed positioning) so it isn't clipped by it.
+                if (window.bootstrap) {
+                    bootstrap.Dropdown.getOrCreateInstance(assignToggle, {
+                        popperConfig: function (defaultConfig) {
+                            return Object.assign({}, defaultConfig, { strategy: 'fixed' });
+                        },
+                    });
+                }
+                var assignEmpty = row.querySelector('.js-assign-empty');
+
+                assignSearch.addEventListener('input', function () {
+                    var query = assignSearch.value.trim().toLowerCase();
+                    var visible = 0;
+                    row.querySelectorAll('.js-assign-option').forEach(function (option) {
+                        var match = option.textContent.toLowerCase().indexOf(query) !== -1;
+                        option.parentElement.classList.toggle('d-none', !match);
+                        if (match) { visible++; }
+                    });
+                    assignEmpty.classList.toggle('d-none', visible > 0);
+                });
+
+                assignToggle.addEventListener('shown.bs.dropdown', function () {
+                    assignSearch.value = '';
+                    assignSearch.dispatchEvent(new Event('input'));
+                    assignSearch.focus();
+                });
+            }
 
             if (canAssignTickets && employees.length) {
                 setAssignment(currentUserIsEmployee ? currentUserId : null);
@@ -826,6 +875,8 @@
         if (! rowsContainer.children.length) {
             createServiceRow();
         }
+
+        syncSummaryClient();
 
         document.getElementById('enquiryForm').addEventListener('submit', function (e) {
             var hasClient = customerIdInput.value

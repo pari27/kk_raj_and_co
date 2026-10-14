@@ -28,7 +28,9 @@
     :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Master Services']]"
 >
     <x-slot:actions>
-        <a href="{{ route('admin.services.create') }}" class="btn btn-tm-primary">+ Add Master Service</a>
+        @if ($canManage)
+            <a href="{{ route('admin.services.create') }}" class="btn btn-tm-primary">+ Add Master Service</a>
+        @endif
     </x-slot:actions>
 </x-page-header>
 
@@ -87,7 +89,9 @@
                         <th>Requirements</th>
                         <th>Services</th>
                         <th>Status</th>
-                        <th class="text-end">Actions</th>
+                        @if ($canManage)
+                            <th class="text-end">Actions</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -109,11 +113,15 @@
                                         {{ $initials }}
                                     </div>
                                     <div>
-                                        <a
-                                            href="{{ route('admin.services.show', $service) }}"
-                                            class="fw-semibold text-decoration-none {{ $service->is_active ? 'text-body' : 'tm-muted' }}"
-                                            style="font-size: .8rem;"
-                                        >{{ $service->name }}</a>
+                                        @if ($canManage)
+                                            <a
+                                                href="{{ route('admin.services.show', $service) }}"
+                                                class="fw-semibold text-decoration-none {{ $service->is_active ? 'text-body' : 'tm-muted' }}"
+                                                style="font-size: .8rem;"
+                                            >{{ $service->name }}</a>
+                                        @else
+                                            <span class="fw-semibold {{ $service->is_active ? '' : 'tm-muted' }}" style="font-size: .8rem;">{{ $service->name }}</span>
+                                        @endif
                                         @if ($service->description)
                                             <div class="tm-muted small">{{ $service->description }}</div>
                                         @endif
@@ -130,6 +138,7 @@
                                         'name' => $document->name,
                                         'mandatory' => (bool) $document->is_mandatory,
                                         'instructions' => $document->instructions,
+                                        'type' => $document->input_type,
                                         'formats' => $document->allowed_formats,
                                         'size' => $document->formattedMaxSize(),
                                     ])->values();
@@ -139,7 +148,7 @@
                                     class="btn btn-link p-0 text-decoration-none text-body d-inline-flex align-items-center gap-1 small js-show-documents"
                                     data-service="{{ $service->name }}"
                                     data-fee="₹{{ number_format((float) $service->default_price, 0) }}"
-                                    data-edit-url="{{ route('admin.services.edit', $service) }}"
+                                    data-edit-url="{{ $canManage ? route('admin.services.edit', $service) : '' }}"
                                     data-documents="{{ $documentList->toJson() }}"
                                     data-bs-toggle="modal"
                                     data-bs-target="#serviceDocumentsModal"
@@ -158,6 +167,7 @@
                                     {{ $service->is_active ? 'Active' : 'Inactive' }}
                                 </span>
                             </td>
+                            @if ($canManage)
                             <td class="text-end">
                                 <div class="d-inline-flex justify-content-end gap-1">
                                     <a href="{{ route('admin.services.show', $service) }}" class="tm-icon-btn-sm text-decoration-none" aria-label="View {{ $service->name }}" title="View">
@@ -174,6 +184,7 @@
                                     </a>
                                 </div>
                             </td>
+                            @endif
                         </tr>
                     @endforeach
                 </tbody>
@@ -210,7 +221,11 @@
             <div class="modal-body px-4 py-3" id="serviceDocumentsBody"></div>
 
             <div class="d-flex align-items-center justify-content-between px-4 py-3" style="background: #fafbfc;">
-                <a href="#" id="serviceDocumentsEdit" class="btn btn-outline-success btn-sm">Edit documents</a>
+                @if ($canManage)
+                    <a href="#" id="serviceDocumentsEdit" class="btn btn-outline-success btn-sm">Edit documents</a>
+                @else
+                    <span></span>
+                @endif
                 <button type="button" class="btn btn-sm text-white px-3" style="background: #101b3d;" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
@@ -269,7 +284,7 @@
                 }
 
                 const meta = makeEl('div', 'd-flex flex-wrap align-items-center gap-1 mt-1');
-                (doc.formats || '').split(',').map((format) => format.trim()).filter(Boolean).forEach((format) => {
+                (doc.type === 'text' ? 'Text' : (doc.formats || '')).split(',').map((format) => format.trim()).filter(Boolean).forEach((format) => {
                     const chip = makeEl('span', 'badge fw-bold', format.toUpperCase());
                     chip.style.cssText = 'background: #eaf0fb; color: #1d3f8f; font-size: .62rem;';
                     meta.appendChild(chip);
@@ -297,7 +312,10 @@
                 document.getElementById('serviceDocumentsTotal').textContent = documents.length;
                 document.getElementById('serviceDocumentsMandatory').textContent = mandatory.length;
                 document.getElementById('serviceDocumentsOptional').textContent = optional.length;
-                document.getElementById('serviceDocumentsEdit').href = button.dataset.editUrl;
+                var editLink = document.getElementById('serviceDocumentsEdit');
+                if (editLink) {
+                    editLink.href = button.dataset.editUrl;
+                }
 
                 documentsBody.innerHTML = '';
 

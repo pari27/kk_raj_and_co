@@ -67,6 +67,20 @@
                         <span class="tm-nav-icon">{!! $tmIcon('bar-chart') !!}</span> Reports
                     </a>
 
+                    @if (! $tmIsAdminLike)
+                        <div class="tm-nav-section-label">Masters</div>
+                        <a href="{{ route('admin.services.index') }}" class="tm-nav-link {{ request()->routeIs('admin.services.*') ? 'active' : '' }}">
+                            <span class="tm-nav-icon">{!! $tmIcon('briefcase') !!}</span> Master Services
+                        </a>
+                    @endif
+
+                    @if (! $tmIsAdminLike)
+                        <div class="tm-nav-section-label">System</div>
+                        <a href="{{ route('admin.audit-log') }}" class="tm-nav-link {{ request()->routeIs('admin.audit-log') ? 'active' : '' }}">
+                            <span class="tm-nav-icon">{!! $tmIcon('clock') !!}</span> My Audit Log
+                        </a>
+                    @endif
+
                     @if ($tmIsAdminLike)
                         <div class="tm-nav-section-label">Masters</div>
                         <a href="{{ route('admin.services.index') }}" class="tm-nav-link {{ request()->routeIs('admin.services.*') ? 'active' : '' }}">
@@ -146,7 +160,7 @@
                                     <div class="d-flex justify-content-between gap-2">
                                         <span class="fw-bold small">{{ $n->title }}</span>
                                         <span class="d-flex align-items-center gap-1 tm-muted flex-shrink-0" style="font-size: .7rem;">
-                                            {{ $n->created_at->diffForHumans(short: true) }} ago
+                                            {{ $n->created_at->diffForHumans(short: true) }}
                                             @if ($n->isUnread())<span class="rounded-circle bg-success d-inline-block" style="width: 7px; height: 7px;"></span>@endif
                                         </span>
                                     </div>

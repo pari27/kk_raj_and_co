@@ -103,7 +103,7 @@ class TicketController extends Controller
 
         AuditLogger::log(
             action: 'Updated',
-            module: 'Ticket',
+            module: 'Service',
             recordLabel: $ticket->number,
             recordUrl: route('tickets.show', $ticket),
             details: "Status {$before->value} → {$status->value}",
@@ -137,7 +137,7 @@ class TicketController extends Controller
 
         AuditLogger::log(
             action: 'Updated',
-            module: 'Ticket',
+            module: 'Service',
             recordLabel: $ticket->number,
             recordUrl: route('tickets.show', $ticket),
             details: "Reassigned to {$label}",

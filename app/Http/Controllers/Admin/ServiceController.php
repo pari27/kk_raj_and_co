@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class ServiceController extends Controller
@@ -23,7 +24,9 @@ class ServiceController extends Controller
 
         $services = Service::query()->with('documents')->withCount('documents')->latest('created_at')->get();
 
-        return view('admin.services.index', compact('services'));
+        $canManage = auth()->user()->isSuperAdmin() || auth()->user()->isAdmin();
+
+        return view('admin.services.index', compact('services', 'canManage'));
     }
 
     public function show(Service $service): View
@@ -97,6 +100,8 @@ class ServiceController extends Controller
         $before = $service->only(['default_price', 'gst_percent']);
         $documentsBefore = $service->documents()->get()->keyBy('name');
 
+        $this->guardRemovedDocuments($documentsBefore, $request->input('documents', []));
+
         $service->update([
             ...$request->safe()->only(['name', 'description', 'default_price', 'gst_percent']),
             'price_includes_gst' => $request->boolean('price_includes_gst'),
@@ -169,11 +174,14 @@ class ServiceController extends Controller
 
             $submittedNames[] = $name;
 
+            $isText = ($row['input_type'] ?? 'file') === 'text';
+
             $rows[] = [
                 'name' => $name,
                 'instructions' => $row['instructions'] ?? null,
-                'allowed_formats' => $row['allowed_formats'] ?? null,
-                'max_file_size_kb' => ! empty($row['max_file_size_mb']) ? (int) round(((float) $row['max_file_size_mb']) * 1024) : null,
+                'input_type' => $isText ? 'text' : 'file',
+                'allowed_formats' => $isText ? null : 'PDF, JPG, PNG',
+                'max_file_size_kb' => $isText ? null : 5120,
                 'is_mandatory' => ! empty($row['mandatory']),
             ];
 
@@ -198,10 +206,43 @@ class ServiceController extends Controller
             }
         }
 
-        $service->documents()->delete();
+        // Update documents in place (matched by name) so uploads already made against
+        // them keep pointing at the same row; only add new ones and drop removed ones.
+        $existing = $service->documents()->get()->keyBy('name');
 
-        if ($rows !== []) {
-            $service->documents()->createMany($rows);
+        foreach ($rows as $row) {
+            if ($existing->has($row['name'])) {
+                $existing->get($row['name'])->update($row);
+            } else {
+                $existing->put($row['name'], $service->documents()->create($row));
+            }
+        }
+
+        $service->documents()->whereNotIn('name', $submittedNames)->delete();
+    }
+
+    /**
+     * A document that already has uploads or entries on a ticket can't be
+     * removed from the service; staff should mark it Optional instead.
+     *
+     * @param  Collection<string, ServiceDocument>  $before
+     * @param  array<int, array<string, mixed>>  $submitted
+     */
+    private function guardRemovedDocuments(Collection $before, array $submitted): void
+    {
+        $submittedNames = collect($submitted)
+            ->map(fn ($row) => trim((string) ($row['name'] ?? '')))
+            ->filter()
+            ->all();
+
+        $blocked = $before
+            ->filter(fn (ServiceDocument $document, string $name) => ! in_array($name, $submittedNames, true) && $document->ticketDocuments()->exists())
+            ->keys();
+
+        if ($blocked->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'documents' => 'Cannot remove '.$blocked->implode(', ').': already used on existing services. Mark it Optional instead.',
+            ]);
         }
     }
 
@@ -209,7 +250,7 @@ class ServiceController extends Controller
     {
         AuditLogger::log(
             action: $action,
-            module: 'Service',
+            module: 'Master Service',
             recordLabel: $service->name,
             recordUrl: route('admin.services.show', $service),
             details: $details,

@@ -240,7 +240,7 @@ class PaymentTest extends TestCase
     public function test_employee_can_also_view_and_record_payments(): void
     {
         $employee = User::factory()->create(['role' => UserRole::Employee]);
-        $ticket = $this->createTicket(500, ['status' => TicketStatus::TaskCompleted, 'completed_at' => now()]);
+        $ticket = $this->createTicket(500, ['status' => TicketStatus::TaskCompleted, 'completed_at' => now(), 'assigned_to' => $employee->id]);
 
         $this->actingAs($employee)->get(route('payments.index'))->assertOk();
 

@@ -229,7 +229,7 @@ class EnquiryTest extends TestCase
         ]);
 
         $this->assertSame(1, AuditLog::where('module', 'Enquiry')->count());
-        $this->assertSame(1, AuditLog::where('module', 'Ticket')->count());
+        $this->assertSame(1, AuditLog::where('module', 'Service')->count());
     }
 
     public function test_at_least_one_service_is_required(): void

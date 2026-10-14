@@ -15,6 +15,7 @@ class AppNotification extends Model
         'tickets' => 'Services',
         'payments' => 'Payments',
         'enquiries' => 'Enquiries',
+        'clients' => 'Clients',
         'security' => 'Security',
     ];
 

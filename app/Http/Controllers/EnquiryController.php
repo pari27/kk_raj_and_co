@@ -11,6 +11,7 @@ use App\Models\Service;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Models\Setting;
 use App\Support\NumberSequence;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -152,7 +153,7 @@ class EnquiryController extends Controller
             $total = max(0, round($subtotal + $gstTotal - $discount, 2));
 
             $enquiry = Enquiry::create([
-                'number' => NumberSequence::next('enquiries', 'ENQ'),
+                'number' => NumberSequence::next('enquiries', Setting::enquiryPrefix()),
                 'customer_id' => $customer->id,
                 'created_by' => $user->id,
                 'notes' => $request->validated('notes'),
@@ -165,7 +166,7 @@ class EnquiryController extends Controller
 
             foreach ($ticketRows as $row) {
                 $createdTickets[] = Ticket::create([
-                    'number' => NumberSequence::next('tickets', 'TKT'),
+                    'number' => NumberSequence::next('tickets', Setting::servicePrefix()),
                     'enquiry_id' => $enquiry->id,
                     'service_id' => $row['service']->id,
                     'customer_id' => $customer->id,
@@ -204,7 +205,7 @@ class EnquiryController extends Controller
         foreach ($createdTickets as $ticket) {
             AuditLogger::log(
                 action: 'Created',
-                module: 'Ticket',
+                module: 'Service',
                 recordLabel: $ticket->number,
                 recordUrl: route('tickets.show', $ticket),
                 details: $ticket->assigned_to
@@ -224,7 +225,16 @@ class EnquiryController extends Controller
     {
         $this->authorize('view', $enquiry);
 
-        $enquiry->load(['customer', 'createdBy', 'tickets.service', 'tickets.assignedTo', 'payments']);
+        $user = auth()->user();
+
+        $enquiry->load([
+            'customer',
+            'createdBy',
+            'tickets' => fn ($query) => $query->visibleTo($user),
+            'tickets.service',
+            'tickets.assignedTo',
+            'payments',
+        ]);
 
         $closedTicketsCount = $enquiry->tickets
             ->filter(fn (Ticket $ticket) => $ticket->status->isClosed())

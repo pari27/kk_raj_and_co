@@ -66,6 +66,35 @@
                 </div>
             </form>
         </div>
+
+        <div class="tm-card p-0 overflow-hidden mt-3">
+            <div class="tm-section-title">Numbering</div>
+            <form method="POST" action="{{ route('admin.settings.numbering.update') }}" class="p-4">
+                @csrf
+                @method('PUT')
+
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="tm-field-label d-block" for="servicePrefixInput">Service number prefix</label>
+                        <input type="text" id="servicePrefixInput" name="service_prefix" value="{{ old('service_prefix', $setting->service_prefix) }}" maxlength="6" class="form-control tm-field text-uppercase @error('service_prefix') is-invalid @enderror">
+                        @error('service_prefix')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-6">
+                        <label class="tm-field-label d-block" for="enquiryPrefixInput">Enquiry number prefix</label>
+                        <input type="text" id="enquiryPrefixInput" name="enquiry_prefix" value="{{ old('enquiry_prefix', $setting->enquiry_prefix) }}" maxlength="6" class="form-control tm-field text-uppercase @error('enquiry_prefix') is-invalid @enderror">
+                        @error('enquiry_prefix')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-tm-primary mt-3">Save</button>
+                <p class="tm-muted mt-2 mb-0" style="font-size: .75rem; font-style: italic;">
+                    New numbers look like <strong>{{ $setting->service_prefix }}-{{ now()->year }}-0001</strong> and <strong>{{ $setting->enquiry_prefix }}-{{ now()->year }}-0001</strong>. Existing numbers are not changed.
+                </p>
+            </form>
+        </div>
     </div>
 </div>
 @endsection

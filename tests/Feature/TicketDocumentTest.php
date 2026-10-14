@@ -61,6 +61,35 @@ class TicketDocumentTest extends TestCase
         Storage::disk('public')->assertExists($document->file_path);
     }
 
+    public function test_text_document_stores_a_typed_value_instead_of_a_file(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+        [$ticket, $serviceDocument] = $this->createTicketWithDocument(['input_type' => 'text', 'allowed_formats' => null, 'max_file_size_kb' => null]);
+
+        $this->actingAs($admin)
+            ->post(route('tickets.documents.store', $ticket), [
+                'service_document_id' => $serviceDocument->id,
+                'text_value' => 'ABCDE1234F',
+            ])
+            ->assertRedirect(route('tickets.show', $ticket));
+
+        $document = TicketDocument::query()->where('ticket_id', $ticket->id)->firstOrFail();
+        $this->assertSame('ABCDE1234F', $document->text_value);
+        $this->assertNull($document->file_path);
+
+        $this->actingAs($admin)->get(route('tickets.show', $ticket))->assertOk()->assertSee('ABCDE1234F');
+    }
+
+    public function test_text_document_requires_a_value(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+        [$ticket, $serviceDocument] = $this->createTicketWithDocument(['input_type' => 'text']);
+
+        $this->actingAs($admin)
+            ->post(route('tickets.documents.store', $ticket), ['service_document_id' => $serviceDocument->id])
+            ->assertSessionHasErrors('text_value');
+    }
+
     public function test_reuploading_increments_the_version(): void
     {
         Storage::fake('public');

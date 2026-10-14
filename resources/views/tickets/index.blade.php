@@ -125,7 +125,7 @@
 
     <div class="p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
         <div class="flex-grow-1" style="max-width: 320px;">
-            <input type="text" id="ticketSearch" class="form-control tm-field" placeholder="Search service no., client, phone or status">
+            <input type="text" id="ticketSearch" class="form-control tm-field" placeholder="Search service no., client, phone, status or assignee">
         </div>
         <div class="d-flex flex-wrap gap-2">
             <div id="ticketDateRangeWrap" class="d-none" style="min-width: 220px;">
@@ -137,6 +137,14 @@
                 <input type="hidden" id="ticketDateFrom">
                 <input type="hidden" id="ticketDateTo">
             </div>
+            @if ($isAdmin)
+                <select id="assigneeFilter" class="form-select tm-field" aria-label="Filter by assigned to">
+                    <option value="">Assigned to: All</option>
+                    @foreach ($pending->concat($history)->map(fn ($t) => $t->assignedTo->name ?? 'Unassigned')->unique()->sort()->values() as $assigneeName)
+                        <option value="{{ $assigneeName }}">{{ $assigneeName }}</option>
+                    @endforeach
+                </select>
+            @endif
             <select id="sortOrder" class="form-select tm-field">
                 <option value="desc" selected>Newest first</option>
                 <option value="asc">Oldest first</option>
@@ -303,6 +311,7 @@
         var subtitleEl = document.getElementById('ticketsSubtitle');
         var searchInput = document.getElementById('ticketSearch');
         var sortOrder = document.getElementById('sortOrder');
+        var assigneeFilter = document.getElementById('assigneeFilter');
         var paginationSummary = document.getElementById('paginationSummary');
         var paginationPages = document.getElementById('paginationPages');
         var dateRangeWrap = document.getElementById('ticketDateRangeWrap');
@@ -334,6 +343,7 @@
             var sort = sortState[activeTab];
 
             var rows = activeTableRows();
+            var assigneeValue = assigneeFilter ? assigneeFilter.value : '';
 
             var dateFrom = activeTab === 'history' ? dateFromInput.value : '';
             var dateTo = activeTab === 'history' ? dateToInput.value : '';
@@ -345,6 +355,7 @@
                     || (row.getAttribute('data-service') || '').toLowerCase().includes(search)
                     || (row.getAttribute('data-phone') || '').toLowerCase().includes(search)
                     || (row.getAttribute('data-status') || '').toLowerCase().includes(search)
+                    || (row.getAttribute('data-employee') || '').toLowerCase().includes(search)
                     || (row.getAttribute('data-open-days') || '') === search;
 
                 var matchesDate = true;
@@ -362,7 +373,9 @@
                     }
                 }
 
-                row.dataset.visible = (matchesSearch && matchesDate) ? '1' : '0';
+                var matchesAssignee = !assigneeValue || (row.getAttribute('data-employee') || '') === assigneeValue;
+
+                row.dataset.visible = (matchesSearch && matchesDate && matchesAssignee) ? '1' : '0';
             });
 
             var visibleRows = rows.filter(function (row) { return row.dataset.visible === '1'; });
@@ -439,6 +452,10 @@
         });
 
         searchInput.addEventListener('input', function () { currentPage = 1; render(); });
+
+        if (assigneeFilter) {
+            assigneeFilter.addEventListener('change', function () { currentPage = 1; render(); });
+        }
 
         sortOrder.addEventListener('input', function () {
             sortState[activeTab] = { key: 'sort', dir: sortOrder.value, type: 'number' };

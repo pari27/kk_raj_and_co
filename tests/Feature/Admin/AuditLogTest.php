@@ -46,11 +46,29 @@ class AuditLogTest extends TestCase
         $this->assertTrue(strpos($content, 'Newer entry') < strpos($content, 'Older entry'));
     }
 
-    public function test_employee_cannot_view_the_audit_log(): void
+    public function test_employee_sees_only_their_own_audit_entries(): void
+    {
+        $employee = User::factory()->create(['role' => UserRole::Employee]);
+        $colleague = User::factory()->create(['role' => UserRole::Employee]);
+
+        AuditLog::create(['user_id' => $employee->id, 'action' => 'Created', 'module' => 'Customer', 'record_label' => 'My Own Client', 'details' => 'Created client']);
+        AuditLog::create(['user_id' => $colleague->id, 'action' => 'Created', 'module' => 'Customer', 'record_label' => 'Colleague Client', 'details' => 'Created client']);
+
+        $this->actingAs($employee)->get(route('admin.audit-log'))
+            ->assertOk()
+            ->assertSee('My Own Client')
+            ->assertDontSee('Colleague Client');
+
+        $csv = $this->actingAs($employee)->get(route('admin.audit-log.export'))->streamedContent();
+        $this->assertStringContainsString('My Own Client', $csv);
+        $this->assertStringNotContainsString('Colleague Client', $csv);
+    }
+
+    public function test_employee_can_open_the_audit_log_page(): void
     {
         $employee = User::factory()->create(['role' => UserRole::Employee]);
 
-        $this->actingAs($employee)->get(route('admin.audit-log'))->assertForbidden();
+        $this->actingAs($employee)->get(route('admin.audit-log'))->assertOk();
     }
 
     public function test_guest_is_redirected_to_login(): void

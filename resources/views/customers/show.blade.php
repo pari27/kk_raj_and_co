@@ -228,7 +228,7 @@
                                     <td class="text-end fw-semibold">₹{{ number_format((float) $ticket->total) }}</td>
                                 </tr>
                             @empty
-                                <tr><td colspan="4" class="text-center tm-muted py-4">No pending services.</td></tr>
+                                <tr><td colspan="4" class="text-center tm-muted py-4" style="font-size: .8rem;">No pending services.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -255,7 +255,7 @@
                             </div>
                         </div>
                     @empty
-                        <div class="text-center tm-muted py-4">No enquiries recorded for this client.</div>
+                        <div class="text-center tm-muted py-4" style="font-size: .8rem;">No enquiries recorded for this client.</div>
                     @endforelse
                 </div>
             </section>

@@ -30,6 +30,16 @@ class Ticket extends Model
         ];
     }
 
+    /**
+     * An employee only sees services assigned to them; admins see everything.
+     */
+    public function scopeVisibleTo(\Illuminate\Database\Eloquent\Builder $query, User $user): void
+    {
+        if ($user->isEmployee()) {
+            $query->where('assigned_to', $user->id);
+        }
+    }
+
     public function enquiry(): BelongsTo
     {
         return $this->belongsTo(Enquiry::class);

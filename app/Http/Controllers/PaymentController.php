@@ -24,11 +24,15 @@ class PaymentController extends Controller
             ? Carbon::create(now()->year, 4, 1)->startOfDay()
             : Carbon::create(now()->year - 1, 4, 1)->startOfDay();
 
-        $receivedThisMonth = Payment::query()->where('paid_at', '>=', $monthStart)->get();
-        $receivedThisFy = Payment::query()->where('paid_at', '>=', $fyStart)->sum('amount');
+        $user = auth()->user();
+        $ownPayments = fn () => Payment::query()->whereHas('enquiry', fn ($enquiry) => $enquiry->visibleTo($user));
+
+        $receivedThisMonth = $ownPayments()->where('paid_at', '>=', $monthStart)->get();
+        $receivedThisFy = $ownPayments()->where('paid_at', '>=', $fyStart)->sum('amount');
 
         $pendingEnquiries = Enquiry::query()
-            ->with(['customer', 'tickets.service', 'payments'])
+            ->visibleTo($user)
+            ->with(['customer', 'tickets' => fn ($query) => $query->visibleTo($user), 'tickets.service', 'payments'])
             ->get()
             ->filter(fn (Enquiry $enquiry) => $enquiry->balanceDue() > 0)
             ->sortByDesc(fn (Enquiry $enquiry) => $enquiry->balanceDue())
@@ -36,8 +40,8 @@ class PaymentController extends Controller
 
         $partialPaymentsCount = $pendingEnquiries->filter(fn (Enquiry $enquiry) => $enquiry->amountPaid() > 0)->count();
 
-        $payments = Payment::query()
-            ->with(['enquiry.customer', 'enquiry.tickets.service', 'receivedBy'])
+        $payments = $ownPayments()
+            ->with(['enquiry.customer', 'enquiry.tickets' => fn ($query) => $query->visibleTo($user), 'enquiry.tickets.service', 'receivedBy'])
             ->latest('paid_at')
             ->latest('id')
             ->get();
@@ -66,6 +70,8 @@ class PaymentController extends Controller
     public function store(StorePaymentRequest $request): RedirectResponse
     {
         $enquiry = Enquiry::query()->with('payments')->findOrFail($request->validated('enquiry_id'));
+
+        $this->authorize('view', $enquiry);
 
         $balanceDue = $enquiry->balanceDue();
         $amount = (float) $request->validated('amount');
@@ -174,8 +180,11 @@ class PaymentController extends Controller
 
     public function export(): StreamedResponse
     {
+        $user = auth()->user();
+
         $payments = Payment::query()
-            ->with(['enquiry.customer', 'enquiry.tickets.service', 'receivedBy'])
+            ->whereHas('enquiry', fn ($enquiry) => $enquiry->visibleTo($user))
+            ->with(['enquiry.customer', 'enquiry.tickets' => fn ($query) => $query->visibleTo($user), 'enquiry.tickets.service', 'receivedBy'])
             ->latest('paid_at')
             ->latest('id')
             ->get();
