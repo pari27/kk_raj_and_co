@@ -344,7 +344,7 @@
 <div class="row g-3">
     <div class="col-12 col-xl-6">
         <div class="tm-card p-0" style="overflow: hidden;">
-            <div class="d-flex align-items-center justify-content-between p-3" style="background: #1f6b30;">
+            <div class="d-flex align-items-center justify-content-between p-2 px-3" style="background: #1f6b30;">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Received by payment mode</h2>
                 <span class="small" style="color: rgba(255,255,255,.75);">{{ now()->format('F') }}</span>
             </div>

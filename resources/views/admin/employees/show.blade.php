@@ -22,7 +22,7 @@
     }
     #employee-show-page .emp-side-heading {
         color: #fff;
-        padding: .8rem 1.15rem;
+        padding: .5rem 1rem;
         border-radius: .8rem .8rem 0 0;
     }
     #employee-show-page .emp-info-label {

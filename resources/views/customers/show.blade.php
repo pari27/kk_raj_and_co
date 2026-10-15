@@ -30,7 +30,7 @@
     #customer-show-page .client-section-title {
         background: #101b3d;
         color: #fff;
-        padding: .85rem 1.15rem;
+        padding: .5rem 1rem;
         border-radius: .8rem .8rem 0 0;
     }
 
@@ -73,7 +73,7 @@
 
     #customer-show-page .client-side-heading {
         color: #fff;
-        padding: .8rem 1rem;
+        padding: .5rem 1rem;
         border-radius: .8rem .8rem 0 0;
     }
 

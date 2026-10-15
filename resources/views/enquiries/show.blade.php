@@ -88,7 +88,7 @@
 <div class="row g-3">
     <div class="col-12 col-xl-8">
         <div class="tm-card p-0 mb-3" style="overflow: hidden;">
-            <div class="p-3" style="background: #101b3d;">
+            <div class="p-2 px-3" style="background: #101b3d;">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Client</h2>
             </div>
             <div class="p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
@@ -113,7 +113,7 @@
         </div>
 
         <div class="tm-card p-0 mb-3" style="overflow: hidden;">
-            <div class="d-flex align-items-center justify-content-between p-3" style="background: #101b3d;">
+            <div class="d-flex align-items-center justify-content-between p-2 px-3" style="background: #101b3d;">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Services in this enquiry ({{ $enquiry->tickets->count() }})</h2>
                 <span class="enquiry-ticket-heading-note" style="color: rgba(255,255,255,.7); font-size: .72rem;">One entry per service</span>
             </div>
@@ -152,7 +152,7 @@
         </div>
 
         <div class="tm-card p-0" style="overflow: hidden;">
-            <div class="p-3" style="background: #101b3d;">
+            <div class="p-2 px-3" style="background: #101b3d;">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Activity</h2>
             </div>
             <div class="p-4">
@@ -173,7 +173,7 @@
 
     <div class="col-12 col-xl-4">
         <div class="tm-card p-0 mb-3" style="overflow: hidden;">
-            <div class="d-flex align-items-center justify-content-between gap-2 p-3" style="background: #1f6b30;">
+            <div class="d-flex align-items-center justify-content-between gap-2 p-2 px-3" style="background: #1f6b30;">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Fee breakdown</h2>
                 @if ($feesPending > 0)
                     <a href="#enquiryPaymentModal" role="button" data-bs-toggle="modal" class="enquiry-make-payment-button flex-shrink-0">Make payment</a>
@@ -209,7 +209,7 @@
         </div>
 
         <div class="tm-card p-0 mb-3" style="overflow: hidden;">
-            <div class="p-3" style="background: #101b3d;">
+            <div class="p-2 px-3" style="background: #101b3d;">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Enquiry details</h2>
             </div>
             <ul class="list-unstyled p-3 mb-0 enquiry-details-list">
@@ -234,7 +234,7 @@
 
         @if ($enquiry->notes)
             <div class="tm-card p-0" style="overflow: hidden;">
-                <div class="p-3" style="background: #1f6b30;">
+                <div class="p-2 px-3" style="background: #1f6b30;">
                     <h2 class="h6 tm-serif fw-bold mb-0 text-white">Notes</h2>
                 </div>
                 <div class="p-3 small">{{ $enquiry->notes }}</div>

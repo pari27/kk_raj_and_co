@@ -12,7 +12,7 @@
     .tm-section-title {
         background: #101b3d;
         color: #fff;
-        padding: .85rem 1.25rem;
+        padding: .5rem 1rem;
         font-weight: 700;
         font-size: .95rem;
     }

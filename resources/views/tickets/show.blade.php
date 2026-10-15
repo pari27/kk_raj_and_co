@@ -24,7 +24,7 @@
     #ticket-show-page .ticket-progress-step.is-current { color: #805d00; }
     #ticket-show-page .ticket-progress-step.is-current .ticket-step-dot { border-color: #c58b00; color: #c58b00; background: #fff8df; }
     #ticket-show-page .ticket-panel { overflow: hidden; }
-    #ticket-show-page .ticket-panel-heading { align-items: center; background: #101b3d; color: #fff; display: flex; justify-content: space-between; padding: .8rem 1rem; }
+    #ticket-show-page .ticket-panel-heading { align-items: center; background: #101b3d; color: #fff; display: flex; justify-content: space-between; padding: .5rem 1rem; }
     #ticket-show-page .ticket-panel-heading h2 { font-size: .95rem; font-weight: 700; margin: 0; }
     #ticket-show-page .ticket-panel-heading-green { background: #101b3d; }
     #ticket-show-page .ticket-panel-heading-teal { background: #1f6b30; }
@@ -57,7 +57,7 @@
     @media (max-width: 575.98px) {
         #ticket-show-page .ticket-summary-main { padding: 1rem; }
         #ticket-show-page .ticket-progress { min-width: 34rem; }
-        #ticket-show-page .ticket-panel-heading { padding: .75rem .85rem; }
+        #ticket-show-page .ticket-panel-heading { padding: .5rem 1rem; }
     }
 </style>
 @endpush
@@ -363,7 +363,7 @@
             <form method="POST" action="{{ route('tickets.documents.store', $ticket) }}" enctype="multipart/form-data" id="uploadDocumentForm">
                 @csrf
                 <input type="hidden" name="service_document_id" id="uploadDocServiceDocumentId">
-                <div class="p-3" style="background: #101b3d;">
+                <div class="p-2 px-3" style="background: #101b3d;">
                     <h2 class="h6 fw-bold mb-0 text-white" id="uploadDocTitle">Upload document</h2>
                 </div>
                 <div class="modal-body p-4">

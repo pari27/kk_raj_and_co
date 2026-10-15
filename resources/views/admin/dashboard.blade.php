@@ -109,7 +109,7 @@
 
     <div class="col-12 col-xl-5">
         <div class="tm-card tm-card-hover p-0 h-100" style="overflow: hidden;">
-            <div class="p-3" style="background: #101b3d;">
+            <div class="p-2 px-3" style="background: #101b3d;">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white" style="font-size: .88rem;">Open services by status</h2>
             </div>
             <div class="p-3 d-flex align-items-center gap-3">
@@ -135,7 +135,7 @@
 <div class="row g-3 mb-3">
     <div class="col-12 col-xl-5">
         <div class="tm-card tm-card-hover p-0 h-100" style="overflow: hidden;">
-            <div class="p-3" style="background: #101b3d;">
+            <div class="p-2 px-3" style="background: #101b3d;">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Fees by month</h2>
             </div>
             <div class="p-3" style="height: 220px;">
@@ -146,7 +146,7 @@
 
     <div class="col-12 col-xl-3">
         <div class="tm-card tm-card-hover p-0 h-100 text-center" style="overflow: hidden;">
-            <div class="p-3 text-start" style="background: #101b3d;">
+            <div class="p-2 px-3 text-start" style="background: #101b3d;">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Fee collection</h2>
             </div>
             <div class="p-3">
@@ -164,7 +164,7 @@
 
     <div class="col-12 col-xl-4">
         <div class="tm-card tm-card-hover p-0 h-100" style="overflow: hidden;">
-            <div class="d-flex align-items-center justify-content-between p-3" style="background: #101b3d;">
+            <div class="d-flex align-items-center justify-content-between p-2 px-3" style="background: #101b3d;">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Employee workload</h2>
                 <div class="d-flex align-items-center gap-2" style="font-size: .72rem;">
                     <span class="badge rounded-pill fw-normal" style="border: 1px solid #3b82f6; color: #fff; background: #3b82f6;">Open</span>
@@ -190,7 +190,7 @@
 </div>
 
 <div class="tm-card tm-card-hover p-0" style="overflow: hidden;">
-    <div class="d-flex align-items-center justify-content-between p-3" style="background: #101b3d;">
+    <div class="d-flex align-items-center justify-content-between p-2 px-3" style="background: #101b3d;">
         <h2 class="h6 tm-serif fw-bold mb-0 text-white">Services by type</h2>
         <div class="d-flex align-items-center gap-2" style="font-size: .72rem;">
             <span class="badge rounded-pill fw-normal" style="border: 1px solid #3b82f6; color: #fff; background: #3b82f6;">Open</span>

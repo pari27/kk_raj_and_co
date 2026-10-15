@@ -69,7 +69,7 @@ body.portal > .d-flex { flex: 1 0 auto; }
 .p-stat.green { background: linear-gradient(135deg, #0f4a25, #1f7a3a); }
 
 .p-card { background: #fff; border: 1px solid var(--tm-surface-border); border-radius: .8rem; overflow: hidden; margin-bottom: 1rem; }
-.p-card-head { padding: .85rem 1.1rem; font-weight: 700; font-size: .8rem; color: #fff; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.p-card-head { padding: .5rem 1rem; font-weight: 700; font-size: .8rem; color: #fff; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .p-card-head.navy { background: var(--tm-navy); }
 .p-card-head.red { background: #b3261e; }
 .p-card-head.green { background: #2f9e58; }

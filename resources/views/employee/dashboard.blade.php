@@ -222,7 +222,7 @@
 <div class="modal fade" id="dashCompletedThisMonthModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border: 0; border-radius: .75rem; overflow: hidden;">
-            <div class="p-3" style="background: #1f6b30;">
+            <div class="p-2 px-3" style="background: #1f6b30;">
                 <h2 class="h6 fw-bold mb-0 text-white">Completed this month ({{ $completedThisMonthList->count() }})</h2>
             </div>
             <div class="modal-body p-0" style="max-height: 60vh; overflow-y: auto;">
