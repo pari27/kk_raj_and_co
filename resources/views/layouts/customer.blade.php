@@ -3,116 +3,137 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', config('app.name', 'Task Management') . ' — Client Portal')</title>
+    <title>@yield('title', config('app.firm_name') . ' — Client Portal')</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        :root {
-            --tm-bg: #f3f4f7;
-            --tm-surface: #ffffff;
-            --tm-surface-border: #e5e7ec;
-            --tm-muted: #6b7280;
-            --tm-accent: #4a9b3e;
-            --tm-navy: #101b3d;
-        }
-
-        body {
-            background-color: var(--tm-bg);
-            color: #1f2430;
-            min-height: 100vh;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        }
-
-        h1, h2, h3, h4, h5, h6, .tm-serif {
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        }
-
-        .tm-topbar {
-            background: var(--tm-navy);
-        }
-
-        .tm-brand-logo {
-            height: 26px;
-            width: auto;
-            display: block;
-        }
-
-        .tm-card {
-            background: var(--tm-surface);
-            border: 1px solid var(--tm-surface-border);
-            border-radius: .85rem;
-        }
-
-        .tm-muted {
-            color: var(--tm-muted);
-        }
-
-        .tm-divider-gold {
-            border-bottom: 2px solid var(--tm-accent);
-        }
-
-        .tm-table {
-            --bs-table-bg: transparent;
-            --bs-table-color: #1f2430;
-            --bs-table-border-color: var(--tm-surface-border);
-            font-size: .875rem;
-        }
-
-        .tm-table thead th {
-            color: var(--tm-muted);
-            font-size: .72rem;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            font-weight: 600;
-        }
-
-        .tm-field {
-            background: #fff;
-            border: 1px solid var(--tm-surface-border);
-            font-size: .875rem;
-        }
-
-        .tm-field:focus {
-            border-color: var(--tm-accent);
-            box-shadow: 0 0 0 .2rem rgba(74, 155, 62, .15);
-        }
-
-        .btn {
-            font-size: .85rem;
-        }
-
-        .btn-tm-primary {
-            background: var(--tm-navy);
-            border-color: var(--tm-navy);
-            color: #fff;
-        }
-
-        .btn-tm-primary:hover {
-            background: #1a2a5c;
-            border-color: #1a2a5c;
-            color: #fff;
-        }
-    </style>
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/portal.css') }}" rel="stylesheet">
 
     @stack('styles')
 </head>
-<body>
-    <header class="tm-topbar d-flex align-items-center justify-content-between px-4 py-2">
-        <div class="d-flex align-items-center gap-2">
-            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.firm_name', 'Firm') }}" class="tm-brand-logo">
-            <div class="text-white small fw-semibold">Client Portal</div>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-            <span class="text-white small d-none d-sm-inline">{{ $customerName ?? 'Meera Traders' }}</span>
-            <form method="POST" action="#">
-                <button type="button" class="btn btn-outline-light btn-sm">Log out</button>
-            </form>
-        </div>
-    </header>
+<body class="portal">
+    @php
+        $pClient = auth('customer')->user();
+        $pInitial = mb_strtoupper(mb_substr(trim($pClient?->name ?? ''), 0, 1));
+        $pUnread = $pClient ? \App\Models\ClientNotification::where('customer_id', $pClient->id)->whereNull('read_at')->count() : 0;
+        $pPhone = config('app.firm_phone');
+        $pNav = [
+            ['route' => 'customer.dashboard', 'label' => 'Dashboard', 'short' => 'Home', 'icon' => 'home', 'match' => ['customer.dashboard']],
+            ['route' => 'customer.tickets.index', 'label' => 'My services', 'short' => 'Services', 'icon' => 'list', 'match' => ['customer.tickets.*']],
+            ['route' => 'customer.payments.index', 'label' => 'Payments', 'short' => 'Payments', 'icon' => 'credit-card', 'match' => ['customer.payments.*']],
+            ['route' => 'customer.updates', 'label' => 'Updates', 'short' => 'Updates', 'icon' => 'bell', 'match' => ['customer.updates*'], 'badge' => $pUnread],
+            ['route' => 'customer.profile', 'label' => 'Profile', 'short' => 'Profile', 'icon' => 'user', 'match' => ['customer.profile', 'customer.password.*']],
+        ];
+    @endphp
 
-    <main class="p-4">
-        @yield('content')
-    </main>
+    <div class="d-flex flex-column flex-md-row">
+        <aside class="tm-sidebar pt-4 pb-3 d-none d-md-flex flex-column" id="pSidebar">
+            <div class="px-3 mb-3">
+                <a href="{{ route('customer.dashboard') }}"><img src="{{ asset('images/logo.png') }}" alt="{{ config('app.firm_name') }}" class="tm-brand-logo"></a>
+            </div>
+
+            <nav class="d-flex flex-column gap-1 px-2">
+                @foreach ($pNav as $item)
+                    <a href="{{ route($item['route']) }}" class="tm-nav-link {{ request()->routeIs(...$item['match']) ? 'active' : '' }}">
+                        <span class="tm-nav-icon"><x-portal-icon :name="$item['icon']" :size="17" /></span>
+                        {{ $item['label'] }}
+                        @if (! empty($item['badge']))<span class="badge rounded-pill bg-danger ms-auto" style="font-size: .65rem;">{{ $item['badge'] }}</span>@endif
+                    </a>
+                @endforeach
+            </nav>
+
+            @if ($pPhone)
+                <div class="mt-auto px-3">
+                    <div class="p-help">
+                        <div class="p-help-label">Need help?</div>
+                        <div class="fw-bold text-white">{{ $pPhone }}</div>
+                        @if (config('app.firm_hours'))<div class="p-help-hours">{{ config('app.firm_hours') }}</div>@endif
+                    </div>
+                </div>
+            @endif
+        </aside>
+
+        <div class="flex-grow-1 min-vw-0">
+            <header class="tm-topbar d-flex align-items-center gap-3 px-3 px-md-4 py-2 sticky-top">
+                <button class="tm-icon-btn d-none d-md-inline-flex" type="button" id="pSidebarToggle" aria-label="Show or hide the menu">
+                    <x-portal-icon name="menu" :size="18" />
+                </button>
+                <a href="{{ route('customer.dashboard') }}" class="d-md-none"><img src="{{ asset('images/logo.png') }}" alt="{{ config('app.firm_name') }}" class="tm-brand-logo" style="height: 30px;"></a>
+
+                <div class="d-flex align-items-center gap-3 ms-auto">
+                    <a href="{{ route('customer.updates') }}" class="tm-icon-btn position-relative text-decoration-none" style="width: 36px; height: 36px;" aria-label="Updates">
+                        <x-portal-icon name="bell" :size="17" />
+                        @if ($pUnread)<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: .55rem;">{{ $pUnread }}</span>@endif
+                    </a>
+
+                    <div class="dropdown">
+                        <button class="btn d-flex align-items-center gap-2 p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="tm-avatar">{{ $pInitial }}</div>
+                            <div class="text-start d-none d-md-block">
+                                <div class="small fw-semibold text-white">{{ $pClient?->name }}</div>
+                                <div style="font-size: .72rem; color: rgba(255,255,255,.6);">Client</div>
+                            </div>
+                            <svg class="d-none d-md-block" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a href="{{ route('customer.profile') }}" class="dropdown-item d-flex align-items-center gap-2 tm-dropdown-item">
+                                    <span class="d-flex" style="color: var(--tm-accent);"><x-portal-icon name="user" :size="14" /></span> Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('customer.password.edit') }}" class="dropdown-item d-flex align-items-center gap-2 tm-dropdown-item">
+                                    <span class="d-flex" style="color: var(--tm-accent);"><x-portal-icon name="lock" :size="14" /></span> Change Password
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{{ route('customer.logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item d-flex align-items-center gap-2 tm-dropdown-item"><x-portal-icon name="logout" :size="14" /> Log out</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <main class="px-4 pb-5 pt-0 p-main">
+                @if (session('status'))
+                    <div class="alert alert-success py-2 small mt-3 mb-0" role="status">{{ session('status') }}</div>
+                @endif
+                @if ($errors->any())
+                    <div class="alert alert-danger py-2 small mt-3 mb-0" role="alert">
+                        @foreach ($errors->all() as $error)<div>{{ $error }}</div>@endforeach
+                    </div>
+                @endif
+
+                @yield('content')
+            </main>
+        </div>
+    </div>
+
+    <nav class="pbottom d-md-none" aria-label="Main">
+        @foreach ($pNav as $item)
+            @php $active = request()->routeIs(...$item['match']); @endphp
+            <a href="{{ route($item['route']) }}" class="{{ $active ? 'active' : '' }}">
+                <span class="pbottom-icon">
+                    <x-portal-icon :name="$item['icon']" :size="20" />
+                    @if (! empty($item['badge']))<span class="pbottom-dot"></span>@endif
+                </span>
+                <span>{{ $item['short'] }}</span>
+            </a>
+        @endforeach
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('pSidebarToggle').addEventListener('click', function () {
+            var side = document.getElementById('pSidebar');
+            side.classList.toggle('d-md-flex');
+            side.classList.toggle('d-md-none');
+        });
+    </script>
+    @stack('scripts')
 </body>
 </html>

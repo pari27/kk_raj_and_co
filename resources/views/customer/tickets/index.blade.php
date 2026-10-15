@@ -1,47 +1,9 @@
 @extends('layouts.customer')
 
-@section('title', 'My Services — ' . config('app.name', 'Task Management'))
+@section('title', 'My services — ' . config('app.firm_name'))
 
 @section('content')
-@php
-    $tickets = [
-        ['number' => 'SRV-2026-0001', 'service' => 'GST Return Filing', 'status' => 'Work In Progress', 'created' => '28 Sep 2026'],
-        ['number' => 'SRV-2026-0002', 'service' => 'Income Tax Return Filing', 'status' => 'Task Completed', 'created' => '10 Sep 2026'],
-        ['number' => 'SRV-2026-0003', 'service' => 'ROC Annual Filing', 'status' => 'Documents Pending', 'created' => '25 Sep 2026'],
-    ];
-@endphp
+<x-page-header title="My services" subtitle="Everything we are doing, or have done, for you" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('customer.dashboard')], ['label' => 'My services']]" />
 
-<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 pb-3 mb-4 tm-divider-gold">
-    <div>
-        <h1 class="h4 tm-serif fw-bold mb-1">My Services</h1>
-        <p class="tm-muted mb-0" style="font-size: .89rem;">Track the status of every service you've requested</p>
-    </div>
-</div>
-
-<div class="tm-card p-0">
-    <div class="table-responsive">
-        <table class="table tm-table align-middle mb-0">
-            <thead>
-                <tr>
-                    <th>Service No.</th>
-                    <th>Service</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($tickets as $i => $ticket)
-                    <tr>
-                        <td class="fw-semibold">
-                            <a href="{{ route('customer.tickets.show', $i + 1) }}" class="text-decoration-none" style="color: inherit;">{{ $ticket['number'] }}</a>
-                        </td>
-                        <td>{{ $ticket['service'] }}</td>
-                        <td><x-status-badge :status="$ticket['status']" /></td>
-                        <td class="tm-muted">{{ $ticket['created'] }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-</div>
+@include('customer._services-card')
 @endsection

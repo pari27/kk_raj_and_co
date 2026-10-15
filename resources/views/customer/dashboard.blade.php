@@ -1,70 +1,102 @@
 @extends('layouts.customer')
 
-@section('title', 'My Dashboard — ' . config('app.name', 'Task Management'))
+@section('title', 'Dashboard — ' . config('app.firm_name'))
 
 @section('content')
 @php
-    $tickets = [
-        ['number' => 'SRV-2026-0001', 'service' => 'GST Return Filing', 'status' => 'Work In Progress'],
-        ['number' => 'SRV-2026-0002', 'service' => 'Income Tax Return Filing', 'status' => 'Task Completed'],
-        ['number' => 'SRV-2026-0003', 'service' => 'ROC Annual Filing', 'status' => 'Documents Pending'],
-    ];
+    $money = fn ($amount) => '₹'.number_format((float) $amount);
+    $firstName = explode(' ', trim($customer->name))[0];
+    $firstUpload = $attention->first(fn ($item) => $item['tone'] !== 'blue');
 @endphp
 
-<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 pb-3 mb-4 tm-divider-gold">
-    <div>
-        <h1 class="h4 tm-serif fw-bold mb-1">Welcome, Meera Traders</h1>
-        <p class="tm-muted mb-0" style="font-size: .89rem;">Here's the status of your work with us</p>
+<x-page-header title="Welcome, {{ $firstName }}" :subtitle="'Here\'s where your services with '.config('app.firm_name').' stand'" :breadcrumbs="[['label' => 'Dashboard']]">
+    @if ($firstUpload)
+        <x-slot:actions>
+            <a href="{{ $firstUpload['url'] }}" class="pbtn-navy d-none d-md-inline-flex"><x-portal-icon name="upload" :size="16" /> Upload documents</a>
+        </x-slot:actions>
+    @endif
+</x-page-header>
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-xl-3 d-none d-md-block">
+        <div class="p-stat blue">
+            <div class="lb">Active services</div>
+            <div class="vl">{{ $stats['active'] }}</div>
+            <div class="sb">in progress</div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="p-stat amber">
+            <div class="lb">Documents needed</div>
+            <div class="vl">{{ $stats['documents'] }}</div>
+            <div class="sb">{{ $stats['documentServices'] }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="p-stat maroon">
+            <div class="lb">Amount due</div>
+            <div class="vl">{{ $money($stats['due']) }}</div>
+            <div class="sb">{{ $stats['dueServices'] ? 'across '.$stats['dueServices'].' '.($stats['dueServices'] === 1 ? 'service' : 'services') : 'nothing due' }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3 d-none d-md-block">
+        <div class="p-stat green">
+            <div class="lb">Completed</div>
+            <div class="vl">{{ $stats['completed'] }}</div>
+            <div class="sb">this year</div>
+        </div>
     </div>
 </div>
 
-<div class="row g-3 mb-4">
-    <div class="col-6 col-md-4">
-        <div class="tm-card p-3 h-100">
-            <div class="tm-muted small mb-2">Total services</div>
-            <div class="h3 tm-serif fw-bold mb-0">3</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-4">
-        <div class="tm-card p-3 h-100">
-            <div class="tm-muted small mb-2">Documents pending from you</div>
-            <div class="h3 tm-serif fw-bold mb-0 text-warning">1</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-4">
-        <div class="tm-card p-3 h-100">
-            <div class="tm-muted small mb-2">Fees pending</div>
-            <div class="h3 tm-serif fw-bold mb-0 text-warning">₹2,500</div>
-        </div>
-    </div>
-</div>
+<div class="row g-3">
+    <div class="{{ $contacts->isNotEmpty() ? 'col-12 col-lg-8' : 'col-12' }}">
+        <div class="p-card">
+            <div class="p-card-head navy sm"><span>Needs your attention</span></div>
 
-<div class="tm-card p-0">
-    <div class="d-flex align-items-center justify-content-between p-3 pb-0">
-        <h2 class="h6 tm-serif fw-bold mb-0">My services</h2>
-        <a href="{{ route('customer.tickets.index') }}" class="small text-decoration-underline">View all</a>
+            @forelse ($attention as $item)
+                <a href="{{ $item['url'] }}" class="p-attn">
+                    <span class="bar {{ $item['tone'] }}"></span>
+                    <div>
+                        <div class="tt">{{ $item['title'] }}</div>
+                        <div class="sb">{{ $item['sub'] }}</div>
+                    </div>
+                    <span class="chip {{ $item['tone'] }}">{{ $item['action'] }}</span>
+                </a>
+            @empty
+                <div class="p-card-body text-center tm-muted" style="font-size: .85rem;">You're all caught up. Nothing needs your attention.</div>
+            @endforelse
+        </div>
     </div>
-    <div class="table-responsive">
-        <table class="table tm-table align-middle mb-0">
-            <thead>
-                <tr>
-                    <th>Service No.</th>
-                    <th>Service</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($tickets as $i => $ticket)
-                    <tr>
-                        <td class="fw-semibold">
-                            <a href="{{ route('customer.tickets.show', $i + 1) }}" class="text-decoration-none" style="color: inherit;">{{ $ticket['number'] }}</a>
-                        </td>
-                        <td>{{ $ticket['service'] }}</td>
-                        <td><x-status-badge :status="$ticket['status']" /></td>
-                    </tr>
+
+    @if ($contacts->isNotEmpty())
+        <div class="col-12 col-lg-4">
+            <div class="p-card">
+                <div class="p-card-head navy sm"><span>Your contact at {{ config('app.firm_name') }}</span></div>
+
+                @foreach ($contacts as $item)
+                    <div class="p-card-body {{ $item['contact'] ? '' : 'p-unassigned' }}" style="{{ $loop->last ? '' : 'border-bottom: 1px solid var(--p-line);' }}">
+                        <div class="tm-muted fw-bold text-uppercase" style="font-size: .68rem; letter-spacing: .08em; margin-bottom: .6rem;">For {{ $item['service'] }}</div>
+
+                        @if ($item['contact'])
+                            <div class="p-contact">
+                                <span class="p-av">{{ $item['contact']['initials'] }}</span>
+                                <div>
+                                    <div class="fw-bold">{{ $item['contact']['name'] }}</div>
+                                    <div class="p-contact-lines">
+                                    @if ($item['contact']['phone'])<div class="p-contact-line"><x-portal-icon name="phone" :size="15" /> {{ $item['contact']['phone'] }}</div>@endif
+                                    @if ($item['contact']['email'])<div class="p-contact-line"><x-portal-icon name="mail" :size="15" /> {{ $item['contact']['email'] }}</div>@endif
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="tm-muted small">We'll tell you who is handling this soon.</div>
+                        @endif
+                    </div>
                 @endforeach
-            </tbody>
-        </table>
-    </div>
+            </div>
+        </div>
+    @endif
 </div>
+
+@include('customer._services-card')
 @endsection

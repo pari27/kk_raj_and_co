@@ -39,21 +39,26 @@ class AppServiceProvider extends ServiceProvider
     private function registerAuditLogListeners(): void
     {
         Event::listen(function (Login $event) {
+            $isClient = $event->guard === 'customer';
+
             AuditLogger::log(
                 action: 'Logged in',
-                module: 'Login',
+                module: $isClient ? 'Client Portal' : 'Login',
                 recordLabel: $event->user->name ?? $event->user->email,
-                userId: $event->user->getAuthIdentifier(),
+                details: $isClient ? 'Client signed in to the portal' : null,
+                userId: $isClient ? null : $event->user->getAuthIdentifier(),
             );
         });
 
         Event::listen(function (Failed $event) {
+            $isClient = $event->guard === 'customer';
+
             AuditLogger::log(
                 action: 'Failed login',
-                module: 'Login',
+                module: $isClient ? 'Client Portal' : 'Login',
                 recordLabel: $event->credentials['email'] ?? null,
-                details: 'Invalid credentials',
-                userId: $event->user?->getAuthIdentifier(),
+                details: $isClient ? 'Invalid credentials (client portal)' : 'Invalid credentials',
+                userId: $isClient ? null : $event->user?->getAuthIdentifier(),
             );
         });
 
@@ -62,11 +67,13 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
+            $isClient = $event->guard === 'customer';
+
             AuditLogger::log(
                 action: 'Logged out',
-                module: 'Login',
+                module: $isClient ? 'Client Portal' : 'Login',
                 recordLabel: $event->user->name ?? $event->user->email,
-                userId: $event->user->getAuthIdentifier(),
+                userId: $isClient ? null : $event->user->getAuthIdentifier(),
             );
         });
     }

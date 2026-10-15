@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Enums\TicketStatus;
 use App\Models\AppNotification;
 use App\Models\Customer;
+use App\Services\ClientPortalService;
 use App\Models\Enquiry;
 use App\Models\Payment;
 use App\Models\Ticket;
@@ -23,6 +24,44 @@ use Illuminate\Support\ServiceProvider;
  */
 class NotificationServiceProvider extends ServiceProvider
 {
+    /**
+     * Add an Updates line for the client when their service moves to a new step.
+     */
+    private function tellClientAboutProgress(Ticket $ticket): void
+    {
+        $client = $ticket->customer;
+        $before = $ticket->getOriginal('status');
+
+        if (! $client || ! $before instanceof TicketStatus) {
+            return;
+        }
+
+        $step = ClientPortalService::stepFor($ticket->status);
+
+        if ($step === ClientPortalService::stepFor($before) && $ticket->status !== TicketStatus::OnHold) {
+            return;
+        }
+
+        $service = $ticket->service?->name ?? 'Your service';
+        $url = route('customer.tickets.show', $ticket);
+
+        match (true) {
+            $ticket->status === TicketStatus::OnHold => ClientPortalService::notify($client, 'service', "{$service} is on hold", 'We will tell you when it moves again.', $url),
+            $step === 2 => ClientPortalService::notify($client, 'service', "{$service}: we are checking your documents", 'Thank you for sending them. We will tell you what is next.', $url),
+            $step === 3 => ClientPortalService::notify($client, 'service', "{$service} is in progress", 'Our team has started working on it.', $url),
+            $step === 4 => ClientPortalService::notify($client, 'service', "{$service} completed", 'Your service is complete.', $url),
+            default => null,
+        };
+
+        if ($step === 4) {
+            $balance = app(ClientPortalService::class)->feeShare($ticket->load(['enquiry.tickets', 'enquiry.payments']))['balance'];
+
+            if ($balance > 0) {
+                ClientPortalService::notify($client, 'payment', 'Payment due: ₹'.number_format($balance), "For {$service}.", route('customer.payments.index'));
+            }
+        }
+    }
+
     public function boot(): void
     {
         View::composer('layouts.app', function ($view) {
@@ -36,7 +75,7 @@ class NotificationServiceProvider extends ServiceProvider
             ]);
         });
 
-        $actor = fn (): string => Auth::user()?->name ?? 'Someone';
+        $actor = fn (): string => Auth::guard('web')->user()?->name ?? Auth::guard('customer')->user()?->name ?? 'Someone';
 
         TicketDocument::created(function (TicketDocument $document) use ($actor) {
             $ticket = $document->ticket;
@@ -64,6 +103,10 @@ class NotificationServiceProvider extends ServiceProvider
                     route('tickets.show', $ticket), $ticket->number,
                 );
 
+                if ($ticket->customer) {
+                    ClientPortalService::notify($ticket->customer, 'documents', "{$name} verified", 'Thank you. One more step done.', route('customer.tickets.show', $ticket));
+                }
+
                 return;
             }
 
@@ -81,6 +124,10 @@ class NotificationServiceProvider extends ServiceProvider
                 "{$actor()} rejected **{$name}** on {$ticket->service?->name}: {$document->rejection_reason}",
                 route('tickets.show', $ticket), $ticket->number,
             );
+
+            if ($ticket->customer) {
+                ClientPortalService::notify($ticket->customer, 'documents', "{$name} needs a re-upload", $document->rejection_reason, route('customer.tickets.show', $ticket));
+            }
         });
 
         // Tells the new assignee, and every admin (except the assignee, who already got theirs).
@@ -130,6 +177,8 @@ class NotificationServiceProvider extends ServiceProvider
             }
 
             if ($ticket->wasChanged('status')) {
+                $this->tellClientAboutProgress($ticket);
+
                 $byHand = request()->routeIs('tickets.update-status');
 
                 Notifier::notify(
@@ -148,6 +197,18 @@ class NotificationServiceProvider extends ServiceProvider
             $enquiry = $payment->enquiry;
             $amount = '₹'.number_format((float) $payment->amount, 2);
 
+            if ($enquiry?->customer) {
+                $services = $enquiry->tickets->pluck('service.name')->filter()->unique()->values();
+
+                ClientPortalService::notify(
+                    $enquiry->customer,
+                    'payment',
+                    'Payment received: '.$amount,
+                    'Thank you. For '.app(ClientPortalService::class)->joinNames($services).'.',
+                    route('customer.payments.index'),
+                );
+            }
+
             Notifier::notify(
                 Notifier::admins(),
                 'payments',
@@ -158,7 +219,7 @@ class NotificationServiceProvider extends ServiceProvider
         });
 
         Payment::deleted(function (Payment $payment) use ($actor) {
-            if (! Auth::user()?->isEmployee()) {
+            if (! Auth::guard('web')->user()?->isEmployee()) {
                 return;
             }
 
@@ -175,7 +236,7 @@ class NotificationServiceProvider extends ServiceProvider
         });
 
         Customer::created(function (Customer $customer) use ($actor) {
-            $creator = Auth::user();
+            $creator = Auth::guard('web')->user();
 
             if (! $creator?->isEmployee()) {
                 return;

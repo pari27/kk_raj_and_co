@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => EnsureUserHasRole::class,
         ]);
+
+        $middleware->redirectGuestsTo(fn (Request $request) => $request->is('client', 'client/*') ? route('customer.login') : route('login'));
+        $middleware->redirectUsersTo(fn (Request $request) => $request->is('client', 'client/*') ? route('customer.dashboard') : route('dashboard'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

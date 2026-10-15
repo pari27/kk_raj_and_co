@@ -167,7 +167,7 @@
                                 <div class="ticket-document-name">{{ $serviceDocument->name }}{{ $current ? ' v'.$current->version : '' }}</div>
                                 @if ($current)
                                     <div class="ticket-document-note">
-                                        {{ $current->version > 1 ? 'Re-uploaded' : 'Uploaded' }} by {{ $current->uploadedBy?->name ?? 'Staff' }} on service &middot; {{ $current->created_at->format('j M, g:i A') }}
+                                        {{ $current->version > 1 ? 'Re-uploaded' : 'Uploaded' }} by {{ $current->uploaderLabel() }} on service &middot; {{ $current->created_at->format('j M, g:i A') }}
                                     </div>
                                     @if ($current->text_value !== null)
                                         <div class="ticket-document-note" style="color: #000;">Value: {{ $current->text_value }}</div>
@@ -216,7 +216,7 @@
                                         'filename' => $v->original_filename,
                                         'size' => $formatBytes($v->file_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($v->file_path) ? \Illuminate\Support\Facades\Storage::disk('public')->size($v->file_path) : 0),
                                         'icon' => $fileExtIcon((string) $v->original_filename),
-                                        'uploaded_by' => $v->uploadedBy?->name ?? 'Staff',
+                                        'uploaded_by' => $v->uploaderLabel(),
                                         'uploaded_at' => $v->created_at->format('j M Y, g:i A'),
                                         'verified_by' => $v->verifiedBy?->name,
                                         'verified_at' => $v->verified_at?->format('j M Y, g:i A'),

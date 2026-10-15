@@ -32,7 +32,7 @@ class NotificationService
      */
     public static function notify(iterable $recipients, string $type, string $title, string $body, ?string $url = null, ?string $linkText = null, ?string $linkLabel = null): void
     {
-        $actorId = Auth::id();
+        $actorId = Auth::guard('web')->id();
         $seen = [];
 
         foreach ($recipients as $user) {

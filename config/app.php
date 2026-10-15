@@ -17,6 +17,34 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Firm details shown to clients in the client portal
+    |--------------------------------------------------------------------------
+    | FIRM_PHONE is optional: the portal only shows "Call us" when it is set.
+    */
+
+    'firm_name' => env('FIRM_NAME', 'KK Raj & Co'),
+
+    'firm_tagline' => env('FIRM_TAGLINE', 'Chartered Accountants'),
+
+    'firm_phone' => env('FIRM_PHONE'),
+
+    'firm_hours' => env('FIRM_HOURS'),
+
+    // Where clients can pay. Each is optional: the "How to pay" popup only shows the ways that are set.
+    'firm_address' => env('FIRM_ADDRESS'),
+
+    'firm_upi_id' => env('FIRM_UPI_ID'),
+
+    'firm_bank_account_name' => env('FIRM_BANK_ACCOUNT_NAME'),
+
+    'firm_bank_account_number' => env('FIRM_BANK_ACCOUNT_NUMBER'),
+
+    'firm_bank_ifsc' => env('FIRM_BANK_IFSC'),
+
+    'firm_bank_branch' => env('FIRM_BANK_BRANCH'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |

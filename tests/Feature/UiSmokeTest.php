@@ -133,13 +133,24 @@ class UiSmokeTest extends TestCase
     {
         $this->get(route('customer.login'))->assertOk();
         $this->get(route('customer.verify-otp'))->assertOk();
-        $this->get(route('customer.set-password'))->assertOk();
+
+        // Choosing a password needs a verified code first, so a bare visit goes back to the code step.
+        $this->get(route('customer.set-password'))->assertRedirect(route('customer.verify-otp'));
     }
 
     public function test_customer_portal_screens_render(): void
     {
-        $this->get(route('customer.dashboard'))->assertOk();
-        $this->get(route('customer.tickets.index'))->assertOk();
-        $this->get(route('customer.tickets.show', 1))->assertOk();
+        // The portal is for signed-in clients only: a visitor is sent to the client login.
+        $this->get(route('customer.dashboard'))->assertRedirect(route('customer.login'));
+        $this->get(route('customer.tickets.index'))->assertRedirect(route('customer.login'));
+        $this->get(route('customer.payments.index'))->assertRedirect(route('customer.login'));
+
+        $client = \App\Models\Customer::factory()->create();
+
+        $this->actingAs($client, 'customer')->get(route('customer.dashboard'))->assertOk();
+        $this->actingAs($client, 'customer')->get(route('customer.tickets.index'))->assertOk();
+        $this->actingAs($client, 'customer')->get(route('customer.updates'))->assertOk();
+        $this->actingAs($client, 'customer')->get(route('customer.profile'))->assertOk();
+        $this->actingAs($client, 'customer')->get(route('customer.payments.index'))->assertOk();
     }
 }

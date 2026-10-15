@@ -19,7 +19,8 @@ class AuditLogger
         ?int $userId = null,
     ): AuditLog {
         return AuditLog::create([
-            'user_id' => $userId ?? Auth::id(),
+            // The staff login only: a client's id must never land in a column that points at users.
+            'user_id' => $userId ?? Auth::guard('web')->id(),
             'action' => $action,
             'module' => $module,
             'subject_type' => $subject ? $subject::class : null,

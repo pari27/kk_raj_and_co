@@ -15,10 +15,20 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EnquiryController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\Portal\AuthController as PortalAuthController;
+use App\Http\Controllers\Portal\DashboardController as PortalDashboardController;
+use App\Http\Controllers\Portal\DocumentController as PortalDocumentController;
+use App\Http\Controllers\Portal\OtpController as PortalOtpController;
+use App\Http\Controllers\Portal\PasswordController as PortalPasswordController;
+use App\Http\Controllers\Portal\PaymentController as PortalPaymentController;
+use App\Http\Controllers\Portal\ProfileController as PortalProfileController;
+use App\Http\Controllers\Portal\UpdateController as PortalUpdateController;
+use App\Http\Controllers\Portal\ServiceController as PortalServiceController;
 use App\Http\Controllers\ProfilePasswordController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketDocumentController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -143,13 +153,43 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-// Customer portal â€” UI only for now. These will move behind the dedicated `customer`
-// guard/middleware once the customer-portal backend module is approved and built.
+// Client portal. Clients sign in through their own `customer` guard (separate from
+// staff), and every screen below `auth:customer` only ever shows the signed-in
+// client's own data.
 Route::prefix('client')->name('customer.')->group(function () {
-    Route::get('login', fn () => view('customer.auth.login'))->name('login');
-    Route::get('verify-otp', fn () => view('customer.auth.verify-otp'))->name('verify-otp');
-    Route::get('set-password', fn () => view('customer.auth.set-password'))->name('set-password');
-    Route::get('dashboard', fn () => view('customer.dashboard'))->name('dashboard');
-    Route::get('services', fn () => view('customer.tickets.index'))->name('tickets.index');
-    Route::get('services/{ticket}', fn ($ticket) => view('customer.tickets.show', compact('ticket')))->name('tickets.show');
+    // /client on its own: signed-in clients go to their dashboard, everyone else to the login.
+    Route::get('/', fn () => redirect()->route(Auth::guard('customer')->check() ? 'customer.dashboard' : 'customer.login'))->name('home');
+
+    Route::middleware('guest:customer')->group(function () {
+        Route::get('login', [PortalAuthController::class, 'create'])->name('login');
+        Route::post('login', [PortalAuthController::class, 'store'])->middleware('throttle:10,1')->name('login.store');
+
+        Route::get('verify-otp', [PortalOtpController::class, 'create'])->name('verify-otp');
+        Route::post('verify-otp/send', [PortalOtpController::class, 'send'])->middleware('throttle:5,1')->name('otp.send');
+        Route::post('verify-otp', [PortalOtpController::class, 'verify'])->middleware('throttle:10,1')->name('otp.verify');
+
+        Route::get('set-password', [PortalPasswordController::class, 'create'])->name('set-password');
+        Route::post('set-password', [PortalPasswordController::class, 'store'])->middleware('throttle:10,1')->name('set-password.store');
+    });
+
+    Route::middleware('auth:customer')->group(function () {
+        Route::post('logout', [PortalAuthController::class, 'destroy'])->name('logout');
+
+        Route::get('dashboard', [PortalDashboardController::class, 'index'])->name('dashboard');
+        Route::get('services', [PortalServiceController::class, 'index'])->name('tickets.index');
+
+        Route::get('updates', [PortalUpdateController::class, 'index'])->name('updates');
+        Route::post('updates/read-all', [PortalUpdateController::class, 'readAll'])->name('updates.read-all');
+        Route::get('updates/{notification}', [PortalUpdateController::class, 'open'])->name('updates.open');
+
+        Route::get('profile', [PortalProfileController::class, 'show'])->name('profile');
+        Route::put('profile/email-updates', [PortalProfileController::class, 'emailUpdates'])->name('profile.email-updates');
+        Route::get('profile/password', [PortalProfileController::class, 'editPassword'])->name('password.edit');
+        Route::put('profile/password', [PortalProfileController::class, 'updatePassword'])->middleware('throttle:10,1')->name('password.update');
+        Route::get('services/{ticket}', [PortalServiceController::class, 'show'])->name('tickets.show');
+        Route::post('services/{ticket}/documents', [PortalDocumentController::class, 'store'])->name('documents.store');
+        Route::get('services/{ticket}/documents/{document}/download', [PortalDocumentController::class, 'download'])->name('documents.download');
+        Route::get('services/{ticket}/documents/{document}/view', [PortalDocumentController::class, 'view'])->name('documents.view');
+        Route::get('payments', [PortalPaymentController::class, 'index'])->name('payments.index');
+    });
 });
