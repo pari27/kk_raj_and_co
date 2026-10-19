@@ -18,12 +18,12 @@ class EnquiryPolicy
     }
 
     /**
-     * Admin/SuperAdmin can view any enquiry. An Employee can only view an
+     * Admin can view any enquiry. An Employee can only view an
      * enquiry that has at least one ticket assigned to them.
      */
     public function view(User $user, Enquiry $enquiry): bool
     {
-        if ($user->isSuperAdmin() || $user->isAdmin()) {
+        if ($user->isAdmin()) {
             return true;
         }
 
@@ -36,17 +36,17 @@ class EnquiryPolicy
     }
 
     /**
-     * Setting a discount or overriding a line's price is an Admin/SuperAdmin-only action.
+     * Setting a discount or overriding a line's price is an Admin-only action.
      */
     public function managePricing(User $user): bool
     {
-        return $user->isSuperAdmin() || $user->isAdmin();
+        return $user->isAdmin();
     }
 
     /**
      * Everyone who can create an enquiry can also choose who each ticket is
      * assigned to. An Employee's tickets default to themselves but they can
-     * delegate a line to a colleague; Admin/SuperAdmin default to unassigned.
+     * delegate a line to a colleague; Admin default to unassigned.
      */
     public function assignTickets(User $user): bool
     {

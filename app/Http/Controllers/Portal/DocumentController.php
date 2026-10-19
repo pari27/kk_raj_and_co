@@ -35,7 +35,19 @@ class DocumentController extends Controller
             ->firstWhere('serviceDocument.id', $serviceDocument->id);
 
         // Only what is still missing, or was rejected, can be sent.
-        abort_unless($row && $row['needsUpload'], 422, 'This document does not need to be sent again.');
+        abort_unless($row, 404);
+
+        if (! $row['needsUpload']) {
+            $name = $serviceDocument->name;
+
+            $message = match (true) {
+                $ticket->status->isClosed() => 'This service is complete, so documents can no longer be sent.',
+                $row['current']?->status === 'Verified' => "\"{$name}\" has already been checked and accepted. You do not need to send it again.",
+                default => "\"{$name}\" has already been sent and is waiting to be checked.",
+            };
+
+            return redirect()->route('customer.tickets.show', $ticket)->with('error', $message);
+        }
 
         $nextVersion = 1 + (int) TicketDocument::query()
             ->where('ticket_id', $ticket->id)

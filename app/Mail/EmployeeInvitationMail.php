@@ -28,15 +28,15 @@ class EmployeeInvitationMail extends Mailable
 
         if (! $template) {
             return [
-                'subject' => 'Welcome to '.config('app.name').' — set up your account',
-                'body' => "Hi {$this->employee->name},\n\nAn account has been created for you on ".config('app.name').". Open the link below to set your password and sign in.\n\n{$this->setPasswordUrl}",
+                'subject' => 'Your '.config('app.firm_name').' account: please set your password',
+                'body' => "Dear {$this->employee->name},\n\nAn account has been created for you at ".config('app.firm_name').". To activate it, please use the link below to set your password and sign in.\n\n{$this->setPasswordUrl}\n\nYours sincerely,\n".config('app.firm_name'),
             ];
         }
 
         return $template->render([
             'employee_name' => $this->employee->name,
             'set_password_url' => $this->setPasswordUrl,
-            'firm_name' => config('app.name'),
+            'firm_name' => config('app.firm_name'),
         ]);
     }
 

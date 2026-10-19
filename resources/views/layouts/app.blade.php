@@ -10,11 +10,11 @@
 
     @stack('styles')
 </head>
-<body>
+<body class="route-{{ str_replace('.', '-', (string) request()->route()?->getName()) }}">
     @include('partials.flash-toast')
     @php
         $tmUser = auth()->user();
-        $tmIsAdminLike = $tmUser->isSuperAdmin() || $tmUser->isAdmin();
+        $tmIsAdminLike = $tmUser->isAdmin();
         $tmIcons = [
             'grid' => '<rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect>',
             'plus-circle' => '<circle cx="12" cy="12" r="9"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line>',
@@ -39,7 +39,7 @@
         <aside class="tm-sidebar pt-4 pb-3">
             <div class="px-3 mb-2 d-flex align-items-center justify-content-between gap-2">
                 <a href="{{ route('dashboard') }}">
-                    <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.firm_name', 'Firm') }}" class="tm-brand-logo">
+                    <img src="{{ config('app.firm_logo_url') }}" alt="{{ config('app.firm_name', 'Firm') }}" class="tm-brand-logo">
                 </a>
                 <button class="btn btn-sm btn-outline-light tm-menu-toggle d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#tmSidebarNav" aria-label="Menu">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -114,16 +114,20 @@
                     {!! $tmIcon('grid', 18) !!}
                 </button>
 
-                <div class="tm-search d-none d-md-flex align-items-center gap-2 px-3 py-2 flex-grow-1" style="max-width: 420px;">
+                <button class="tm-icon-btn d-none d-md-inline-flex" type="button" id="tmSidebarToggle" aria-label="Show or hide the menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+
+                <form method="GET" action="{{ route('search') }}" role="search" class="tm-search d-none d-md-flex align-items-center gap-2 px-3 py-2 flex-grow-1 u-df925c">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="text" placeholder="Search service no., client name, phone or email" disabled>
-                </div>
+                    <input type="search" name="q" value="{{ request()->routeIs('search') ? request('q') : '' }}" placeholder="Search service no., client name, phone or email" aria-label="Search" autocomplete="off" minlength="2">
+                </form>
 
                 <div class="d-flex align-items-center gap-3 ms-auto">
                 <div class="dropdown">
-                    <button class="btn btn-sm rounded-pill d-flex align-items-center gap-1 text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--tm-accent); border: 1px solid var(--tm-accent);">
+                    <button class="btn btn-sm rounded-pill d-flex align-items-center gap-1 text-white u-76a2ef" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         FY {{ now()->month >= 4 ? now()->year : now()->year - 1 }}-{{ substr((string) (now()->month >= 4 ? now()->year + 1 : now()->year), -2) }}
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -134,17 +138,17 @@
                 </div>
 
                 <div class="dropdown">
-                    <button class="tm-icon-btn position-relative" type="button" title="Notifications" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" style="width: 31px; height: 31px;">
+                    <button class="tm-icon-btn position-relative u-ddb254" type="button" title="Notifications" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                             <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                         </svg>
                         @if ($tmUnreadCount > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: .55rem;">{{ $tmUnreadCount > 99 ? '99+' : $tmUnreadCount }}</span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger u-d95e57">{{ $tmUnreadCount > 99 ? '99+' : $tmUnreadCount }}</span>
                         @endif
                     </button>
-                    <div class="dropdown-menu dropdown-menu-end p-0 overflow-hidden" style="width: 380px; max-width: 92vw;">
-                        <div class="d-flex align-items-center justify-content-between px-3 py-2 text-white" style="background: #101b3d;">
+                    <div class="dropdown-menu dropdown-menu-end p-0 overflow-hidden u-b8baa0">
+                        <div class="d-flex align-items-center justify-content-between px-3 py-2 text-white u-8b012c">
                             <span class="fw-bold">Notifications
                                 @if ($tmUnreadCount > 0)<span class="badge rounded-pill bg-danger ms-1">{{ $tmUnreadCount }} new</span>@endif
                             </span>
@@ -156,15 +160,15 @@
                         @forelse ($tmRecentNotifications as $n)
                             <a href="{{ route('notifications.open', $n) }}" class="d-flex gap-2 px-3 py-2 border-bottom text-decoration-none text-reset" style="{{ $n->isUnread() ? 'background: #f5f8ff;' : '' }}">
                                 @include('notifications._icon', ['notification' => $n, 'size' => 36])
-                                <div class="flex-grow-1" style="min-width: 0;">
+                                <div class="flex-grow-1 u-6ec2d9">
                                     <div class="d-flex justify-content-between gap-2">
                                         <span class="fw-bold small">{{ $n->title }}</span>
-                                        <span class="d-flex align-items-center gap-1 tm-muted flex-shrink-0" style="font-size: .7rem;">
+                                        <span class="d-flex align-items-center gap-1 tm-muted flex-shrink-0 u-67283f">
                                             {{ $n->created_at->diffForHumans(short: true) }}
-                                            @if ($n->isUnread())<span class="rounded-circle bg-success d-inline-block" style="width: 7px; height: 7px;"></span>@endif
+                                            @if ($n->isUnread())<span class="rounded-circle bg-success d-inline-block u-f24797"></span>@endif
                                         </span>
                                     </div>
-                                    <div class="small tm-muted" style="font-size: .75rem;">{{ $n->renderBody() }}</div>
+                                    <div class="small tm-muted u-cc37c5">{{ $n->renderBody() }}</div>
                                 </div>
                             </a>
                         @empty
@@ -179,14 +183,14 @@
                         <div class="tm-avatar">{{ strtoupper(substr($tmUser->name, 0, 1)) }}</div>
                         <div class="text-start d-none d-sm-block">
                             <div class="small fw-semibold text-white">{{ $tmUser->name }}</div>
-                            <div style="font-size: .72rem; color: rgba(255,255,255,.6);">{{ $tmUser->role->label() }}</div>
+                            <div class="u-be643c">{{ $tmUser->role->label() }}</div>
                         </div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
                             <a href="{{ route('password.change') }}" class="dropdown-item d-flex align-items-center gap-2 tm-dropdown-item">
-                                <span class="d-flex" style="color: var(--tm-accent);">{!! $tmIcon('lock', 14) !!}</span> Change Password
+                                <span class="d-flex u-60cf33">{!! $tmIcon('lock', 14) !!}</span> Change Password
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
@@ -211,6 +215,23 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Show or hide the left menu on wide screens; the choice is remembered.
+        (function () {
+            var toggle = document.getElementById('tmSidebarToggle');
+            var key = 'tmSidebarCollapsed';
+
+            try {
+                if (localStorage.getItem(key) === '1') { document.body.classList.add('tm-sidebar-collapsed'); }
+            } catch (e) {}
+
+            if (!toggle) { return; }
+
+            toggle.addEventListener('click', function () {
+                var collapsed = document.body.classList.toggle('tm-sidebar-collapsed');
+                try { localStorage.setItem(key, collapsed ? '1' : '0'); } catch (e) {}
+            });
+        })();
+
         document.addEventListener('input', function (e) {
             if (!e.target.classList || !e.target.classList.contains('js-price-input')) {
                 return;

@@ -2,67 +2,6 @@
 
 @section('title', 'Master Employee Designations — ' . config('app.name', 'Task Management'))
 
-@push('styles')
-<style>
-    #designations-page .desig-action-btn {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 0;
-    }
-    #designations-page .tm-filter-pill {
-        font-size: .8rem;
-    }
-    #designations-page .desig-status-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-    #designationsTable.tm-table tbody td {
-        font-size: .8rem;
-    }
-    #designationsTable.tm-table thead th:first-child,
-    #designationsTable.tm-table thead th:last-child {
-        border-radius: 0;
-    }
-    .desig-modal-icon {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-    }
-    .desig-modal-checklist li {
-        display: flex;
-        align-items: flex-start;
-        gap: .5rem;
-        padding: .3rem 0;
-        font-size: .85rem;
-    }
-    .desig-modal-employees-box {
-        background: #f5f6f8;
-        border-radius: .6rem;
-        padding: .6rem .75rem;
-        display: flex;
-        align-items: center;
-        gap: .6rem;
-        font-size: .82rem;
-    }
-    #editDesignationModal .modal-header {
-        background: #101b3d;
-        color: #fff;
-    }
-    #editDesignationModal .modal-header .btn-close {
-        filter: invert(1) grayscale(100%) brightness(200%);
-    }
-</style>
-@endpush
 
 @section('content')
 @php
@@ -128,12 +67,12 @@
         @foreach ($statCards as $card)
             <div class="col-6 col-xl-3">
                 <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                    <span class="position-absolute rounded-circle" style="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                    <span class="position-absolute rounded-circle" style="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
+                    <span class="position-absolute rounded-circle u-943986"></span>
+                    <span class="position-absolute rounded-circle u-e46b84"></span>
                     <div class="position-relative">
-                        <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
+                        <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                         <div class="h3 tm-serif fw-bold mb-1 text-white">{{ number_format($card['count']) }}</div>
-                        <div style="color: rgba(255,255,255,.75); font-size: .72rem;">{{ $card['caption'] }}</div>
+                        <div class="u-48932b">{{ $card['caption'] }}</div>
                     </div>
                 </div>
             </div>
@@ -202,8 +141,8 @@
                                             <div class="d-inline-flex justify-content-end gap-1">
                                                 <button
                                                     type="button"
-                                                    class="desig-action-btn js-edit-designation"
-                                                    style="background: #e5f5e0;"
+                                                    class="desig-action-btn js-edit-designation u-389ec9"
+                                                   
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#editDesignationModal"
                                                     data-action="{{ route('admin.designations.update', $designation) }}"
@@ -241,7 +180,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="d-flex align-items-center justify-content-between p-3 tm-muted" style="font-size: .75rem;">
+                    <div class="d-flex align-items-center justify-content-between p-3 tm-muted u-cc37c5">
                         <span id="designationsPaginationSummary"></span>
                         <ul class="pagination pagination-sm mb-0" id="designationsPaginationPages"></ul>
                     </div>
@@ -251,7 +190,7 @@
 
         <div class="col-12 col-xl-4">
             <section class="tm-card p-0 overflow-hidden">
-                <div class="tm-section-title" style="background: #1f6b30;">Add designation</div>
+                <div class="tm-section-title u-1fcbae">Add designation</div>
                 <form method="POST" action="{{ route('admin.designations.store') }}" class="p-3">
                     @csrf
                     <div class="mb-3">
@@ -261,10 +200,10 @@
                     </div>
                     <div class="form-check form-switch mb-3">
                         <input type="checkbox" id="newDesignationActive" name="is_active" value="1" class="form-check-input" {{ old('is_active', true) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="newDesignationActive" style="font-size: .8rem;">Active</label>
+                        <label class="form-check-label u-5a305f" for="newDesignationActive">Active</label>
                     </div>
                     <button type="submit" class="btn btn-tm-primary w-100">Save designation</button>
-                    <div class="alert alert-light border mt-3 mb-0" style="font-size: .72rem;">Designations can't be deleted. Make one inactive to hide it from new staff; existing staff keep it.</div>
+                    <div class="alert alert-light border mt-3 mb-0 u-31578e">Designations can't be deleted. Make one inactive to hide it from new staff; existing staff keep it.</div>
                 </form>
             </section>
         </div>
@@ -279,10 +218,10 @@
                 @method('PUT')
                 <div class="modal-header">
                     <div class="d-flex align-items-center gap-2">
-                        <span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 34px; height: 34px; background: rgba(255,255,255,.15);"><i class="bi bi-award text-white"></i></span>
+                        <span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 u-a8d46f"><i class="bi bi-award text-white"></i></span>
                         <div>
                             <h2 class="modal-title fs-6 fw-bold mb-0" id="editDesignationTitle">Edit designation</h2>
-                            <div id="editModalEmployeeSubtitle" style="color: rgba(255,255,255,.75); font-size: .8rem;">Not used by any employees</div>
+                            <div id="editModalEmployeeSubtitle" class="u-300385">Not used by any employees</div>
                         </div>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -290,31 +229,31 @@
                 <div class="modal-body">
                     <label class="tm-field-label" for="editDesignationName">Designation name <span class="text-danger">*</span></label>
                     <input type="text" id="editDesignationName" name="name" maxlength="60" class="form-control tm-field mb-1" required>
-                    <div class="tm-muted mb-3" style="font-size: .72rem;">Must be unique. <span id="editModalCharCount">0</span> / 60 characters</div>
+                    <div class="tm-muted mb-3 u-31578e">Must be unique. <span id="editModalCharCount">0</span> / 60 characters</div>
 
                     <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
                         <div>
-                            <div class="fw-semibold" style="font-size: .85rem;">Active</div>
-                            <div class="tm-muted" style="font-size: .75rem;">Shows in the designation list when adding staff</div>
+                            <div class="fw-semibold u-8ae449">Active</div>
+                            <div class="tm-muted u-cc37c5">Shows in the designation list when adding staff</div>
                         </div>
                         <div class="form-check form-switch mb-0">
                             <input type="checkbox" id="editDesignationActive" name="is_active" value="1" class="form-check-input" role="switch">
                         </div>
                     </div>
 
-                    <div class="desig-modal-employees-box mb-3 d-none" id="editModalEmployeesBox" style="font-size: .8rem;">
+                    <div class="desig-modal-employees-box mb-3 d-none u-5a305f" id="editModalEmployeesBox">
                         <div class="d-flex" id="editModalMiniAvatars"></div>
                         <span><span id="editModalEmployeeNames"></span> have this designation</span>
                     </div>
 
-                    <div class="alert alert-warning mb-0 d-none" id="editModalWarningBox" style="font-size: .8rem;">
+                    <div class="alert alert-warning mb-0 d-none u-5a305f" id="editModalWarningBox">
                         <i class="bi bi-exclamation-triangle me-1"></i>
                         Renaming updates it for all employees who have it. Making it inactive keeps it on their records but hides it for new staff.
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn text-white" style="background: #1f6b30;">Save changes</button>
+                    <button type="submit" class="btn text-white u-1fcbae">Save changes</button>
                 </div>
             </form>
         </div>

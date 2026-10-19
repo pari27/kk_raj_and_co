@@ -4,56 +4,6 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
-<style>
-    .tm-ticket-tab {
-        padding: .4rem .9rem;
-        border-radius: 999px;
-        border-bottom: 0;
-        font-size: .8rem;
-        background-color: #6c757d;
-        color: #fff;
-    }
-    .tm-ticket-tab.active {
-        background-color: #101b3d;
-        color: #fff;
-        border-bottom: 0;
-    }
-    .tm-ticket-tab.active .badge {
-        background-color: #fff !important;
-        border-color: #fff !important;
-        color: #101b3d !important;
-    }
-    #paymentsTicketsTable.tm-table thead th:first-child,
-    #paymentsTicketsTable.tm-table thead th:last-child,
-    #paymentsPendingTable.tm-table thead th:first-child,
-    #paymentsPendingTable.tm-table thead th:last-child {
-        border-radius: 0;
-    }
-    #paymentsTicketsTable.tm-table tbody td,
-    #paymentsPendingTable.tm-table tbody td {
-        font-size: .8rem;
-    }
-    #paymentsPendingTable .js-record-payment,
-    .js-record-payment {
-        color: var(--tm-navy);
-        border-color: var(--tm-navy);
-        font-size: .72rem;
-        padding: .2rem .6rem;
-    }
-    #paymentsPendingTable .js-record-payment:hover,
-    .js-record-payment:hover {
-        background: var(--tm-navy);
-        border-color: var(--tm-navy);
-        color: #fff;
-    }
-    .daterangepicker td.active, .daterangepicker td.active:hover {
-        background-color: var(--tm-accent);
-    }
-    .daterangepicker .ranges li.active {
-        background-color: #101b3d;
-        color: #fff;
-    }
-</style>
 @endpush
 
 @section('content')
@@ -66,7 +16,7 @@
     ];
 
     $modeColors = ['UPI' => '#6d5bd0', 'Bank transfer' => '#2f5fbe', 'Cash' => '#1f6b30', 'Cheque' => '#b9650a'];
-    $isAdminLike = auth()->user()->isSuperAdmin() || auth()->user()->isAdmin();
+    $isAdminLike = auth()->user()->isAdmin();
 
     $paymentEnquiriesData = $pendingEnquiries->mapWithKeys(fn ($enquiry) => [
         $enquiry->id => [
@@ -84,8 +34,8 @@
 <x-breadcrumbs :items="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Payments']]" />
 <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 pb-3 mb-4 tm-divider-gold">
     <div>
-        <h1 class="tm-serif fw-bold mb-1" style="font-size: 1.15rem;">Payments</h1>
-        <p class="tm-muted mb-0" style="font-size: .8rem;">Fees received and still pending across all enquiries</p>
+        <h1 class="tm-serif fw-bold mb-1 u-e83e11">Payments</h1>
+        <p class="tm-muted mb-0 u-5a305f">Fees received and still pending across all enquiries</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
         <a href="{{ route('payments.export') }}" class="btn btn-outline-secondary">&darr; Export</a>
@@ -97,12 +47,12 @@
     @foreach ($statCards as $card)
         <div class="col-6 col-xl-3">
             <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                <span class="position-absolute rounded-circle" style="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                <span class="position-absolute rounded-circle" style="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
+                <span class="position-absolute rounded-circle u-943986"></span>
+                <span class="position-absolute rounded-circle u-e46b84"></span>
                 <div class="position-relative">
-                    <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
+                    <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['value'] }}</div>
-                    <div class="small" style="color: rgba(255,255,255,.75); font-size: .72rem;">{{ $card['caption'] }}</div>
+                    <div class="small u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -122,18 +72,18 @@
     <hr class="mt-2 mb-0">
 
     <div class="p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
-        <div class="tm-search d-flex align-items-center gap-2 px-3 py-2" style="max-width: 320px; background: #fff; border: 1px solid var(--tm-surface-border);">
+        <div class="tm-search d-flex align-items-center gap-2 px-3 py-2 u-a559f1">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" id="paymentsSearch" placeholder="Search client, enquiry or reference" style="background: transparent; border: 0; outline: none; color: var(--tm-text); width: 100%; font-size: .85rem;">
+            <input type="text" id="paymentsSearch" placeholder="Search client, enquiry or reference" class="u-d0e030">
         </div>
 
         <div class="d-flex flex-wrap gap-2">
-            <div style="min-width: 180px;">
+            <div class="u-94a14c">
                 <button type="button" id="paymentDateRangeBtn" class="btn btn-outline-secondary d-flex align-items-center gap-2 w-100">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    <span id="paymentDateRangeLabel" class="flex-grow-1 text-start" style="font-weight: 400;">All time</span>
+                    <span id="paymentDateRangeLabel" class="flex-grow-1 text-start u-fe3f5c">All time</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
                 <input type="hidden" id="paymentDateFrom">
@@ -141,14 +91,14 @@
             </div>
 
             <div id="receivedFilters" class="d-flex flex-wrap gap-2 d-none">
-                <select id="modeFilter" class="form-select form-select-sm" style="width: auto; font-size: .8rem;">
+                <select id="modeFilter" class="form-select form-select-sm u-11b8dd">
                     <option value="">Mode: All</option>
                     <option value="UPI">UPI</option>
                     <option value="Bank transfer">Bank transfer</option>
                     <option value="Cash">Cash</option>
                     <option value="Cheque">Cheque</option>
                 </select>
-                <select id="receivedByFilter" class="form-select form-select-sm" style="width: auto; font-size: .8rem;">
+                <select id="receivedByFilter" class="form-select form-select-sm u-11b8dd">
                     <option value="">Received by: All</option>
                     @foreach ($receivedByUsers as $user)
                         <option value="{{ $user->name }}">{{ $user->name }}</option>
@@ -199,20 +149,20 @@
                             @else
                                 <div class="fw-semibold">—</div>
                             @endif
-                            <div class="tm-muted" style="font-size: .75rem;">{{ $enquiry?->customer->phone ?? '' }}</div>
+                            <div class="tm-muted u-cc37c5">{{ $enquiry?->customer->phone ?? '' }}</div>
                         </td>
                         <td>
                             <a href="{{ route('enquiries.show', $enquiry) }}" class="fw-semibold text-decoration-none">{{ $enquiry->number ?? '—' }}</a>
-                            <div class="tm-muted" style="font-size: .75rem;">{{ $services ?: '' }}</div>
+                            <div class="tm-muted u-cc37c5">{{ $services ?: '' }}</div>
                         </td>
-                        <td class="text-end fw-semibold" style="color: #1f6b30;">₹{{ number_format((float) $payment->amount) }}</td>
+                        <td class="text-end fw-semibold u-f63532">₹{{ number_format((float) $payment->amount) }}</td>
                         <td>
                             <span class="badge rounded-pill fw-normal" style="background: #eef4ff; color: {{ $modeColors[$payment->mode] ?? '#2f5fbe' }};">{{ $payment->mode }}</span>
                         </td>
                         <td class="tm-muted">{{ $payment->reference ?: '—' }}</td>
                         <td>{{ $payment->receivedBy->name ?? '—' }}</td>
                         <td>
-                            <span class="d-flex align-items-center gap-1" style="font-size: .8rem;">
+                            <span class="d-flex align-items-center gap-1 u-5a305f">
                                 <span class="rounded-circle d-inline-block" style="width:7px;height:7px;background:{{ $payment->is_partial ? '#b9650a' : '#1f6b30' }};"></span>
                                 {{ $payment->is_partial ? 'Partial' : 'Full' }}
                             </span>
@@ -300,7 +250,7 @@
                     >
                         <td>
                             <a href="{{ route('enquiries.show', $enquiry) }}" class="fw-semibold text-decoration-none">{{ $enquiry->number }}</a>
-                            <div class="tm-muted" style="font-size: .72rem;">{{ $enquiry->created_at->format('j M Y') }}</div>
+                            <div class="tm-muted u-31578e">{{ $enquiry->created_at->format('j M Y') }}</div>
                         </td>
                         <td>
                             @if ($enquiry->customer)
@@ -308,10 +258,10 @@
                             @else
                                 <div class="fw-semibold">—</div>
                             @endif
-                            <div class="tm-muted" style="font-size: .75rem;">{{ $enquiry->customer->phone ?? '' }}</div>
+                            <div class="tm-muted u-cc37c5">{{ $enquiry->customer->phone ?? '' }}</div>
                         </td>
                         <td>{{ $pendingServices ?: '—' }}</td>
-                        <td class="text-end fw-semibold" style="color: #7f1616;">₹{{ number_format($enquiry->balanceDue()) }}</td>
+                        <td class="text-end fw-semibold u-a8cc8a">₹{{ number_format($enquiry->balanceDue()) }}</td>
                         <td class="text-end">
                             <button
                                 type="button"
@@ -335,7 +285,7 @@
         </table>
     </div>
 
-    <div class="d-flex align-items-center justify-content-between p-3 tm-muted" id="paymentsPaginationBar" style="font-size: .75rem;">
+    <div class="d-flex align-items-center justify-content-between p-3 tm-muted u-cc37c5" id="paymentsPaginationBar">
         <span id="paymentsPaginationSummary"></span>
         <ul class="pagination pagination-sm mb-0" id="paymentsPaginationPages"></ul>
     </div>
@@ -343,21 +293,21 @@
 
 <div class="row g-3">
     <div class="col-12 col-xl-6">
-        <div class="tm-card p-0" style="overflow: hidden;">
-            <div class="d-flex align-items-center justify-content-between p-2 px-3" style="background: #1f6b30;">
+        <div class="tm-card p-0 u-abf627">
+            <div class="d-flex align-items-center justify-content-between p-2 px-3 u-1fcbae">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Received by payment mode</h2>
-                <span class="small" style="color: rgba(255,255,255,.75);">{{ now()->format('F') }}</span>
+                <span class="small u-bbebd4">{{ now()->format('F') }}</span>
             </div>
             <div class="p-3">
                 @if ($modeBreakdown->isEmpty())
                     <p class="tm-muted small mb-0">No payments received this month yet.</p>
                 @else
-                    <div class="rounded-pill mb-3 d-flex" style="height: 8px; overflow: hidden; background: #eceef2;">
+                    <div class="rounded-pill mb-3 d-flex u-1065fe">
                         @foreach ($modeBreakdown as $mode => $amount)
                             <span style="width: {{ round($amount / $modeTotal * 100) }}%; background: {{ $modeColors[$mode] ?? '#9aa1b0' }};"></span>
                         @endforeach
                     </div>
-                    <ul class="list-unstyled mb-0" style="font-size: .85rem;">
+                    <ul class="list-unstyled mb-0 u-8ae449">
                         @foreach ($modeBreakdown as $mode => $amount)
                             <li class="d-flex align-items-center justify-content-between py-2 {{ ! $loop->last ? 'border-bottom' : '' }}">
                                 <span class="d-flex align-items-center gap-2">
@@ -366,7 +316,7 @@
                                 </span>
                                 <span class="d-flex align-items-center gap-3">
                                     <strong>₹{{ number_format($amount) }}</strong>
-                                    <span class="tm-muted" style="width: 2.5rem; text-align: right;">{{ round($amount / $modeTotal * 100) }}%</span>
+                                    <span class="tm-muted u-248075">{{ round($amount / $modeTotal * 100) }}%</span>
                                 </span>
                             </li>
                         @endforeach
@@ -377,17 +327,17 @@
     </div>
 
     <div class="col-12 col-xl-6">
-        <div class="tm-card p-0" style="overflow: hidden;">
-            <div class="d-flex align-items-center justify-content-between p-3" style="background: #7f1616;">
+        <div class="tm-card p-0 u-abf627">
+            <div class="d-flex align-items-center justify-content-between p-3 u-d75e14">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Largest pending fees</h2>
-                <span class="small text-decoration-underline" style="color: #fff; cursor: pointer;" onclick="document.querySelector('[data-tab=pending]').click();">All {{ $pendingEnquiries->count() }} &rarr;</span>
+                <span class="small text-decoration-underline u-56df19" onclick="document.querySelector('[data-tab=pending]').click();">All {{ $pendingEnquiries->count() }} &rarr;</span>
             </div>
             <div class="p-3">
                 @forelse ($pendingEnquiries->take(4) as $enquiry)
                     <div class="d-flex align-items-center justify-content-between gap-3 py-2 {{ ! $loop->last ? 'border-bottom' : '' }}">
                         <div>
-                            <div class="fw-bold" style="font-size: .8rem;">{{ $enquiry->customer->name ?? '—' }}</div>
-                            <div class="tm-muted" style="font-size: .75rem;">{{ $enquiry->number }} &middot; {{ $enquiry->tickets->pluck('service.name')->filter()->implode(', ') }}</div>
+                            <div class="fw-bold u-5a305f">{{ $enquiry->customer->name ?? '—' }}</div>
+                            <div class="tm-muted u-cc37c5">{{ $enquiry->number }} &middot; {{ $enquiry->tickets->pluck('service.name')->filter()->implode(', ') }}</div>
                             <div style="font-size: .72rem; color: {{ $enquiry->amountPaid() > 0 ? '#b9650a' : '#7f1616' }};">
                                 {{ $enquiry->amountPaid() > 0
                                     ? 'Part paid, ₹'.number_format($enquiry->balanceDue()).' balance'
@@ -395,7 +345,7 @@
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <strong style="color: #7f1616; font-size: .8rem;">₹{{ number_format($enquiry->balanceDue()) }}</strong>
+                            <strong class="u-ea6dd7">₹{{ number_format($enquiry->balanceDue()) }}</strong>
                             <button
                                 type="button"
                                 class="btn btn-sm js-record-payment"
@@ -416,18 +366,18 @@
 </div>
 
 <div class="modal fade" id="recordPaymentModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 560px;">
-        <div class="modal-content" style="border: 0; border-radius: .75rem; overflow: hidden;">
+    <div class="modal-dialog modal-dialog-centered u-55acce">
+        <div class="modal-content u-d581ba">
             <form method="POST" action="{{ route('payments.store') }}">
                 @csrf
                 <input type="hidden" name="enquiry_id" id="paymentEnquiryIdInput" value="{{ old('enquiry_id') }}">
                 <input type="hidden" name="mode" id="paymentModeInput" value="{{ old('mode', 'UPI') }}">
 
-                <div class="d-flex align-items-start gap-3 p-3" style="background: #101b3d;">
-                    <span class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: rgba(255,255,255,.12); color: #fff;">&#8377;</span>
+                <div class="d-flex align-items-start gap-3 p-3 u-8b012c">
+                    <span class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 u-f688b1">&#8377;</span>
                     <div class="flex-grow-1">
                         <h2 class="h6 fw-bold mb-0 text-white">Record payment</h2>
-                        <div class="small" id="recordPaymentSubtitle" style="color: rgba(255,255,255,.7);">Advance, partial or full — against any enquiry with a balance due</div>
+                        <div class="small u-5bb556" id="recordPaymentSubtitle">Advance, partial or full — against any enquiry with a balance due</div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -446,29 +396,29 @@
                         @error('enquiry_id')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                     </div>
 
-                    <div id="paymentEnquiryCard" class="rounded-3 p-3 mb-3 d-none" style="background: #eef9ef; border: 1px solid #cdeccb;">
+                    <div id="paymentEnquiryCard" class="rounded-3 p-3 mb-3 d-none u-90d8bd">
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div class="fw-bold" id="paymentCardClient"></div>
-                            <span class="badge rounded-pill fw-normal" id="paymentCardStatus" style="font-size: .68rem;"></span>
+                            <span class="badge rounded-pill fw-normal u-dcc109" id="paymentCardStatus"></span>
                         </div>
-                        <div class="mb-2" style="font-size: .82rem; color: #2f5fbe; font-weight: 600;" id="paymentCardTicket"></div>
+                        <div class="mb-2 u-2be81d" id="paymentCardTicket"></div>
                         <div class="row g-2 mb-2">
                             <div class="col-4">
-                                <div class="rounded-3 p-2" style="background: #fff;">
-                                    <div class="tm-muted" style="font-size: .68rem;">Total fee</div>
-                                    <div class="fw-bold" style="font-size: .85rem;" id="paymentCardTotal"></div>
+                                <div class="rounded-3 p-2 u-be685b">
+                                    <div class="tm-muted u-dcc109">Total fee</div>
+                                    <div class="fw-bold u-8ae449" id="paymentCardTotal"></div>
                                 </div>
                             </div>
                             <div class="col-4">
-                                <div class="rounded-3 p-2" style="background: #fff;">
-                                    <div class="tm-muted" style="font-size: .68rem;">Already paid</div>
-                                    <div class="fw-bold" style="font-size: .85rem;" id="paymentCardPaid"></div>
+                                <div class="rounded-3 p-2 u-be685b">
+                                    <div class="tm-muted u-dcc109">Already paid</div>
+                                    <div class="fw-bold u-8ae449" id="paymentCardPaid"></div>
                                 </div>
                             </div>
                             <div class="col-4">
-                                <div class="rounded-3 p-2" style="background: #fceaea;">
-                                    <div style="font-size: .68rem; color: #7f1616;">Balance due</div>
-                                    <div class="fw-bold" style="font-size: .85rem; color: #7f1616;" id="paymentCardBalance"></div>
+                                <div class="rounded-3 p-2 u-5c1733">
+                                    <div class="u-de5f15">Balance due</div>
+                                    <div class="fw-bold u-b34e3c" id="paymentCardBalance"></div>
                                 </div>
                             </div>
                         </div>
@@ -479,7 +429,7 @@
                         <div class="col-md-6">
                             <label class="tm-field-label d-block">Amount received <span class="text-danger">*</span></label>
                             <div class="tm-field-icon">
-                                <span style="position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:#9aa1b0;">&#8377;</span>
+                                <span class="u-3185cc">&#8377;</span>
                                 <input type="number" step="0.01" min="0.01" name="amount" id="paymentAmountInput" value="{{ old('amount') }}" class="form-control tm-field @error('amount') is-invalid @enderror" required>
                             </div>
                             @error('amount')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
@@ -490,13 +440,13 @@
                             @error('paid_at')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                         </div>
                     </div>
-                    <div class="mb-3" style="font-size: .78rem; color: #1f6b30; font-weight: 600;" id="paymentFullBalanceNote"></div>
+                    <div class="mb-3 u-2601d9" id="paymentFullBalanceNote"></div>
 
                     <div class="mb-3">
                         <label class="tm-field-label d-block">Payment mode <span class="text-danger">*</span></label>
                         <div class="d-flex gap-2 flex-wrap" id="paymentModeButtons">
                             @foreach (['UPI', 'Bank transfer', 'Cash', 'Cheque'] as $mode)
-                                <button type="button" class="btn btn-outline-secondary btn-sm js-mode-button flex-grow-1" data-mode="{{ $mode }}" data-label="{{ $mode }}" style="font-size: .8rem;">{{ $mode }}</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm js-mode-button flex-grow-1 u-5a305f" data-mode="{{ $mode }}" data-label="{{ $mode }}">{{ $mode }}</button>
                             @endforeach
                         </div>
                         @error('mode')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
@@ -515,10 +465,10 @@
                         @error('note')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                     </div>
 
-                    <div class="rounded-3 p-3 mb-2" id="paymentConsequenceBox" style="background: #eef9ef; border: 1px solid #cdeccb; font-size: .82rem;">
+                    <div class="rounded-3 p-3 mb-2 u-cc54cf" id="paymentConsequenceBox">
                         <span id="paymentConsequenceText"></span>
                     </div>
-                    <div class="d-flex gap-2" style="font-size: .76rem; color: #6b7280;">
+                    <div class="d-flex gap-2 u-18c3f7">
                         <span>&#9432;</span>
                         <span>If you enter less than the balance, it's saved as a partial payment and the enquiry stays open.</span>
                     </div>
@@ -533,44 +483,44 @@
 </div>
 
 <div class="modal fade" id="editPaymentModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 560px;">
-        <div class="modal-content" style="border: 0; border-radius: .75rem; overflow: hidden;">
+    <div class="modal-dialog modal-dialog-centered u-55acce">
+        <div class="modal-content u-d581ba">
             <form method="POST" id="editPaymentForm">
                 @csrf
                 @method('PUT')
 
-                <div class="d-flex align-items-start gap-3 p-3" style="background: #101b3d;">
-                    <span class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: rgba(255,255,255,.12); color: #fff;">&#8377;</span>
+                <div class="d-flex align-items-start gap-3 p-3 u-8b012c">
+                    <span class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 u-f688b1">&#8377;</span>
                     <div class="flex-grow-1">
                         <h2 class="h6 fw-bold mb-0 text-white">Edit payment</h2>
-                        <div class="small" id="editPaymentTicketLabel" style="color: rgba(255,255,255,.7);"></div>
+                        <div class="small u-5bb556" id="editPaymentTicketLabel"></div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body p-4">
-                    <div class="rounded-3 p-3 mb-3" style="background: #eef9ef; border: 1px solid #cdeccb;">
+                    <div class="rounded-3 p-3 mb-3 u-90d8bd">
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div class="fw-bold" id="editPaymentCardClient"></div>
                         </div>
-                        <div class="mb-2" style="font-size: .82rem; color: #2f5fbe; font-weight: 600;" id="editPaymentCardTicket"></div>
+                        <div class="mb-2 u-2be81d" id="editPaymentCardTicket"></div>
                         <div class="row g-2">
                             <div class="col-4">
-                                <div class="rounded-3 p-2" style="background: #fff;">
-                                    <div class="tm-muted" style="font-size: .68rem;">Total fee</div>
-                                    <div class="fw-bold" style="font-size: .85rem;" id="editPaymentCardTotal"></div>
+                                <div class="rounded-3 p-2 u-be685b">
+                                    <div class="tm-muted u-dcc109">Total fee</div>
+                                    <div class="fw-bold u-8ae449" id="editPaymentCardTotal"></div>
                                 </div>
                             </div>
                             <div class="col-4">
-                                <div class="rounded-3 p-2" style="background: #fff;">
-                                    <div class="tm-muted" style="font-size: .68rem;">Other payments</div>
-                                    <div class="fw-bold" style="font-size: .85rem;" id="editPaymentCardPaid"></div>
+                                <div class="rounded-3 p-2 u-be685b">
+                                    <div class="tm-muted u-dcc109">Other payments</div>
+                                    <div class="fw-bold u-8ae449" id="editPaymentCardPaid"></div>
                                 </div>
                             </div>
                             <div class="col-4">
-                                <div class="rounded-3 p-2" style="background: #fceaea;">
-                                    <div style="font-size: .68rem; color: #7f1616;">Balance due</div>
-                                    <div class="fw-bold" style="font-size: .85rem; color: #7f1616;" id="editPaymentCardBalance"></div>
+                                <div class="rounded-3 p-2 u-5c1733">
+                                    <div class="u-de5f15">Balance due</div>
+                                    <div class="fw-bold u-b34e3c" id="editPaymentCardBalance"></div>
                                 </div>
                             </div>
                         </div>
@@ -580,7 +530,7 @@
                         <div class="col-md-6">
                             <label class="tm-field-label d-block">Amount received <span class="text-danger">*</span></label>
                             <div class="tm-field-icon">
-                                <span style="position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:#9aa1b0;">&#8377;</span>
+                                <span class="u-3185cc">&#8377;</span>
                                 <input type="number" step="0.01" min="0.01" name="amount" id="editPaymentAmount" class="form-control tm-field" required>
                             </div>
                         </div>
@@ -589,13 +539,13 @@
                             <input type="date" name="paid_at" id="editPaymentDate" max="{{ now()->format('Y-m-d') }}" class="form-control tm-field" required>
                         </div>
                     </div>
-                    <div class="mb-3" style="font-size: .78rem; color: #1f6b30; font-weight: 600;" id="editPaymentFullBalanceNote"></div>
+                    <div class="mb-3 u-2601d9" id="editPaymentFullBalanceNote"></div>
 
                     <div class="mb-3">
                         <label class="tm-field-label d-block">Payment mode <span class="text-danger">*</span></label>
                         <div class="d-flex gap-2 flex-wrap" id="editPaymentModeButtons">
                             @foreach (['UPI', 'Bank transfer', 'Cash', 'Cheque'] as $mode)
-                                <button type="button" class="btn btn-outline-secondary btn-sm js-edit-mode-button flex-grow-1" data-mode="{{ $mode }}" data-label="{{ $mode }}" style="font-size: .8rem;">{{ $mode }}</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm js-edit-mode-button flex-grow-1 u-5a305f" data-mode="{{ $mode }}" data-label="{{ $mode }}">{{ $mode }}</button>
                             @endforeach
                         </div>
                         <input type="hidden" name="mode" id="editPaymentModeInput" value="UPI">
@@ -612,7 +562,7 @@
                         <textarea name="note" id="editPaymentNote" rows="2" maxlength="500" class="form-control tm-field"></textarea>
                     </div>
 
-                    <div class="rounded-3 p-3" id="editPaymentConsequenceBox" style="background: #eef9ef; border: 1px solid #cdeccb; font-size: .82rem;">
+                    <div class="rounded-3 p-3 u-cc54cf" id="editPaymentConsequenceBox">
                         <span id="editPaymentConsequenceText"></span>
                     </div>
                 </div>
@@ -627,15 +577,15 @@
 
 <div class="modal fade" id="deletePaymentModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content position-relative" style="border: 0; border-radius: .75rem;">
-            <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="top: 1rem; right: 1rem; background-color: #f3f4f7; border-radius: 50%; width: 30px; height: 30px; padding: 0; opacity: 1;"></button>
+        <div class="modal-content position-relative u-05655d">
+            <button type="button" class="btn-close position-absolute u-cf02dc" data-bs-dismiss="modal" aria-label="Close"></button>
 
             <form method="POST" id="deletePaymentForm">
                 @csrf
                 @method('DELETE')
 
                 <div class="modal-body p-4 pt-5 text-center">
-                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle" style="width: 64px; height: 64px; background: #fce9e9;">
+                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle u-db0f6a">
                         <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </div>
                     <h2 class="h5 fw-bold mb-2">Delete payment?</h2>
@@ -956,7 +906,7 @@
             editFullBalanceNote.innerHTML = isFull ? '&check; Full balance' : '';
 
             if (amount > balance) {
-                editConsequenceText.innerHTML = '<strong style="color:#dc3545;">Amount can\'t exceed the balance due (' + rupees(balance) + ').</strong>';
+                editConsequenceText.innerHTML = '<strong class="u-b75578">Amount can\'t exceed the balance due (' + rupees(balance) + ').</strong>';
             } else if (isFull) {
                 editConsequenceText.innerHTML = '<strong>&check; Balance after saving: ' + rupees(remaining) + '.</strong> This fully settles the balance due.';
             } else if (amount > 0) {

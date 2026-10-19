@@ -5,7 +5,7 @@
 @section('content')
 <x-page-header title="Edit Admin Account" subtitle="Admin #{{ $adminAccount }}" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Admin Accounts', 'url' => route('admin.admin-accounts.index')], ['label' => 'Edit admin account']]" />
 
-<div class="tm-card p-4" style="max-width: 560px;">
+<div class="tm-card p-4 u-55acce">
     <p class="small tm-muted mb-4">UI preview only — saving is wired up once this backend is approved and built.</p>
 
     <form>

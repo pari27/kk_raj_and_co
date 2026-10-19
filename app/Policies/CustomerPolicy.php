@@ -8,8 +8,8 @@ use App\Models\User;
 class CustomerPolicy
 {
     /**
-     * Managing clients is a shared staff capability — SuperAdmin, Admin and
-     * Employee all work with the same Customers list.
+     * Managing clients is a shared staff capability — Admin and
+     * Employee both work with the same Customers list.
      */
     public function viewAny(User $user): bool
     {

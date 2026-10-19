@@ -24,7 +24,7 @@ class ServiceController extends Controller
 
         $services = Service::query()->with('documents')->withCount('documents')->latest('created_at')->get();
 
-        $canManage = auth()->user()->isSuperAdmin() || auth()->user()->isAdmin();
+        $canManage = auth()->user()->isAdmin();
 
         return view('admin.services.index', compact('services', 'canManage'));
     }

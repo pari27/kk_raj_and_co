@@ -21,10 +21,10 @@
 <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 pb-3 mb-4 tm-divider-gold">
     <div>
         <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
-            <h1 class="tm-serif fw-bold mb-0" style="font-size: 1.15rem;">{{ $ticket->service->name }}</h1>
+            <h1 class="tm-serif fw-bold mb-0 u-e83e11">{{ $ticket->service->name }}</h1>
             <span class="ppill {{ $stage['tone'] }} d-none d-md-inline-flex">{{ $stage['label'] }}</span>
         </div>
-        <p class="tm-muted mb-0" style="font-size: .8rem;">{{ $ticket->number }} &middot; Started {{ $ticket->created_at->format('j M Y') }}</p>
+        <p class="tm-muted mb-0 u-5a305f">{{ $ticket->number }} &middot; Started {{ $ticket->created_at->format('j M Y') }}</p>
     </div>
     <a href="{{ route('customer.tickets.index') }}" class="pbtn-navy d-none d-md-inline-flex"><x-portal-icon name="arrow-left" :size="15" /> My services</a>
 </div>
@@ -47,7 +47,7 @@
         <div class="p-stepbar">
             <div class="d-flex align-items-center justify-content-between">
                 <span class="ppill {{ $stage['tone'] }}">{{ $stage['label'] }}</span>
-                <span class="eyebrow tm-muted" style="font-size: .7rem; letter-spacing: .08em; font-weight: 700;">STEP {{ $step }} OF {{ count($steps) }}</span>
+                <span class="eyebrow tm-muted u-09d558">STEP {{ $step }} OF {{ count($steps) }}</span>
             </div>
             <div class="segs">
                 @foreach ($steps as $index => $label)<span class="{{ $index < $step ? 'on' : '' }}"></span>@endforeach
@@ -95,7 +95,7 @@
                                 Not uploaded yet
                             @endif
                         </div>
-                        <div class="sub" style="font-size: .66rem;">{{ $limits }}</div>
+                        <div class="sub u-6baed3">{{ $limits }}</div>
                     </div>
 
                     <div class="acts">
@@ -123,7 +123,7 @@
                     </div>
                 </div>
             @empty
-                <div class="p-card-body tm-muted" style="font-size: .85rem;">No documents are needed for this service.</div>
+                <div class="p-card-body tm-muted u-8ae449">No documents are needed for this service.</div>
             @endforelse
         </div>
 
@@ -137,7 +137,7 @@
                         <div class="tm">{{ $when($entry['when']) }}</div>
                     </div>
                 @empty
-                    <div class="tm-muted py-3" style="font-size: .85rem;">Nothing to show yet.</div>
+                    <div class="tm-muted py-3 u-8ae449">Nothing to show yet.</div>
                 @endforelse
             </div>
         </div>
@@ -158,7 +158,7 @@
                         </div>
                         <div class="amt">{{ $money($ticket->total) }}</div>
                     </div>
-                    <a href="{{ route('customer.payments.index') }}" class="d-inline-block mt-3 fw-bold text-decoration-none" style="color: var(--p-green); font-size: .9rem;">How to pay →</a>
+                    <a href="{{ route('customer.payments.index') }}" class="d-inline-block mt-3 fw-bold text-decoration-none u-2fbbac">How to pay →</a>
                 @else
                     <div class="p-topay paid">
                         <div><div class="tt">Paid</div><div class="sb">Thank you</div></div>
@@ -171,8 +171,8 @@
         <div class="p-card">
             <div class="p-card-head navy"><span>Your final documents</span></div>
             <div class="p-card-body d-flex gap-3 align-items-start">
-                <span class="p-doc" style="padding: 0; border: 0;"><span class="ico" style="background: #dff3ea; color: #0f766e;"><x-portal-icon name="download" :size="19" /></span></span>
-                <div class="tm-muted" style="font-size: .85rem;">Your final documents will appear here once the work is completed.</div>
+                <span class="p-doc u-53e7d7"><span class="ico u-ea1160"><x-portal-icon name="download" :size="19" /></span></span>
+                <div class="tm-muted u-8ae449">Your final documents will appear here once the work is completed.</div>
             </div>
         </div>
     </div>
@@ -194,7 +194,7 @@
             </div>
 
             <div class="p-3">
-                <div class="tm-muted mb-2" id="uploadInstructions" style="font-size: .85rem;"></div>
+                <div class="tm-muted mb-2 u-8ae449" id="uploadInstructions"></div>
 
                 <div id="uploadFileArea">
                     <div class="p-choice">

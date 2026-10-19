@@ -29,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
 
+        Setting::applyFirmProfile();
+
         $this->registerAuditLogListeners();
 
         Event::listen(function (NotificationSending $event) {

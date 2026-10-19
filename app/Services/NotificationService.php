@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Auth;
 class NotificationService
 {
     /**
-     * Active Super Admin / Admin accounts.
+     * Active Admin accounts.
      *
      * @return array<int, User>
      */
     public static function admins(): array
     {
         return User::query()
-            ->whereIn('role', [UserRole::SuperAdmin->value, UserRole::Admin->value])
+            ->whereIn('role', [UserRole::Admin->value])
             ->where('is_active', true)
             ->get()
             ->all();

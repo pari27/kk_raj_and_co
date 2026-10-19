@@ -97,7 +97,7 @@
                 </span>
                 <span class="form-check form-switch m-0 p-0">
                     <input type="hidden" name="email_updates" value="0">
-                    <input class="form-check-input m-0" type="checkbox" role="switch" name="email_updates" value="1" @checked($customer->email_notifications_enabled) onchange="this.form.submit()" aria-label="Email updates" style="width: 2.6rem; height: 1.4rem; float: none;">
+                    <input class="form-check-input m-0 u-0b9c7b" type="checkbox" role="switch" name="email_updates" value="1" @checked($customer->email_notifications_enabled) onchange="this.form.submit()" aria-label="Email updates">
                 </span>
             </form>
             @unless ($customer->email_notifications_enabled)
@@ -115,7 +115,7 @@
 
         <form method="POST" action="{{ route('customer.logout') }}">
             @csrf
-            <button type="submit" class="btn w-100 py-2" style="background: #fff; border: 1px solid #f0b8b3; color: #b3261e; font-weight: 700;"><x-portal-icon name="logout" :size="16" /> Log out</button>
+            <button type="submit" class="btn w-100 py-2 u-24d101"><x-portal-icon name="logout" :size="16" /> Log out</button>
         </form>
     </div>
 </div>

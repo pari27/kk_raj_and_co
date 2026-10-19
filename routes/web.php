@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\EmailTemplateController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\EmployeeDesignationController;
@@ -64,8 +65,9 @@ Route::middleware('auth')->group(function () {
     Route::get('password/change', [ProfilePasswordController::class, 'edit'])->name('password.change');
     Route::put('password/change', [ProfilePasswordController::class, 'update'])->name('password.update');
 
-    Route::middleware('role:SuperAdmin,Admin,Employee')->group(function () {
+    Route::middleware('role:Admin,Employee')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('search', [SearchController::class, 'index'])->name('search');
 
         Route::get('clients', [CustomerController::class, 'index'])->name('customers.index');
         Route::get('clients/create', [CustomerController::class, 'create'])->name('customers.create');
@@ -108,7 +110,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Master Services list: read-only for employees (add/edit/activate stay admin-only below).
-    Route::middleware('role:SuperAdmin,Admin,Employee')->name('admin.')->group(function () {
+    Route::middleware('role:Admin,Employee')->name('admin.')->group(function () {
         Route::get('master-services', [ServiceController::class, 'index'])->name('services.index');
 
         // Employees see only their own entries (see AuditLogController).
@@ -116,7 +118,7 @@ Route::middleware('auth')->group(function () {
         Route::get('audit-log/export', [AuditLogController::class, 'export'])->name('audit-log.export');
     });
 
-    Route::middleware('role:SuperAdmin,Admin')->name('admin.')->group(function () {
+    Route::middleware('role:Admin')->name('admin.')->group(function () {
         Route::get('master-services/create', [ServiceController::class, 'create'])->name('services.create');
         Route::post('master-services', [ServiceController::class, 'store'])->name('services.store');
         Route::get('master-services/{service}', [ServiceController::class, 'show'])->name('services.show');
@@ -145,6 +147,7 @@ Route::middleware('auth')->group(function () {
         Route::get('admin-accounts/{adminAccount}/edit', fn ($adminAccount) => view('admin.admin-accounts.edit', compact('adminAccount')))->name('admin-accounts.edit');
 
         Route::get('settings/firm-profile', [SettingController::class, 'edit'])->name('settings.firm-profile');
+        Route::put('settings/firm-profile', [SettingController::class, 'updateFirmProfile'])->name('settings.firm-profile.update');
         Route::put('settings/system', [SettingController::class, 'update'])->name('settings.system.update');
         Route::put('settings/numbering', [SettingController::class, 'updateNumbering'])->name('settings.numbering.update');
         Route::get('settings/email-templates', [EmailTemplateController::class, 'index'])->name('settings.email-templates.index');

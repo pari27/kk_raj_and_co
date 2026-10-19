@@ -5,7 +5,7 @@
 @section('content')
 <div class="tm-auth-card">
     <div class="text-center mb-4">
-        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.firm_name') }}" class="d-block mx-auto mb-3" style="height: 26px; width: auto;">
+        <img src="{{ config('app.firm_logo_url') }}" alt="{{ config('app.firm_name') }}" class="d-block mx-auto mb-3 u-a60e1d">
         <h1 class="h4 text-white fw-semibold mb-1">Verify it's you</h1>
         <p class="tm-muted small mb-0">
             We'll email a one-time code to set or reset your password.
@@ -33,7 +33,7 @@
 
         <div class="mb-4">
             <label for="code" class="tm-field-label d-block">6-digit code <span class="text-danger">*</span></label>
-            <input id="code" name="code" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" class="form-control tm-field text-center" placeholder="••••••" style="letter-spacing: .5rem; font-size: 1.1rem;">
+            <input id="code" name="code" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" class="form-control tm-field text-center u-1a58d1" placeholder="••••••">
             <div class="form-text tm-muted">The code expires in 10 minutes and works once.</div>
         </div>
 

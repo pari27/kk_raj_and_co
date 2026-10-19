@@ -10,7 +10,7 @@
                 <table width="480" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius: 10px; overflow: hidden;">
                     <tr>
                         <td style="background:#101b3d; padding: 20px 28px;">
-                            <span style="color:#ffffff; font-size: 18px; font-weight: bold;">{{ config('app.name') }}</span>
+                            <span style="color:#ffffff; font-size: 18px; font-weight: bold;">{{ config('app.firm_name') }}</span>
                         </td>
                     </tr>
                     <tr>

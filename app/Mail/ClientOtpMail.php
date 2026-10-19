@@ -32,14 +32,14 @@ class ClientOtpMail extends Mailable
         if (! $template) {
             return [
                 'subject' => 'Your one-time login code',
-                'body' => "Hello {$this->customer->name},\n\nYour one-time login code is {$this->code}. It expires in ".\App\Services\ClientOtpService::EXPIRES_IN_MINUTES." minutes.\n\nRegards,\n".config('app.name'),
+                'body' => "Dear {$this->customer->name},\n\nYour one-time login code is {$this->code}. This code is valid for ".\App\Services\ClientOtpService::EXPIRES_IN_MINUTES." minutes. Please do not share it with anyone.\n\nYours sincerely,\n".config('app.firm_name'),
             ];
         }
 
         return $template->render([
             'customer_name' => $this->customer->name,
             'otp_code' => $this->code,
-            'firm_name' => config('app.name'),
+            'firm_name' => config('app.firm_name'),
         ]);
     }
 

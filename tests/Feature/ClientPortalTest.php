@@ -514,7 +514,9 @@ class ClientPortalTest extends TestCase
         ]);
 
         $send();
-        $send()->assertStatus(422);
+        $send()
+            ->assertRedirect(route('customer.tickets.show', $ticket))
+            ->assertSessionHas('error');
         $this->assertSame(1, TicketDocument::count());
 
         TicketDocument::query()->update(['status' => 'Rejected', 'rejection_reason' => 'Blurred']);

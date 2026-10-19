@@ -2,179 +2,6 @@
 
 @section('title', 'New Enquiry — ' . config('app.name', 'Task Management'))
 
-@push('styles')
-<style>
-    .tm-client-result {
-        border: 1px solid var(--tm-surface-border);
-        border-radius: .6rem;
-        padding: .75rem 1rem;
-        cursor: pointer;
-        transition: border-color .15s ease, background-color .15s ease;
-    }
-    .tm-client-result:hover { background: #f8f9fb; }
-    .tm-client-result.is-selected {
-        border-color: var(--tm-accent);
-        background: var(--tm-accent-soft);
-    }
-    .tm-client-avatar-sm {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: #101b3d;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: .78rem;
-        flex-shrink: 0;
-    }
-    .tm-enquiry-service-row {
-        border: 1px solid var(--tm-surface-border);
-        border-radius: .6rem;
-        padding: .85rem 1rem;
-        display: flex;
-        align-items: flex-start;
-        gap: .85rem;
-        margin-bottom: .6rem;
-    }
-    .tm-enquiry-service-row.is-searching {
-        border-color: var(--tm-accent);
-    }
-    .tm-enquiry-service-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: .5rem;
-        background: #e0edff;
-        color: #2f5fbe;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        margin-top: 1.4rem;
-    }
-    .tm-service-row-label {
-        font-size: .68rem;
-        font-weight: 700;
-        letter-spacing: .02em;
-        color: var(--tm-muted);
-        text-transform: uppercase;
-        margin-bottom: .3rem;
-        display: block;
-    }
-    /* Let the service list hang below its card instead of being cut off by it. */
-    .tm-section-card {
-        overflow: visible;
-    }
-    .tm-section-card > .tm-section-title {
-        border-radius: .85rem .85rem 0 0;
-    }
-    .tm-service-search-wrap {
-        position: relative;
-    }
-    .tm-service-dropdown {
-        position: absolute;
-        top: calc(100% + .35rem);
-        left: 0;
-        right: 0;
-        background: #fff;
-        border: 1px solid var(--tm-surface-border);
-        border-radius: .6rem;
-        box-shadow: 0 10px 30px rgba(16,27,61,.14);
-        z-index: 20;
-        max-height: 320px;
-        overflow-y: auto;
-        padding: .5rem 0;
-    }
-    .tm-service-dropdown-header {
-        font-size: .68rem;
-        font-weight: 700;
-        letter-spacing: .03em;
-        color: var(--tm-muted);
-        text-transform: uppercase;
-        padding: .3rem 1rem .5rem;
-    }
-    .tm-service-option {
-        padding: .5rem 1rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: .75rem;
-    }
-    .tm-service-option:hover, .tm-service-option.is-active {
-        background: #eef4ff;
-    }
-    .tm-service-option-name {
-        font-weight: 700;
-        font-size: .85rem;
-        color: var(--tm-text);
-    }
-    .tm-service-option-meta {
-        font-size: .74rem;
-        color: var(--tm-muted);
-        margin-top: .1rem;
-    }
-    .tm-service-option-price {
-        font-weight: 700;
-        font-size: .85rem;
-        text-align: right;
-        white-space: nowrap;
-    }
-    .tm-service-option-gst {
-        font-size: .7rem;
-        color: var(--tm-muted);
-        font-weight: 400;
-        text-align: right;
-    }
-    .tm-service-dropdown-footer {
-        font-size: .7rem;
-        color: var(--tm-muted);
-        text-align: center;
-        padding: .5rem 1rem 0;
-    }
-    .tm-service-dropdown-empty {
-        font-size: .8rem;
-        color: var(--tm-muted);
-        padding: .5rem 1rem;
-    }
-
-    .tm-add-service-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: .4rem;
-        width: 100%;
-        border: 1.5px dashed #bcd6ff;
-        background: #f3f8ff;
-        color: var(--tm-accent);
-        font-weight: 600;
-        font-size: .85rem;
-        border-radius: .6rem;
-        padding: .7rem;
-    }
-    .tm-add-service-btn:hover {
-        background: #e9f2ff;
-    }
-    .tm-service-match {
-        background: #fff3a3;
-        padding: 0;
-    }
-    .tm-whats-next {
-        background: #eaf1fd;
-        border: 1px solid #cfe0fb;
-        border-radius: .6rem;
-        padding: 1rem;
-    }
-    .tm-lock-note {
-        color: var(--tm-muted);
-        font-size: .78rem;
-        display: inline-flex;
-        align-items: center;
-        gap: .3rem;
-    }
-</style>
-@endpush
 
 @section('content')
 @php
@@ -216,8 +43,8 @@
 <x-breadcrumbs :items="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Enquiries', 'url' => route('enquiries.index')], ['label' => 'New enquiry']]" />
 <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 pb-3 mb-4 tm-divider-gold">
     <div>
-        <h1 class="tm-serif fw-bold mb-1" style="font-size: 1.15rem;">New enquiry</h1>
-        <p class="tm-muted mb-0" style="font-size: .8rem;">Add a client and the services they need</p>
+        <h1 class="tm-serif fw-bold mb-1 u-e83e11">New enquiry</h1>
+        <p class="tm-muted mb-0 u-5a305f">Add a client and the services they need</p>
     </div>
 </div>
 
@@ -230,26 +57,26 @@
             <div class="tm-card tm-section-card p-0 mb-3">
                 <div class="tm-section-title d-flex align-items-center justify-content-between">
                     <span>1. Client</span>
-                    <span class="small fw-normal" style="color: rgba(255,255,255,.75);">Start with the mobile number</span>
+                    <span class="small fw-normal u-bbebd4">Start with the mobile number</span>
                 </div>
                 <div class="p-4">
                     @error('customer_id')
-                        <div class="alert alert-danger py-2 small" style="font-size: .75rem; font-style: italic;">{{ $message }}</div>
+                        <div class="alert alert-danger py-2 small u-cf7e00">{{ $message }}</div>
                     @enderror
                     @error('customer_phone')
-                        <div class="alert alert-danger py-2 small" style="font-size: .75rem; font-style: italic;">{{ $message }}</div>
+                        <div class="alert alert-danger py-2 small u-cf7e00">{{ $message }}</div>
                     @enderror
                     @error('customer_name')
-                        <div class="alert alert-danger py-2 small" style="font-size: .75rem; font-style: italic;">{{ $message }}</div>
+                        <div class="alert alert-danger py-2 small u-cf7e00">{{ $message }}</div>
                     @enderror
                     @error('customer_email')
-                        <div class="alert alert-danger py-2 small" style="font-size: .75rem; font-style: italic;">{{ $message }}</div>
+                        <div class="alert alert-danger py-2 small u-cf7e00">{{ $message }}</div>
                     @enderror
 
 
                     <label class="tm-field-label d-block">Mobile number <span class="text-danger">*</span></label>
                     <div class="d-flex gap-2">
-                        <span class="d-flex align-items-center px-3" style="background: #f3f4f7; border: 1px solid var(--tm-surface-border); border-radius: .5rem; font-size: .85rem; color: var(--tm-muted);">+91</span>
+                        <span class="d-flex align-items-center px-3 u-d03817">+91</span>
                         <input type="text" name="customer_phone" id="clientPhoneInput" inputmode="numeric" maxlength="10" class="form-control tm-field" placeholder="98765 43210" value="{{ old('customer_phone') }}">
                     </div>
 
@@ -276,8 +103,8 @@
 
                     <div class="form-check mt-3">
                         <input class="form-check-input" type="checkbox" name="customer_email_notifications" value="1" id="clientNotifyCheckbox">
-                        <label class="form-check-label fw-semibold" for="clientNotifyCheckbox" style="font-size: .85rem;">Send email notifications to this client</label>
-                        <div style="font-size: .72rem;font-style:italic;" id="clientNotifyCaption"></div>
+                        <label class="form-check-label fw-semibold u-8ae449" for="clientNotifyCheckbox">Send email notifications to this client</label>
+                        <div class="u-0af8f2" id="clientNotifyCaption"></div>
                     </div>
                 </div>
             </div>
@@ -285,11 +112,11 @@
             <div class="tm-card tm-section-card p-0 mb-3">
                 <div class="tm-section-title d-flex align-items-center justify-content-between">
                     <span>2. Services</span>
-                    <span class="small fw-normal" style="color: rgba(255,255,255,.75);">One entry is created for each service</span>
+                    <span class="small fw-normal u-bbebd4">One entry is created for each service</span>
                 </div>
                 <div class="p-4">
                     @error('services')
-                        <div class="alert alert-danger py-2 small" style="font-size: .75rem; font-style: italic;">{{ $message }}</div>
+                        <div class="alert alert-danger py-2 small u-cf7e00">{{ $message }}</div>
                     @enderror
 
                     <div id="serviceRows"></div>
@@ -320,9 +147,9 @@
         </div>
 
         <div class="col-12 col-xl-4">
-            <div class="tm-card p-0 mb-3" style="overflow: hidden;">
-                <div class="tm-side-card-header" style="background: #1f6b30;">Summary</div>
-                <div class="p-3" style="font-size: .85rem;">
+            <div class="tm-card p-0 mb-3 u-abf627">
+                <div class="tm-side-card-header u-1fcbae">Summary</div>
+                <div class="p-3 u-8ae449">
                     <div class="d-flex justify-content-between mb-2">
                         <span class="tm-muted">Client</span>
                         <span class="fw-semibold" id="summaryClient">—</span>
@@ -333,21 +160,21 @@
                     </div>
                     <div id="summaryServiceLines" class="mb-2"></div>
 
-                    <div class="rounded-3 p-3 mt-2" style="background: #e5f5e0;">
-                        <div class="fw-bold" style="color: #1f6b30;">Total</div>
-                        <div style="color: #1f6b30; font-size: .72rem;" class="mb-1">including GST</div>
-                        <div class="fw-bold" style="color: #1f6b30; font-size: 1.2rem;" id="summaryTotal">₹0</div>
+                    <div class="rounded-3 p-3 mt-2 u-389ec9">
+                        <div class="fw-bold u-f63532">Total</div>
+                        <div class="mb-1 u-c07f9c">including GST</div>
+                        <div class="fw-bold u-e95ef8" id="summaryTotal">₹0</div>
                     </div>
                 </div>
             </div>
 
             <div class="tm-whats-next">
-                <div class="fw-bold mb-2" style="color: #0a4fc4; font-size: .88rem;">What happens next</div>
-                <div class="d-flex gap-2 mb-2" style="font-size: .8rem;">
+                <div class="fw-bold mb-2 u-b5760f">What happens next</div>
+                <div class="d-flex gap-2 mb-2 u-5a305f">
                     <span class="text-success">&check;</span>
                     <span id="whatsNextTickets">Services will be created{{ auth()->user()->isEmployee() ? ' and assigned to you' : '' }}</span>
                 </div>
-                <div class="d-flex gap-2" style="font-size: .8rem;">
+                <div class="d-flex gap-2 u-5a305f">
                     <span class="text-primary">&#9993;</span>
                     <span id="whatsNextEmail">No email notifications for this client</span>
                 </div>
@@ -412,9 +239,9 @@
             clientLookupBanner.style.background = '#eef4ff';
             clientLookupBanner.style.border = '1px solid #cfe0ff';
             clientLookupBanner.innerHTML = '<div class="d-flex align-items-start gap-2">'
-                + '<span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:28px;height:28px;background:#2f5fbe;color:#fff;font-size:.9rem;line-height:1;">+</span>'
-                + '<div><div class="fw-bold" style="font-size:.82rem;color:#15245c;">New client</div>'
-                + '<div style="font-size:.76rem;color:#2f3a52;">This number isn’t registered yet. Fill in the name and a new client is created when you save.</div></div>'
+                + '<span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 u-3de690">+</span>'
+                + '<div><div class="fw-bold u-e02448">New client</div>'
+                + '<div class="u-bd1e2f">This number isn’t registered yet. Fill in the name and a new client is created when you save.</div></div>'
                 + '</div>';
             clientNameInput.disabled = false;
             clientEmailInput.disabled = false;
@@ -432,11 +259,11 @@
             var historyText = customer.tickets_count === 1 ? '1 past service' : (customer.tickets_count + ' past services');
             clientLookupBanner.innerHTML = '<div class="d-flex align-items-start justify-content-between gap-2">'
                 + '<div class="d-flex align-items-start gap-2">'
-                + '<span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:28px;height:28px;background:#1f6b30;color:#fff;font-size:.68rem;font-weight:700;">' + initials + '</span>'
-                + '<div><div class="fw-bold" style="font-size:.82rem;color:#1f6b30;">Existing client found</div>'
-                + '<div style="font-size:.76rem;color:#2f3a52;">Client since ' + customer.since + ' &middot; ' + historyText + '</div></div>'
+                + '<span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 u-191a15">' + initials + '</span>'
+                + '<div><div class="fw-bold u-0b7c80">Existing client found</div>'
+                + '<div class="u-bd1e2f">Client since ' + customer.since + ' &middot; ' + historyText + '</div></div>'
                 + '</div>'
-                + '<a href="{{ url('customers') }}/' + customer.id + '" target="_blank" class="fw-semibold text-decoration-none flex-shrink-0" style="font-size:.76rem;color:#1f6b30;">View client &rarr;</a>'
+                + '<a href="{{ url('customers') }}/' + customer.id + '" target="_blank" class="fw-semibold text-decoration-none flex-shrink-0 u-8699ce">View client &rarr;</a>'
                 + '</div>';
             clientNameInput.value = customer.name;
             clientEmailInput.value = customer.email || '';
@@ -570,7 +397,7 @@
 
             function avatarHtml(emp) {
                 if (! emp) {
-                    return '<span class="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width:20px;height:20px;background:#eceef2;color:#6b7280;font-size:.6rem;font-weight:700;">?</span>';
+                    return '<span class="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 u-d8155b">?</span>';
                 }
                 return '<span class="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width:20px;height:20px;background:' + emp.color.bg + ';color:' + emp.color.text + ';font-size:.6rem;font-weight:700;">' + escapeHtml(emp.initials) + '</span>';
             }
@@ -592,25 +419,25 @@
 
             var assignField = '';
             if (canAssignTickets && employees.length) {
-                var optionsHtml = '<li><a class="dropdown-item d-flex align-items-center gap-2 js-assign-option" href="#" data-id="" style="font-size: .8rem;">'
+                var optionsHtml = '<li><a class="dropdown-item d-flex align-items-center gap-2 js-assign-option u-5a305f" href="#" data-id="">'
                     + avatarHtml(null) + '<span>Unassigned</span></a></li>';
                 employees.forEach(function (e) {
-                    optionsHtml += '<li><a class="dropdown-item d-flex align-items-center gap-2 js-assign-option" href="#" data-id="' + e.id + '" style="font-size: .8rem;">'
+                    optionsHtml += '<li><a class="dropdown-item d-flex align-items-center gap-2 js-assign-option u-5a305f" href="#" data-id="' + e.id + '">'
                         + avatarHtml(e) + '<span>' + escapeHtml(assignmentOptionLabel(e)) + '</span></a></li>';
                 });
 
-                assignField = '<div class="flex-shrink-0" style="min-width: 150px;">'
+                assignField = '<div class="flex-shrink-0 u-684a19">'
                     + '<div class="tm-service-row-label">Assign to</div>'
                     + '<div class="dropdown">'
-                    + '<button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2 js-assign-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" style="font-size: .78rem; background: #fff;">'
+                    + '<button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2 js-assign-toggle u-db3251" data-bs-toggle="dropdown" data-bs-auto-close="outside">'
                     + '<span class="js-assign-avatar">' + avatarHtml(null) + '</span>'
                     + '<span class="js-assign-name">Unassigned</span>'
-                    + '<span class="badge rounded-pill text-bg-success js-assign-you d-none" style="font-size: .6rem;">You</span>'
+                    + '<span class="badge rounded-pill text-bg-success js-assign-you d-none u-2a089b">You</span>'
                     + '</button>'
-                    + '<ul class="dropdown-menu pt-0" style="max-height: 260px; overflow-y: auto; min-width: 220px;">'
-                    + '<li class="px-2 pt-2 pb-2 mb-1 border-bottom" style="position: sticky; top: 0; z-index: 1; background: #fff;"><input type="search" class="form-control form-control-sm js-assign-search" placeholder="Search..." autocomplete="off" style="font-size: .78rem;"></li>'
+                    + '<ul class="dropdown-menu pt-0 u-0d9a19">'
+                    + '<li class="px-2 pt-2 pb-2 mb-1 border-bottom u-cdeac9"><input type="search" class="form-control form-control-sm js-assign-search u-319f32" placeholder="Search..." autocomplete="off"></li>'
                     + optionsHtml
-                    + '<li class="js-assign-empty px-3 py-1 tm-muted d-none" style="font-size: .78rem;">No match</li>'
+                    + '<li class="js-assign-empty px-3 py-1 tm-muted d-none u-319f32">No match</li>'
                     + '</ul>'
                     + '</div>'
                     + '<input type="hidden" class="js-assign-value" value="">'
@@ -622,21 +449,21 @@
                 + '</span>'
                 + '<div class="flex-grow-1 tm-service-search-wrap">'
                 + '<label class="tm-service-row-label">Service <span class="text-danger">*</span></label>'
-                + '<div class="js-service-name-display fw-semibold d-none" style="font-size: .85rem;"></div>'
+                + '<div class="js-service-name-display fw-semibold d-none u-8ae449"></div>'
                 + '<div class="tm-field-icon js-service-search-field">'
                 + '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>'
                 + '<input type="text" class="form-control tm-field js-service-search" placeholder="Search and select a service" autocomplete="off">'
                 + '</div>'
-                + '<div class="tm-muted js-service-hint" style="font-size: .76rem; margin-top: .35rem;">Documents and price fill in after you pick a service</div>'
-                + '<div class="js-service-docs d-none" style="font-size: .76rem; margin-top: .4rem;"></div>'
+                + '<div class="tm-muted js-service-hint u-42e121">Documents and price fill in after you pick a service</div>'
+                + '<div class="js-service-docs d-none u-6a3042"></div>'
                 + '<div class="tm-service-dropdown d-none"></div>'
                 + '</div>'
                 + assignField
-                + '<div class="text-end flex-shrink-0" style="min-width: 110px;">'
+                + '<div class="text-end flex-shrink-0 u-fc5653">'
                 + '<div class="tm-service-row-label js-price-label">Price</div>'
-                + '<div class="js-price-area tm-muted" style="font-size: .85rem;">&#8377; —</div>'
+                + '<div class="js-price-area tm-muted u-8ae449">&#8377; —</div>'
                 + '</div>'
-                + '<button type="button" class="tm-remove-doc js-remove-row" title="Remove" style="margin-top: 1.4rem;">&times;</button>';
+                + '<button type="button" class="tm-remove-doc js-remove-row u-994c3e" title="Remove">&times;</button>';
 
             rowsContainer.appendChild(row);
 
@@ -723,10 +550,10 @@
                 var lockIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
                 var priceArea = row.querySelector('.js-price-area');
                 if (canManagePricing) {
-                    priceArea.outerHTML = '<input type="number" class="form-control form-control-sm tm-field text-end js-row-price" name="services[' + i + '][price]" value="' + service.price + '" min="0" step="0.01" style="width: 110px; font-size: .82rem;">';
+                    priceArea.outerHTML = '<input type="number" class="form-control form-control-sm tm-field text-end js-row-price u-ab4078" name="services[' + i + '][price]" value="' + service.price + '" min="0" step="0.01">';
                     row.querySelector('.js-row-price').addEventListener('input', updateSummary);
                 } else {
-                    priceArea.outerHTML = '<span class="d-inline-flex align-items-center gap-1 fw-semibold" style="font-size: .85rem;">' + lockIcon + ' ₹' + service.price.toLocaleString('en-IN') + '</span><input type="hidden" name="services[' + i + '][price]" value="' + service.price + '">';
+                    priceArea.outerHTML = '<span class="d-inline-flex align-items-center gap-1 fw-semibold u-8ae449">' + lockIcon + ' ₹' + service.price.toLocaleString('en-IN') + '</span><input type="hidden" name="services[' + i + '][price]" value="' + service.price + '">';
                 }
 
                 var hiddenServiceId = document.createElement('input');

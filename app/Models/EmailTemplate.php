@@ -58,6 +58,82 @@ class EmailTemplate extends Model
             ],
             'required' => [],
         ],
+        'admin_new_enquiry' => [
+            'variables' => [
+                'admin_name' => "The admin's name",
+                'actor_name' => 'Who recorded the enquiry',
+                'customer_name' => "The client's name",
+                'enquiry_number' => 'The enquiry number',
+                'total' => 'The enquiry total',
+                'firm_name' => 'Your firm name',
+            ],
+            'required' => [],
+        ],
+        'admin_payment_received' => [
+            'variables' => [
+                'admin_name' => "The admin's name",
+                'amount' => 'The amount received',
+                'mode' => 'How it was paid',
+                'customer_name' => "The client's name",
+                'enquiry_number' => 'The enquiry number',
+                'firm_name' => 'Your firm name',
+            ],
+            'required' => [],
+        ],
+        'admin_payment_deleted' => [
+            'variables' => [
+                'admin_name' => "The admin's name",
+                'actor_name' => 'Who deleted the payment',
+                'amount' => 'The amount',
+                'mode' => 'How it was paid',
+                'customer_name' => "The client's name",
+                'enquiry_number' => 'The enquiry number',
+                'firm_name' => 'Your firm name',
+            ],
+            'required' => [],
+        ],
+        'admin_service_assigned' => [
+            'variables' => [
+                'admin_name' => "The admin's name",
+                'actor_name' => 'Who assigned the service',
+                'service_number' => 'The service number',
+                'service_name' => 'The service name',
+                'customer_name' => "The client's name",
+                'employee_name' => 'Who it was assigned to',
+                'firm_name' => 'Your firm name',
+            ],
+            'required' => [],
+        ],
+        'admin_client_added' => [
+            'variables' => [
+                'admin_name' => "The admin's name",
+                'actor_name' => 'Who added the client',
+                'customer_name' => "The client's name",
+                'firm_name' => 'Your firm name',
+            ],
+            'required' => [],
+        ],
+        'employee_document_uploaded' => [
+            'variables' => [
+                'employee_name' => "The employee's name",
+                'document_name' => 'The document name',
+                'service_number' => 'The service number',
+                'service_name' => 'The service name',
+                'customer_name' => "The client's name",
+                'firm_name' => 'Your firm name',
+            ],
+            'required' => [],
+        ],
+        'client_document_rejected' => [
+            'variables' => [
+                'customer_name' => "The client's name",
+                'document_name' => 'The document name',
+                'service_name' => 'The service name',
+                'reason' => 'Why it was not accepted',
+                'firm_name' => 'Your firm name',
+            ],
+            'required' => [],
+        ],
     ];
 
     /**

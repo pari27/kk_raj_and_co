@@ -13,10 +13,10 @@ class PaymentPolicy
     }
 
     /**
-     * Deleting a recorded payment is an Admin/SuperAdmin-only action.
+     * Deleting a recorded payment is an Admin-only action.
      */
     public function delete(User $user, Payment $payment): bool
     {
-        return $user->isSuperAdmin() || $user->isAdmin();
+        return $user->isAdmin();
     }
 }

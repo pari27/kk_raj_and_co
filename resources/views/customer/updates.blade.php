@@ -26,7 +26,7 @@
         @if ($hasUnread)
             <form method="POST" action="{{ route('customer.updates.read-all') }}" class="m-0">
                 @csrf
-                <button type="submit" class="btn btn-link p-0 text-white" style="font-size: .8rem; font-weight: 700;">Mark all read</button>
+                <button type="submit" class="btn btn-link p-0 text-white u-43a94f">Mark all read</button>
             </form>
         @endif
     </div>
@@ -49,7 +49,7 @@
             </a>
         @endforeach
     @empty
-        <div class="p-card-body text-center tm-muted" style="font-size: .85rem;">Nothing new yet. We'll tell you here when something changes.</div>
+        <div class="p-card-body text-center tm-muted u-8ae449">Nothing new yet. We'll tell you here when something changes.</div>
     @endforelse
 </div>
 @endsection

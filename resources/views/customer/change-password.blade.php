@@ -21,14 +21,14 @@
 
 <div class="row g-3">
     <div class="col-12 col-lg-8">
-        <div class="tm-card p-0" style="overflow: hidden;">
-            <div class="d-flex align-items-center gap-3 p-3" style="background: #101b3d;">
-                <span class="d-flex align-items-center justify-content-center rounded-3" style="width: 38px; height: 38px; background: var(--tm-accent); color: #fff;">
+        <div class="tm-card p-0 u-abf627">
+            <div class="d-flex align-items-center gap-3 p-3 u-8b012c">
+                <span class="d-flex align-items-center justify-content-center rounded-3 u-9d3471">
                     {!! $icon('lock', 18) !!}
                 </span>
                 <div>
                     <h2 class="h6 tm-serif fw-bold mb-1 text-white">Update your password</h2>
-                    <div class="small" style="color: rgba(255,255,255,.75);">Signed in as {{ $customer->name }}</div>
+                    <div class="small u-bbebd4">Signed in as {{ $customer->name }}</div>
                 </div>
             </div>
 
@@ -66,7 +66,7 @@
                                 <div class="tm-strength-track flex-grow-1">
                                     <span></span><span></span><span></span><span></span>
                                 </div>
-                                <div id="strengthLabel" class="small tm-muted" style="min-width: 32px;">&nbsp;</div>
+                                <div id="strengthLabel" class="small tm-muted u-cafcd9">&nbsp;</div>
                             </div>
 
                             <div class="mb-2">
@@ -81,7 +81,7 @@
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <div class="tm-card p-3 h-100" style="background: #f8f9fb;">
+                            <div class="tm-card p-3 h-100 u-ef2c44">
                                 <h3 class="small fw-bold mb-3">Your new password needs</h3>
                                 <ul class="list-unstyled small mb-0 tm-requirements" id="requirementsList">
                                     <li data-rule="length"><span class="tm-req-icon"></span> At least 8 characters</li>
@@ -90,7 +90,7 @@
                                     <li data-rule="number"><span class="tm-req-icon"></span> One number (0–9)</li>
                                     <li data-rule="special"><span class="tm-req-icon"></span> One special character (! @ # $)</li>
                                 </ul>
-                                <div id="strengthHint" class="small mt-3 p-2 rounded d-none" style="background: #fdf3e0; color: #7a5b12;"></div>
+                                <div id="strengthHint" class="small mt-3 p-2 rounded d-none u-73dcfa"></div>
                             </div>
                         </div>
                     </div>
@@ -107,11 +107,11 @@
     </div>
 
     <div class="col-12 col-lg-4">
-        <div class="tm-card p-0 mb-3" style="overflow: hidden;">
-            <div class="p-2 px-3" style="background: #1f6b30;">
+        <div class="tm-card p-0 mb-3 u-abf627">
+            <div class="p-2 px-3 u-1fcbae">
                 <h3 class="small fw-bold text-white mb-0">Security tips</h3>
             </div>
-            <ul class="mb-0 p-3 ps-4" style="line-height: 1.7; font-size: .8rem; color: #000;">
+            <ul class="mb-0 p-3 ps-4 u-7a963a">
                 <li>Use a short phrase you can remember, mixed with numbers and symbols</li>
                 <li>Don't reuse a password from email or banking</li>
                 <li>Never share your password with anyone, including people who say they are from the firm</li>
@@ -120,13 +120,13 @@
         </div>
 
         @if ($lastLoginText)
-            <div class="tm-card p-0" style="overflow: hidden;">
-                <div class="p-2 px-3" style="background: #101b3d;">
+            <div class="tm-card p-0 u-abf627">
+                <div class="p-2 px-3 u-8b012c">
                     <h3 class="small fw-bold text-white mb-0">Last login</h3>
                 </div>
                 <div class="p-3 small">
                     <div class="fw-semibold">{{ $customer->last_login_device ?: 'This device' }}</div>
-                    <div style="font-size: .75rem; color: #000;">{{ $lastLoginText }}</div>
+                    <div class="u-31d897">{{ $lastLoginText }}</div>
                 </div>
             </div>
         @endif
@@ -220,9 +220,9 @@
             }
 
             if (confirmPassword.value === newPassword.value) {
-                matchIndicator.innerHTML = '<span style="color:#1f6b30;">' + checkIcon + ' Passwords match</span>';
+                matchIndicator.innerHTML = '<span class="u-d59019">' + checkIcon + ' Passwords match</span>';
             } else {
-                matchIndicator.innerHTML = '<span style="color:#dc3545;">' + crossIcon + ' Passwords do not match</span>';
+                matchIndicator.innerHTML = '<span class="u-b75578">' + crossIcon + ' Passwords do not match</span>';
             }
         }
 

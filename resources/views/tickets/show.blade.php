@@ -4,62 +4,6 @@
 
 @push('styles')
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
-<style>
-    .ts-wrapper.form-select { padding: 0; border: 0; background: none; }
-    .ts-control, .ts-dropdown { font-size: .8rem; }
-    #ticket-show-page .ticket-summary { border-left: 5px solid #29995a; overflow: hidden; }
-    #ticket-show-page .ticket-summary-main { padding: 1.25rem 1.5rem; }
-    #ticket-show-page .ticket-number { color: #596579; font-size: .8rem; font-weight: 700; }
-    #ticket-show-page .ticket-service-title { color: #17233d; font-size: 1.1rem; font-weight: 700; margin: .45rem 0 .6rem; }
-    #ticket-show-page .ticket-meta { color: #596579; display: flex; flex-wrap: wrap; gap: .45rem 1rem; font-size: .78rem; }
-    #ticket-show-page .ticket-progress-wrap { border-top: 1px solid #edf0f4; padding: 1rem 1.25rem .9rem; overflow-x: auto; }
-    #ticket-show-page .ticket-progress { display: flex; align-items: flex-start; }
-    #ticket-show-page .ticket-progress-step { flex: 1 1 0; min-width: 0; text-align: center; color: #8b95a7; font-size: .6rem; font-weight: 600; }
-    #ticket-show-page .ticket-step-track { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: .3rem; }
-    #ticket-show-page .ticket-step-dot { width: 1.15rem; height: 1.15rem; flex: 0 0 1.15rem; display: grid; place-items: center; border: 2px solid #d8dee8; border-radius: 50%; background: #fff; color: #7b8798; font-size: .58rem; position: relative; z-index: 1; }
-    #ticket-show-page .ticket-step-line { position: absolute; left: calc(50% + .575rem); width: calc(100% - 1.15rem); top: 50%; transform: translateY(-50%); height: 2px; background: #e2e6ed; }
-    #ticket-show-page .ticket-progress-step.is-complete { color: #217043; }
-    #ticket-show-page .ticket-progress-step.is-complete .ticket-step-dot { color: #fff; background: #29995a; border-color: #29995a; }
-    #ticket-show-page .ticket-progress-step.is-complete .ticket-step-line { background: #29995a; }
-    #ticket-show-page .ticket-progress-step.is-current { color: #805d00; }
-    #ticket-show-page .ticket-progress-step.is-current .ticket-step-dot { border-color: #c58b00; color: #c58b00; background: #fff8df; }
-    #ticket-show-page .ticket-panel { overflow: hidden; }
-    #ticket-show-page .ticket-panel-heading { align-items: center; background: #101b3d; color: #fff; display: flex; justify-content: space-between; padding: .5rem 1rem; }
-    #ticket-show-page .ticket-panel-heading h2 { font-size: .95rem; font-weight: 700; margin: 0; }
-    #ticket-show-page .ticket-panel-heading-green { background: #101b3d; }
-    #ticket-show-page .ticket-panel-heading-teal { background: #1f6b30; }
-    #ticket-show-page .ticket-panel-heading-purple { background: #101b3d; }
-    #ticket-show-page .ticket-panel-meta { color: #d5dceb; font-size: .75rem; }
-    #ticket-show-page .ticket-panel-heading a.badge.text-bg-primary:hover { background-color: #0b5ed7 !important; color: #fff; }
-    #ticket-show-page .ticket-document-row, #ticket-show-page .ticket-enquiry-row { border-bottom: 1px solid #edf0f4; padding: .8rem 1rem; }
-    #ticket-show-page .ticket-document-row:last-child, #ticket-show-page .ticket-enquiry-row:last-child { border-bottom: 0; }
-    #ticket-show-page .ticket-document-name { color: #202b3e; font-size: .82rem; font-weight: 700; }
-    #ticket-show-page .ticket-document-note, #ticket-show-page .ticket-timeline-meta { color: #667287; font-size: .72rem; margin-top: .2rem; }
-    #ticket-show-page .ticket-timeline-desc { color: #000; font-size: .72rem; }
-    #ticket-show-page .ticket-status-form, #ticket-show-page .ticket-status-form .form-label, #ticket-show-page .ticket-status-form .form-select, #ticket-show-page .ticket-status-form .form-control, #ticket-show-page .ticket-status-form .invalid-feedback, #ticket-show-page .ticket-status-form small, #ticket-show-page .ticket-status-form .btn { font-size: .8rem; }
-    #ticket-show-page .ticket-timeline { padding: 1rem; }
-    #ticket-show-page .ticket-timeline-item { border-left: 2px solid #e0e5ed; margin-left: .45rem; padding: 0 0 .5rem 1rem; position: relative; }
-    #ticket-show-page .ticket-timeline-item:last-child { border-left-color: transparent; padding-bottom: 0; }
-    #ticket-show-page .ticket-timeline-dot { background: #24569b; border: 3px solid #e7effc; border-radius: 50%; height: .8rem; left: -.48rem; position: absolute; top: .05rem; width: .8rem; }
-    #ticket-show-page .ticket-timeline-item:first-child .ticket-timeline-dot { background: #24569b; border-color: #e7effc; }
-    #ticket-show-page .ticket-info-row { align-items: center; border-bottom: 1px solid #edf0f4; display: flex; font-size: .8rem; justify-content: space-between; gap: .75rem; padding: .7rem 1rem; }
-    #ticket-show-page .ticket-info-row:last-child { border-bottom: 0; }
-    #ticket-show-page .ticket-compact-content .ticket-info-row,
-    #ticket-show-page .ticket-compact-content .ticket-fee-pending,
-    #ticket-show-page .ticket-compact-content .ticket-document-name,
-    #ticket-show-page .ticket-compact-content .ticket-document-note,
-    #ticket-show-page .ticket-compact-content .small { font-size: .8rem; }
-    #ticket-show-page .ticket-compact-content .fs-5 { font-size: .8rem !important; }
-    #ticket-show-page .ticket-fee-pending { background: #fceaea; color: #982424; margin: .8rem 1rem 1rem; padding: .8rem; }
-    #ticket-show-page .btn-outline-navy { color: #101b3d; border-color: #101b3d; }
-    #ticket-show-page .btn-outline-navy:hover { color: #fff; background: #101b3d; border-color: #101b3d; }
-    #documentHistoryModal .modal-content { font-size: .8rem; }
-    @media (max-width: 575.98px) {
-        #ticket-show-page .ticket-summary-main { padding: 1rem; }
-        #ticket-show-page .ticket-progress { min-width: 34rem; }
-        #ticket-show-page .ticket-panel-heading { padding: .5rem 1rem; }
-    }
-</style>
 @endpush
 
 @section('content')
@@ -113,35 +57,114 @@
         </x-slot:actions>
     </x-page-header>
 
+    @php
+        $paymentStatus = $ticket->paymentStatus();
+        $paymentTone = match ($paymentStatus) {
+            \App\Enums\PaymentStatus::FullyPaid => 'paid',
+            \App\Enums\PaymentStatus::PartiallyPaid => 'part',
+            default => 'unpaid',
+        };
+        $initials = fn (?string $name): string => collect(preg_split('/\s+/', trim((string) $name)))->filter()->take(2)->map(fn ($part) => mb_strtoupper(mb_substr($part, 0, 1)))->implode('') ?: '?';
+        $daysOpen = (int) abs($ticket->created_at->diffInDays($ticket->completed_at ?? now()));
+        $stepNote = 'Step '.($progressIndex + 1).' of '.count($progressSteps).($ticket->assignedTo && ! $ticket->status->isClosed() ? ' · being handled by '.$ticket->assignedTo->name : '');
+    @endphp
+
     <section class="tm-card ticket-summary mb-3">
         <div class="ticket-summary-main">
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <span class="ticket-number">{{ $ticket->number }}</span>
-                <x-status-badge :status="$ticket->status->value" />
-                <x-payment-status-badge :status="$ticket->paymentStatus()" />
+            <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+                <div class="min-w-0">
+                    <h1 class="ticket-service-title">{{ $ticket->service->name }}</h1>
+                    <div class="ticket-service-details">
+                        @if ($ticket->service->description)
+                            {{ $ticket->service->description }}
+                        @else
+                            From enquiry <a href="{{ route('enquiries.show', $ticket->enquiry) }}" class="text-reset">{{ $ticket->enquiry->number }}</a> &middot; {{ $ticket->service->documents->count() }} {{ \Illuminate\Support\Str::plural('document', $ticket->service->documents->count()) }} required
+                        @endif
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center justify-content-end gap-2 ticket-summary-badges">
+                    <span class="ticket-number-chip">
+                        {{ $ticket->number }}
+                        <button type="button" class="ticket-copy-btn js-copy-number" data-copy="{{ $ticket->number }}" aria-label="Copy service number" title="Copy">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </span>
+                    <span class="ticket-pill emp-pill-{{ \Illuminate\Support\Str::slug($ticket->status->value) }}">{{ $ticket->status->value }}</span>
+                    <span class="ticket-pill ticket-pill-{{ $paymentTone }}">{{ $paymentStatus->value }}</span>
+                </div>
             </div>
-            <h1 class="ticket-service-title">{{ $ticket->service->name }}</h1>
-            <div class="ticket-meta">
-                <strong class="text-dark">{{ $ticket->customer->name }}</strong>
-                @if ($ticket->customer->phone)
-                    <span>{{ $ticket->customer->phone }}</span>
-                @endif
-                @if ($ticket->customer->email)
-                    <span>{{ $ticket->customer->email }}</span>
-                @endif
-                <span>Assigned to <strong class="text-dark">{{ $ticket->assignedTo?->name ?? 'Unassigned' }}</strong></span>
-                <span>Created {{ $ticket->created_at->format('j M Y') }} · {{ $ticket->created_at->diffForHumans() }}</span>
+            <div class="ticket-facts">
+                <div class="ticket-fact">
+                    <div class="ticket-fact-label">Client</div>
+                    <div class="d-flex align-items-start gap-2">
+                        <span class="ticket-avatar ticket-avatar-navy">{{ $initials($ticket->customer->name) }}</span>
+                        <div class="min-w-0">
+                            <a href="{{ route('customers.show', $ticket->customer) }}" class="ticket-fact-name text-decoration-none">{{ $ticket->customer->name }}</a>
+                            @if ($ticket->customer->phone)
+                                <div class="ticket-fact-line">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"></path></svg>
+                                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', (string) $ticket->customer->phone) }}" class="text-reset text-decoration-none">{{ $ticket->customer->phone }}</a>
+                                </div>
+                            @endif
+                            @if ($ticket->customer->email)
+                                <div class="ticket-fact-line">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><polyline points="3 7 12 13 21 7"></polyline></svg>
+                                    <a href="mailto:{{ $ticket->customer->email }}" class="text-reset text-decoration-none">{{ $ticket->customer->email }}</a>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ticket-fact">
+                    <div class="ticket-fact-label">Assigned to</div>
+                    <div class="d-flex align-items-start gap-2">
+                        <span class="ticket-avatar ticket-avatar-green">{{ $ticket->assignedTo ? $initials($ticket->assignedTo->name) : '—' }}</span>
+                        <div>
+                            <div class="ticket-fact-name">{{ $ticket->assignedTo?->name ?? 'Unassigned' }}</div>
+                            @if ($canReassign)
+                                <a href="#ticket-assignment-panel" class="ticket-fact-link">{{ $ticket->assignedTo ? 'Reassign' : 'Assign' }}</a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ticket-fact">
+                    <div class="ticket-fact-label">Created</div>
+                    <div class="d-flex align-items-start gap-2">
+                        <span class="ticket-avatar ticket-avatar-grey">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        </span>
+                        <div>
+                            <div class="ticket-fact-name">{{ $ticket->created_at->format('j M Y') }}</div>
+                            <div class="ticket-fact-line">{{ $ticket->status->isClosed() ? 'Took' : 'Open' }} {{ $daysOpen }} {{ \Illuminate\Support\Str::plural('day', $daysOpen) }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ticket-fact">
+                    <div class="ticket-fact-label">Fee</div>
+                    <div class="ticket-fee-total">&#8377;{{ number_format((float) $ticket->total) }}</div>
+                    <div class="ticket-fact-line">&#8377;{{ number_format((float) $ticket->price) }} + {{ rtrim(rtrim(number_format((float) $ticket->gst_percent, 2), '0'), '.') }}% GST &middot; <span class="ticket-fee-status ticket-fee-status-{{ $paymentTone }}">{{ $paymentStatus->value }}</span></div>
+                </div>
             </div>
         </div>
+
         <div class="ticket-progress-wrap">
+            <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+                <span class="ticket-progress-label">Progress</span>
+                <span class="ticket-progress-note">{{ $stepNote }}</span>
+            </div>
             <div class="ticket-progress" aria-label="Service progress">
                 @foreach ($progressSteps as $index => $step)
                     <div class="ticket-progress-step {{ $index < $progressIndex ? 'is-complete' : ($index === $progressIndex ? 'is-current' : '') }}">
                         <div class="ticket-step-track">
-                            <span class="ticket-step-dot">@if ($index < $progressIndex)✓@elseif ($index === $progressIndex)●@endif</span>
+                            <span class="ticket-step-dot">@if ($index < $progressIndex)✓@else{{ $index + 1 }}@endif</span>
                             @if (! $loop->last)<span class="ticket-step-line"></span>@endif
                         </div>
                         <span>{{ $step }}</span>
+                        @if ($index === $progressIndex)<span class="ticket-step-now">Now</span>@endif
                     </div>
                 @endforeach
             </div>
@@ -150,7 +173,7 @@
 
     <div class="row g-3">
         <div class="col-12 col-xl-8">
-            <section class="tm-card p-0 mb-3 ticket-panel">
+            <section class="tm-card p-0 mb-3 ticket-panel" id="ticket-documents-panel">
                 <div class="ticket-panel-heading">
                     <h2>Documents ({{ $ticket->service->documents->count() }})</h2>
                     <span class="ticket-panel-meta">{{ $documentRows->filter(fn ($row) => $row['current']?->status === 'Verified')->count() }} of {{ $documentRows->count() }} verified</span>
@@ -170,10 +193,10 @@
                                         {{ $current->version > 1 ? 'Re-uploaded' : 'Uploaded' }} by {{ $current->uploaderLabel() }} on service &middot; {{ $current->created_at->format('j M, g:i A') }}
                                     </div>
                                     @if ($current->text_value !== null)
-                                        <div class="ticket-document-note" style="color: #000;">Value: {{ $current->text_value }}</div>
+                                        <div class="ticket-document-note u-f0afc2">Value: {{ $current->text_value }}</div>
                                     @endif
                                     @if ($current->status === 'Rejected' && $current->rejection_reason)
-                                        <div class="ticket-document-note" style="color: #7f1616;">Reason: {{ $current->rejection_reason }}</div>
+                                        <div class="ticket-document-note u-a8cc8a">Reason: {{ $current->rejection_reason }}</div>
                                     @endif
                                 @else
                                     <div class="ticket-document-note">{{ $serviceDocument->is_mandatory ? 'Mandatory' : 'Optional' }} &middot; Not uploaded yet</div>
@@ -181,7 +204,7 @@
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <span class="d-flex align-items-center gap-1" style="font-size: .72rem; color: #000;">
+                            <span class="d-flex align-items-center gap-1 u-7aa556">
                                 <span class="rounded-circle d-inline-block" style="width:7px;height:7px;background:{{ $current ? $documentDotColor($current->status) : '#9aa1b0' }};"></span>
                                 {{ $current?->status ?? 'Not uploaded' }}
                             </span>
@@ -190,20 +213,20 @@
                                 <form method="POST" action="{{ route('tickets.documents.verify', [$ticket, $current]) }}">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="btn btn-sm btn-success" style="font-size: .72rem; padding: .25rem .6rem;">Verify</button>
+                                    <button type="submit" class="btn btn-sm btn-success u-3898d2">Verify</button>
                                 </form>
-                                <button type="button" class="btn btn-sm btn-outline-danger js-reject-document" style="font-size: .72rem; padding: .25rem .6rem;" data-action="{{ route('tickets.documents.reject', [$ticket, $current]) }}">Reject</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger js-reject-document u-3898d2" data-action="{{ route('tickets.documents.reject', [$ticket, $current]) }}">Reject</button>
                             @endif
 
                             @if ($current && $current->file_path)
-                                <a href="{{ asset('storage/'.$current->file_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary" style="font-size: .72rem; padding: .25rem .6rem;">View</a>
+                                <a href="{{ asset('storage/'.$current->file_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary u-3898d2">View</a>
                             @endif
 
                             @if ($row['versions']->count() > 1)
                                 <button
                                     type="button"
-                                    class="btn btn-sm btn-outline-secondary js-document-history"
-                                    style="font-size: .72rem; padding: .25rem .6rem;"
+                                    class="btn btn-sm btn-outline-secondary js-document-history u-3898d2"
+                                   
                                     data-name="{{ $serviceDocument->name }}"
                                     data-mandatory="{{ $serviceDocument->is_mandatory ? 'Mandatory' : 'Optional' }}"
                                     data-service-document-id="{{ $serviceDocument->id }}"
@@ -231,8 +254,8 @@
                             @if ($canUploadDocument && (! $current || $current->status === 'Rejected'))
                                 <button
                                     type="button"
-                                    class="btn btn-sm btn-tm-primary js-upload-document"
-                                    style="font-size: .72rem; padding: .25rem .6rem;"
+                                    class="btn btn-sm btn-tm-primary js-upload-document u-3898d2"
+                                   
                                     data-bs-toggle="modal"
                                     data-bs-target="#uploadDocumentModal"
                                     data-service-document-id="{{ $serviceDocument->id }}"
@@ -250,10 +273,10 @@
             </section>
 
             @if ($canUpdateStatus)
-                <section class="tm-card p-0 mb-3 ticket-panel">
+                <section class="tm-card p-0 mb-3 ticket-panel" id="ticket-status-panel">
                     <div class="ticket-panel-heading ticket-panel-heading-green"><h2>Update status</h2></div>
                     @if ($ticket->status->isClosed())
-                        <div class="alert alert-warning mb-0 mx-3 mt-3" style="font-size: .8rem;">
+                        <div class="alert alert-warning mb-0 mx-3 mt-3 u-5a305f">
                             After task completion, you can't change the status.
                         </div>
                     @endif
@@ -306,7 +329,7 @@
                 <div class="ticket-panel-heading">
                     <h2>FeeS</h2>
                     @if ($ticket->paymentStatus() !== \App\Enums\PaymentStatus::FullyPaid)
-                        <a href="{{ route('payments.index', ['enquiry' => $ticket->enquiry_id]) }}" class="badge rounded-pill text-bg-primary fw-normal px-2 py-1 text-decoration-none" style="font-size: .68rem;">Make Payment</a>
+                        <a href="{{ route('payments.index', ['enquiry' => $ticket->enquiry_id]) }}" class="badge rounded-pill text-bg-primary fw-normal px-2 py-1 text-decoration-none u-dcc109">Make Payment</a>
                     @endif
                 </div>
                 <div class="ticket-info-row"><span class="tm-muted">Price</span><strong>&#8377;{{ number_format((float) $ticket->price, 2) }}</strong></div>
@@ -323,7 +346,7 @@
                 </div>
             </section>
 
-            <section class="tm-card p-0 mb-3 ticket-panel ticket-compact-content">
+            <section class="tm-card p-0 mb-3 ticket-panel ticket-compact-content" id="ticket-assignment-panel">
                 <div class="ticket-panel-heading"><h2>Assignment</h2></div>
                 <div class="p-3">
                     <div class="small mb-2">Currently assigned to <strong>{{ $ticket->assignedTo?->name ?? 'Unassigned' }}</strong></div>
@@ -340,7 +363,7 @@
                             <button type="submit" class="btn btn-outline-secondary btn-sm w-100">Reassign</button>
                         </form>
                     @else
-                        <div class="small tm-muted">Only Admin/Super Admin can reassign a service.</div>
+                        <div class="small tm-muted">Only an Admin can reassign a service.</div>
                     @endif
                 </div>
             </section>
@@ -359,18 +382,18 @@
 
 <div class="modal fade" id="uploadDocumentModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border: 0; border-radius: .75rem; overflow: hidden;">
+        <div class="modal-content u-d581ba">
             <form method="POST" action="{{ route('tickets.documents.store', $ticket) }}" enctype="multipart/form-data" id="uploadDocumentForm">
                 @csrf
                 <input type="hidden" name="service_document_id" id="uploadDocServiceDocumentId">
-                <div class="p-2 px-3" style="background: #101b3d;">
+                <div class="p-2 px-3 u-8b012c">
                     <h2 class="h6 fw-bold mb-0 text-white" id="uploadDocTitle">Upload document</h2>
                 </div>
                 <div class="modal-body p-4">
                     <div id="uploadDocFileField">
                         <label class="tm-field-label d-block">File <span class="text-danger">*</span></label>
                         <input type="file" name="file" class="form-control tm-field" id="uploadDocFileInput" required>
-                        <div class="form-text tm-muted" id="uploadDocHint" style="font-size: .7rem; font-style: italic;"></div>
+                        <div class="form-text tm-muted u-11d1e8" id="uploadDocHint"></div>
                     </div>
                     <div id="uploadDocTextField" class="d-none">
                         <label class="tm-field-label d-block">Details <span class="text-danger">*</span></label>
@@ -388,11 +411,11 @@
 
 <div class="modal fade" id="rejectDocumentModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border: 0; border-radius: .75rem; overflow: hidden;">
+        <div class="modal-content u-d581ba">
             <form method="POST" id="rejectDocumentForm">
                 @csrf
                 @method('PATCH')
-                <div class="p-3" style="background: #7f1616;">
+                <div class="p-3 u-d75e14">
                     <h2 class="h6 fw-bold mb-0 text-white">Reject document</h2>
                 </div>
                 <div class="modal-body p-4">
@@ -409,35 +432,35 @@
 </div>
 
 <div class="modal fade" id="documentHistoryModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 650px;">
-        <div class="modal-content" style="border: 0; border-radius: .75rem; overflow: hidden;">
-            <div class="d-flex align-items-start gap-3 p-3" style="background: #101b3d;">
-                <span class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px; background: rgba(255,255,255,.12); color: #fff;">
+    <div class="modal-dialog modal-dialog-centered u-131429">
+        <div class="modal-content u-d581ba">
+            <div class="d-flex align-items-start gap-3 p-3 u-8b012c">
+                <span class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 u-dd39d6">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                 </span>
                 <div class="flex-grow-1">
                     <h2 class="h6 fw-bold mb-0 text-white"><span id="documentHistoryTitle"></span> &middot; document history</h2>
-                    <div class="small" style="color: rgba(255,255,255,.7);">{{ $ticket->number }} &middot; {{ $ticket->service->name }} &middot; <span id="documentHistoryMandatory"></span></div>
+                    <div class="small u-5bb556">{{ $ticket->number }} &middot; {{ $ticket->service->name }} &middot; <span id="documentHistoryMandatory"></span></div>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="d-flex" style="border-bottom: 1px solid #edf0f4;">
-                <div class="flex-grow-1 text-center py-3" style="border-right: 1px solid #edf0f4;">
-                    <div class="tm-muted" style="font-size: .72rem;">Versions</div>
-                    <div class="fw-bold mb-0" style="font-size: .8rem;" id="documentHistoryVersionsCount"></div>
+            <div class="d-flex u-1616f0">
+                <div class="flex-grow-1 text-center py-3 u-350541">
+                    <div class="tm-muted u-31578e">Versions</div>
+                    <div class="fw-bold mb-0 u-5a305f" id="documentHistoryVersionsCount"></div>
                 </div>
-                <div class="flex-grow-1 text-center py-3" style="border-right: 1px solid #edf0f4;">
-                    <div class="tm-muted" style="font-size: .72rem;">Rejections</div>
-                    <div class="fw-bold mb-0" style="color: #7f1616; font-size: .8rem;" id="documentHistoryRejectionsCount"></div>
+                <div class="flex-grow-1 text-center py-3 u-350541">
+                    <div class="tm-muted u-31578e">Rejections</div>
+                    <div class="fw-bold mb-0 u-ea6dd7" id="documentHistoryRejectionsCount"></div>
                 </div>
                 <div class="flex-grow-1 text-center py-3">
-                    <div class="tm-muted" style="font-size: .72rem;">Status now</div>
-                    <div class="fw-bold mb-0" style="font-size: .8rem;" id="documentHistoryStatusNow"></div>
+                    <div class="tm-muted u-31578e">Status now</div>
+                    <div class="fw-bold mb-0 u-5a305f" id="documentHistoryStatusNow"></div>
                 </div>
             </div>
 
-            <div class="modal-body p-4" id="documentHistoryBody" style="max-height: 55vh; overflow-y: auto;"></div>
+            <div class="modal-body p-4 u-8fa6ab" id="documentHistoryBody"></div>
 
             <div class="modal-footer d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-primary js-upload-new-version">&uarr; Upload new version</button>
@@ -491,6 +514,15 @@
             });
         });
 
+        var copyNumber = document.querySelector('.js-copy-number');
+        if (copyNumber) {
+            copyNumber.addEventListener('click', function () {
+                if (navigator.clipboard) { navigator.clipboard.writeText(copyNumber.getAttribute('data-copy')); }
+                copyNumber.classList.add('is-copied');
+                setTimeout(function () { copyNumber.classList.remove('is-copied'); }, 1200);
+            });
+        }
+
         var rejectForm = document.getElementById('rejectDocumentForm');
 
         function openRejectModal(action) {
@@ -523,20 +555,20 @@
 
         function versionCard(v, isCurrent) {
             var badge = isCurrent
-                ? '<span class="badge rounded-pill text-bg-primary fw-normal ms-2" style="font-size: .65rem;">CURRENT</span>'
+                ? '<span class="badge rounded-pill text-bg-primary fw-normal ms-2 u-87458d">CURRENT</span>'
                 : '';
 
             var isTextVersion = v.text !== null && v.text !== undefined;
-            var actions = isTextVersion ? '' : '<a href="' + v.url + '" target="_blank" class="btn btn-sm btn-outline-secondary" style="font-size: .72rem; padding: .25rem .6rem;">View</a>'
-                + '<a href="' + v.url + '" download class="btn btn-sm btn-outline-secondary" style="font-size: .72rem; padding: .25rem .6rem;">Download</a>';
+            var actions = isTextVersion ? '' : '<a href="' + v.url + '" target="_blank" class="btn btn-sm btn-outline-secondary u-3898d2">View</a>'
+                + '<a href="' + v.url + '" download class="btn btn-sm btn-outline-secondary u-3898d2">Download</a>';
 
             var verifyActions = '';
             if (isCurrent && v.status === 'Awaiting check' && canVerifyDocument) {
-                verifyActions = '<button type="button" class="btn btn-sm btn-outline-danger js-inline-reject" data-action="' + v.reject_url + '" style="font-size: .72rem; padding: .25rem .6rem;">Reject</button>'
+                verifyActions = '<button type="button" class="btn btn-sm btn-outline-danger js-inline-reject u-3898d2" data-action="' + v.reject_url + '">Reject</button>'
                     + '<form method="POST" action="' + v.verify_url + '" class="d-inline">'
                     + '<input type="hidden" name="_token" value="' + csrfToken + '">'
                     + '<input type="hidden" name="_method" value="PATCH">'
-                    + '<button type="submit" class="btn btn-sm btn-success" style="font-size: .72rem; padding: .25rem .6rem;">&check; Verify</button>'
+                    + '<button type="submit" class="btn btn-sm btn-success u-3898d2">&check; Verify</button>'
                     + '</form>';
             }
 
@@ -551,7 +583,7 @@
                 + '<span class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width:34px;height:34px;background:' + v.icon.bg + ';color:' + v.icon.text + ';font-size:.6rem;font-weight:700;">' + v.icon.label + '</span>'
                 + '<div>'
                 + '<div class="small">' + (isTextVersion ? escapeHtml(v.text) : v.filename + ' &middot; ' + v.size) + '</div>'
-                + '<div class="tm-muted" style="font-size:.75rem;">Uploaded by <strong>' + v.uploaded_by + '</strong> (Staff) via service &middot; ' + v.uploaded_at + '</div>'
+                + '<div class="tm-muted u-fde308">Uploaded by <strong>' + v.uploaded_by + '</strong> (Staff) via service &middot; ' + v.uploaded_at + '</div>'
                 + '</div>'
                 + '</div>'
                 + '<div class="d-flex align-items-center gap-2">' + actions + verifyActions + '</div>'
@@ -561,11 +593,11 @@
         function rejectionNotice(v) {
             return '<div class="mb-2">'
                 + '<div class="d-flex justify-content-between align-items-center">'
-                + '<strong style="color:#7f1616;">Version ' + v.version + ' rejected</strong>'
-                + '<span class="tm-muted" style="font-size:.75rem;">' + (v.verified_at || '') + '</span>'
+                + '<strong class="u-9838f4">Version ' + v.version + ' rejected</strong>'
+                + '<span class="tm-muted u-fde308">' + (v.verified_at || '') + '</span>'
                 + '</div>'
                 + '<div class="small tm-muted mb-1">by <strong>' + (v.verified_by || 'Staff') + '</strong> (Staff)</div>'
-                + '<div class="rounded-3 p-2" style="background:#fceaea;font-size:.8rem;"><strong>Reason:</strong> ' + v.rejection_reason + '</div>'
+                + '<div class="rounded-3 p-2 u-21376f"><strong>Reason:</strong> ' + v.rejection_reason + '</div>'
                 + '</div>';
         }
 

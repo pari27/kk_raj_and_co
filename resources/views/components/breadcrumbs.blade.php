@@ -1,9 +1,9 @@
 @props(['items' => []])
 <nav aria-label="breadcrumb" class="mb-3" style="background: #fff; border: 1px solid var(--tm-surface-border); border-top: 0; border-left: 0; border-right: 0; border-radius: 0; padding: .4rem 1.5rem; margin-left: -1.5rem; margin-right: -1.5rem; width: calc(100% + 3rem);">
-    <ol class="d-flex flex-wrap align-items-center gap-2 mb-0" style="list-style: none; padding: 0; font-size: .72rem;">
+    <ol class="d-flex flex-wrap align-items-center gap-2 mb-0 u-0bc3a5">
         @foreach ($items as $i => $item)
             @if ($i > 0)
-                <li class="d-flex" style="color: #c3c8d1;" aria-hidden="true">
+                <li class="d-flex u-12b737" aria-hidden="true">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </li>
             @endif

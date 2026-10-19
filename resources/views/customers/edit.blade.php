@@ -2,159 +2,12 @@
 
 @section('title', 'Edit Client — ' . config('app.name', 'Task Management'))
 
-@push('styles')
-<style>
-    #client-form-page .client-panel {
-        overflow: hidden;
-        border-radius: .85rem;
-    }
-
-    #client-form-page .client-panel-title {
-        padding: .85rem 1.15rem;
-        color: #fff;
-        font-size: 1.05rem;
-        font-weight: 700;
-    }
-
-    #client-form-page .client-panel-title-navy {
-        background: #101b3d;
-    }
-
-    #client-form-page .client-panel-title-blue {
-        background: #24569b;
-    }
-
-    #client-form-page .client-panel-title-green {
-        background: #1f6b30;
-    }
-
-    #client-form-page .client-panel-body {
-        padding: 1.25rem 1.4rem;
-    }
-
-    #client-form-page .client-form-label {
-        display: block;
-        margin-bottom: .45rem;
-        font-size: .8rem;
-        font-weight: 700;
-    }
-
-    #client-form-page .client-form-control {
-        border-radius: .375rem;
-        font-size: .8rem;
-    }
-
-    #client-form-page .client-phone-prefix {
-        display: flex;
-        align-items: center;
-        padding: .375rem .75rem;
-        border: 1px solid #d9dfe8;
-        border-right: 0;
-        border-radius: .375rem 0 0 .375rem;
-        background: #fff;
-        color: #6b7280;
-        font-size: .8rem;
-        font-weight: 600;
-        line-height: 1.5;
-    }
-
-    #client-form-page .client-phone-input {
-        border-radius: 0 .375rem .375rem 0;
-    }
-
-    #client-form-page .client-active-row {
-        padding: .9rem 1rem;
-        border: 1px solid #e2e7ed;
-        border-radius: .65rem;
-    }
-
-    #client-form-page .client-active-row .form-check-input {
-        width: 3rem;
-        height: 1.6rem;
-        margin-top: 0;
-        cursor: pointer;
-    }
-
-    #client-form-page .client-active-row .form-check-input:checked {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
-    }
-
-    #client-form-page .client-step {
-        display: flex;
-        align-items: flex-start;
-        gap: .8rem;
-    }
-
-    #client-form-page .client-step + .client-step {
-        margin-top: 1rem;
-    }
-
-    #client-form-page .client-step-number {
-        width: 2.1rem;
-        height: 2.1rem;
-        flex: 0 0 2.1rem;
-        display: grid;
-        place-items: center;
-        border-radius: 50%;
-        background: #e7effc;
-        color: #24569b;
-        font-weight: 700;
-    }
-
-    #client-form-page .client-rule {
-        display: flex;
-        align-items: flex-start;
-        gap: .65rem;
-        color: #4b5563;
-    }
-
-    #client-form-page .client-rule + .client-rule {
-        margin-top: .8rem;
-    }
-
-    #client-form-page .client-rule-mark {
-        color: #29995a;
-        font-weight: 700;
-    }
-
-    #client-form-page .client-step,
-    #client-form-page .client-step *,
-    #client-form-page .client-rule,
-    #client-form-page .client-rule * {
-        font-size: .8rem;
-    }
-    #client-form-page .client-form-footer {
-        display: flex;
-        justify-content: flex-end;
-        flex-wrap: wrap;
-        gap: .6rem;
-        padding: 1rem 1.4rem;
-        border-top: 1px solid #edf0f3;
-        background: #f8f9fb;
-    }
-
-    @media (max-width: 575.98px) {
-        #client-form-page .client-panel-body {
-            padding: 1rem;
-        }
-
-        #client-form-page .client-form-footer {
-            padding: .85rem 1rem;
-        }
-
-        #client-form-page .client-form-footer .btn {
-            flex: 1 1 auto;
-        }
-    }
-</style>
-@endpush
 
 @section('content')
 <div id="client-form-page">
 <x-page-header title="Edit Client" subtitle="Update client details and contact information" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Clients', 'url' => route('customers.index')], ['label' => 'Edit client']]">
     <x-slot:actions>
-        <a href="{{ route('customers.index') }}" class="btn px-4 py-2 fw-semibold" style="background: #101b3d; border-color: #101b3d; color: #fff;">&larr; Clients</a>
+        <a href="{{ route('customers.index') }}" class="btn px-4 py-2 fw-semibold u-b1aa27">&larr; Clients</a>
     </x-slot:actions>
 </x-page-header>
 
@@ -208,12 +61,12 @@
 
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" value="1" id="clientNotifyCheckbox" name="email_notifications_enabled" {{ old('email_notifications_enabled', $customer->email_notifications_enabled) ? 'checked' : '' }} {{ old('email', $customer->email) ? '' : 'disabled' }}>
-                            <label class="form-check-label fw-semibold" for="clientNotifyCheckbox" style="font-size: .85rem;">Send email notifications to this client</label>
-                            <div style="font-size: .72rem; font-style: italic;" id="clientNotifyCaption"></div>
+                            <label class="form-check-label fw-semibold u-8ae449" for="clientNotifyCheckbox">Send email notifications to this client</label>
+                            <div class="u-de920b" id="clientNotifyCaption"></div>
                         </div>
 
                         <div class="form-check form-switch d-flex align-items-center gap-2">
-                            <input class="form-check-input flex-shrink-0" type="checkbox" role="switch" id="custActive" name="is_active" value="1" style="width: 2.4rem; height: 1.3rem;" {{ old('is_active', $customer->is_active) ? 'checked' : '' }}>
+                            <input class="form-check-input flex-shrink-0 u-88b2c2" type="checkbox" role="switch" id="custActive" name="is_active" value="1" {{ old('is_active', $customer->is_active) ? 'checked' : '' }}>
                             <label class="mb-0 small" for="custActive">Active</label>
                         </div>
 

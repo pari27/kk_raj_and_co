@@ -11,6 +11,7 @@ use App\Models\Payment;
 use App\Models\Ticket;
 use App\Models\TicketDocument;
 use App\Models\User;
+use App\Services\EventMailer;
 use App\Services\NotificationService as Notifier;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Support\Facades\Auth;
@@ -54,11 +55,29 @@ class NotificationServiceProvider extends ServiceProvider
         };
 
         if ($step === 4) {
+            EventMailer::send('service_completed', $client, [
+                'customer_name' => $client->name,
+                'service_number' => $ticket->number,
+                'service_name' => $service,
+            ], $url, 'View your service');
+
             $balance = app(ClientPortalService::class)->feeShare($ticket->load(['enquiry.tickets', 'enquiry.payments']))['balance'];
 
             if ($balance > 0) {
                 ClientPortalService::notify($client, 'payment', 'Payment due: ₹'.number_format($balance), "For {$service}.", route('customer.payments.index'));
             }
+        }
+    }
+
+    /**
+     * Email every active admin (each addressed by name) about something that happened.
+     *
+     * @param  array<string, string>  $values
+     */
+    private function mailAdmins(string $templateKey, array $values, ?string $url = null, ?string $linkLabel = null): void
+    {
+        foreach (Notifier::admins() as $admin) {
+            EventMailer::send($templateKey, $admin, $values + ['admin_name' => $admin->name], $url, $linkLabel);
         }
     }
 
@@ -88,6 +107,14 @@ class NotificationServiceProvider extends ServiceProvider
                 "{$actor()} uploaded **{$name} (v{$document->version})** for {$ticket->service?->name}. It's waiting for your check.",
                 route('tickets.show', $ticket), $ticket->number, 'Review document',
             );
+
+            EventMailer::send('employee_document_uploaded', $ticket->assignedTo, [
+                'employee_name' => $ticket->assignedTo?->name ?? '',
+                'document_name' => $name,
+                'service_number' => $ticket->number,
+                'service_name' => $ticket->service?->name ?? '',
+                'customer_name' => $ticket->customer?->name ?? '',
+            ], route('tickets.show', $ticket), 'Review document');
         });
 
         TicketDocument::updated(function (TicketDocument $document) use ($actor) {
@@ -127,6 +154,13 @@ class NotificationServiceProvider extends ServiceProvider
 
             if ($ticket->customer) {
                 ClientPortalService::notify($ticket->customer, 'documents', "{$name} needs a re-upload", $document->rejection_reason, route('customer.tickets.show', $ticket));
+
+                EventMailer::send('client_document_rejected', $ticket->customer, [
+                    'customer_name' => $ticket->customer->name,
+                    'document_name' => $name,
+                    'service_name' => $ticket->service?->name ?? '',
+                    'reason' => (string) $document->rejection_reason,
+                ], route('customer.tickets.show', $ticket), 'Upload a new copy', essential: true);
             }
         });
 
@@ -150,6 +184,12 @@ class NotificationServiceProvider extends ServiceProvider
                 $url, $ticket->number, 'Open service',
             );
 
+            EventMailer::send('service_reassigned', $assignee, [
+                'employee_name' => $assignee->name,
+                'service_number' => $ticket->number,
+                'service_name' => (string) $service,
+            ], $url, 'Open service');
+
             Notifier::notify(
                 array_filter(Notifier::admins(), fn (User $admin) => $admin->id !== $assignee->id),
                 'tickets',
@@ -157,6 +197,17 @@ class NotificationServiceProvider extends ServiceProvider
                 "{$actor()} assigned **{$service}** for {$client} to {$assignee->name}.",
                 $url, $ticket->number, 'Open service',
             );
+
+            foreach (array_filter(Notifier::admins(), fn (User $admin) => $admin->id !== $assignee->id) as $admin) {
+                EventMailer::send('admin_service_assigned', $admin, [
+                    'admin_name' => $admin->name,
+                    'actor_name' => $actor(),
+                    'service_number' => $ticket->number,
+                    'service_name' => (string) $service,
+                    'customer_name' => (string) $client,
+                    'employee_name' => $assignee->name,
+                ], $url, 'Open service');
+            }
         };
 
         Ticket::created(fn (Ticket $ticket) => $notifyAssignment($ticket));
@@ -207,7 +258,20 @@ class NotificationServiceProvider extends ServiceProvider
                     'Thank you. For '.app(ClientPortalService::class)->joinNames($services).'.',
                     route('customer.payments.index'),
                 );
+
+                EventMailer::send('payment_received', $enquiry->customer, [
+                    'customer_name' => $enquiry->customer->name,
+                    'amount' => $amount,
+                    'enquiry_number' => $enquiry->number,
+                ], route('customer.payments.index'), 'View payments');
             }
+
+            $this->mailAdmins('admin_payment_received', [
+                'amount' => $amount,
+                'mode' => (string) $payment->mode,
+                'customer_name' => (string) $enquiry?->customer?->name,
+                'enquiry_number' => (string) $enquiry?->number,
+            ], $enquiry ? route('enquiries.show', $enquiry) : null, 'View enquiry');
 
             Notifier::notify(
                 Notifier::admins(),
@@ -233,6 +297,14 @@ class NotificationServiceProvider extends ServiceProvider
                 "{$actor()} deleted a **{$amount}** {$payment->mode} payment from {$enquiry?->customer?->name}.",
                 $enquiry ? route('enquiries.show', $enquiry) : null, $enquiry?->number,
             );
+
+            $this->mailAdmins('admin_payment_deleted', [
+                'actor_name' => $actor(),
+                'amount' => $amount,
+                'mode' => (string) $payment->mode,
+                'customer_name' => (string) $enquiry?->customer?->name,
+                'enquiry_number' => (string) $enquiry?->number,
+            ], $enquiry ? route('enquiries.show', $enquiry) : null, 'View enquiry');
         });
 
         Customer::created(function (Customer $customer) use ($actor) {
@@ -252,6 +324,11 @@ class NotificationServiceProvider extends ServiceProvider
                 "**{$customer->name}** ({$contact}) was added by {$actor()}".($designation ? ", {$designation}" : '')." · {$creator->email}.",
                 route('customers.show', $customer), null, 'View client',
             );
+
+            $this->mailAdmins('admin_client_added', [
+                'actor_name' => $actor(),
+                'customer_name' => $customer->name,
+            ], route('customers.show', $customer), 'View client');
         });
 
         Enquiry::created(function (Enquiry $enquiry) use ($actor) {
@@ -264,6 +341,13 @@ class NotificationServiceProvider extends ServiceProvider
                 "{$actor()} created an enquiry for {$enquiry->customer?->name}, total **{$total}**.",
                 route('enquiries.show', $enquiry), $enquiry->number,
             );
+
+            $this->mailAdmins('admin_new_enquiry', [
+                'actor_name' => $actor(),
+                'customer_name' => (string) $enquiry->customer?->name,
+                'enquiry_number' => $enquiry->number,
+                'total' => $total,
+            ], route('enquiries.show', $enquiry), 'View enquiry');
         });
 
         Event::listen(function (Failed $event) {

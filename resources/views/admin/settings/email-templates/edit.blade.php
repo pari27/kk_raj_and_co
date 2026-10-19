@@ -36,13 +36,13 @@
         <div class="tm-card p-0 overflow-hidden">
             <div class="tm-section-title">Placeholders</div>
             <div class="p-3">
-                <p class="tm-muted mb-3" style="font-size: .75rem; font-style: italic;">
+                <p class="tm-muted mb-3 u-cf7e00">
                     Click a placeholder to insert it where the cursor is. It is replaced with the real value when the email is sent.
                 </p>
                 @foreach ($template->variables() as $name => $description)
                     <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary js-insert-placeholder" data-placeholder="@{{{{ $name }}}}" style="font-size: .75rem;"><code>@{{{{ $name }}}}</code></button>
-                        <span class="tm-muted text-end" style="font-size: .75rem;">{{ $description }}{{ in_array($name, $template->requiredVariables(), true) ? ' (required)' : '' }}</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary js-insert-placeholder u-cc37c5" data-placeholder="@{{{{ $name }}}}"><code>@{{{{ $name }}}}</code></button>
+                        <span class="tm-muted text-end u-cc37c5">{{ $description }}{{ in_array($name, $template->requiredVariables(), true) ? ' (required)' : '' }}</span>
                     </div>
                 @endforeach
             </div>

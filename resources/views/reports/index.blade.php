@@ -2,36 +2,6 @@
 
 @section('title', 'Reports — ' . config('app.name', 'Task Management'))
 
-@push('styles')
-<style>
-    .report-filter-card, .report-result-card { background: #fff; border: 1px solid #e5e7ec; border-radius: .75rem; }
-    .report-field-label { font-size: .8rem; font-weight: 700; color: #101b3d; margin-bottom: .35rem; display: block; }
-    .report-picker { min-width: 230px; text-align: left; font-weight: 700; border: 1px solid #2f5fbe; color: #101b3d; background: #fff; border-radius: .5rem; padding: .5rem .8rem; font-size: .85rem; }
-    .report-menu { min-width: 340px; padding: .5rem; border-radius: .75rem; border: 1px solid #e5e7ec; box-shadow: 0 12px 28px #101b3d24; }
-    .report-menu-group { font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: #8a93a6; padding: .55rem .6rem .25rem; }
-    .report-menu-item { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .5rem .6rem; border-radius: .5rem; text-decoration: none; color: #101b3d; }
-    .report-menu-item:hover, .report-menu-item.active { background: #eef3ff; }
-    .report-menu-item .name { font-weight: 700; font-size: .85rem; }
-    .report-menu-item .desc { font-size: .72rem; color: #6b7280; }
-    .report-table { font-size: .8rem; margin: 0; }
-    .report-table thead th { background: #101b3d; color: #fff; text-transform: uppercase; font-size: .7rem; letter-spacing: .05em; padding: .85rem 1rem; white-space: nowrap; border: 0; }
-    .report-table tbody td { padding: .8rem 1rem; vertical-align: middle; }
-    .report-table tbody tr:nth-child(even) { background: #fafbfc; }
-    .report-table tfoot td { background: #f1f3f7; font-weight: 700; padding: .85rem 1rem; }
-    .report-link { font-weight: 700; color: #1d3f8f; text-decoration: none; }
-    .report-chip { display: inline-block; border-radius: 1rem; padding: .25rem .65rem; font-size: .7rem; font-weight: 700; }
-    .report-chip.danger { background: #b42318; color: #fff; }
-    .report-chip.secondary { background: #eef0f3; color: #475366; }
-    .report-chip.info { background: #e8effd; color: #1d3f8f; }
-    .report-chip.success { background: #e3f4e8; color: #1f6b30; }
-    .report-client-strip { background: #fafbfc; padding: .85rem 1.25rem; font-size: .85rem; display: flex; flex-wrap: wrap; gap: 1.5rem; border-bottom: 1px solid #eef0f4; }
-    .report-foot { font-size: .78rem; color: #6b7280; padding: .9rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-    @media print {
-        .tm-sidebar, .tm-topbar, .report-filter-card, .report-actions, .report-foot .pagination { display: none !important; }
-        main { padding: 0 !important; }
-    }
-</style>
-@endpush
 
 @php
     $money = fn ($amount) => '₹'.number_format((float) $amount);
@@ -41,7 +11,7 @@
 @endphp
 
 @section('content')
-<x-page-header title="Reports" subtitle="See how the firm is doing and export any report" />
+<x-page-header title="Reports" subtitle="See how the firm is doing and export any report" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Reports']]" />
 
 <div class="report-filter-card p-4 mb-3">
     <form method="GET" action="{{ route('reports.index') }}" class="row g-3 align-items-end">
@@ -74,7 +44,7 @@
         </div>
 
         @if ($has('client_id'))
-            <div class="col" style="min-width: 240px;">
+            <div class="col u-351b3c">
                 <label class="report-field-label" for="rClient">Client</label>
                 <select id="rClient" name="client_id" class="form-select tm-field">
                     <option value="">Choose a client…</option>
@@ -86,7 +56,7 @@
         @endif
 
         @if ($has('fy'))
-            <div class="col" style="min-width: 240px;">
+            <div class="col u-351b3c">
                 <label class="report-field-label" for="rFy">Financial year</label>
                 <select id="rFy" name="fy" class="form-select tm-field">
                     @foreach ($options['years'] as $year => $label)
@@ -199,7 +169,7 @@
         @endif
 
         <div class="col-auto">
-            <button type="submit" class="btn btn-tm-primary" style="background: #2f9e58; border-color: #2f9e58;">View report</button>
+            <button type="submit" class="btn btn-tm-primary u-603dd1">View report</button>
         </div>
     </form>
 </div>
@@ -207,8 +177,8 @@
 <div class="report-result-card overflow-hidden mb-4">
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 px-4 py-3">
         <div>
-            <h2 class="fw-bold mb-1" style="font-size: 1.05rem;">{{ $result['title'] }}</h2>
-            <div class="tm-muted" style="font-size: .8rem;">{{ $result['subtitle'] }}</div>
+            <h2 class="fw-bold mb-1 u-e3c98a">{{ $result['title'] }}</h2>
+            <div class="tm-muted u-5a305f">{{ $result['subtitle'] }}</div>
         </div>
         <div class="d-flex gap-2 report-actions">
             <a href="{{ route('reports.export', request()->query()) }}" class="btn btn-outline-success btn-sm px-3">
@@ -228,9 +198,9 @@
     @endif
 
     @if ($result['note'])
-        <div class="text-center tm-muted py-5" style="font-size: .8rem;">{{ $result['note'] }}</div>
+        <div class="text-center tm-muted py-5 u-5a305f">{{ $result['note'] }}</div>
     @elseif ($result['rows']->isEmpty())
-        <div class="text-center tm-muted py-5" style="font-size: .8rem;">Nothing to show for these filters.</div>
+        <div class="text-center tm-muted py-5 u-5a305f">Nothing to show for these filters.</div>
     @else
         <div class="table-responsive">
             <table class="table report-table align-middle">
@@ -253,11 +223,11 @@
                                             @if (! empty($cell['url']))<a href="{{ $cell['url'] }}" class="report-link">{{ $cell['text'] }}</a>@else{{ $cell['text'] ?? '—' }}@endif
                                             @break
                                         @case ('money'){{ $money($cell) }}@break
-                                        @case ('money_green')<strong style="color: #1f6b30;">{{ $money($cell) }}</strong>@break
+                                        @case ('money_green')<strong class="u-f63532">{{ $money($cell) }}</strong>@break
                                         @case ('money_red')
-                                            @if ((float) $cell > 0)<strong style="color: #b42318;">{{ $money($cell) }}</strong>@else{{ $money($cell) }}@endif
+                                            @if ((float) $cell > 0)<strong class="u-866cfd">{{ $money($cell) }}</strong>@else{{ $money($cell) }}@endif
                                             @break
-                                        @case ('green')<strong style="color: #1f6b30;">{{ $cell }}</strong>@break
+                                        @case ('green')<strong class="u-f63532">{{ $cell }}</strong>@break
                                         @case ('days')
                                             @if (($cell['value'] ?? null) === null)—@else
                                                 <span @style(['font-weight: 700', 'color: #b42318' => $cell['value'] >= ($column['danger_at'] ?? PHP_INT_MAX)])>{{ $cell['value'] }}</span>

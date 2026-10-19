@@ -132,7 +132,7 @@
     <div class="p-card-head navy"><span>Payments received</span><span class="meta">{{ $payments->count() }}</span></div>
 
     @if ($payments->isEmpty())
-        <div class="p-card-body text-center tm-muted" style="font-size: .85rem;">No payments recorded yet.</div>
+        <div class="p-card-body text-center tm-muted u-8ae449">No payments recorded yet.</div>
     @else
         <div class="table-responsive">
             <table class="table tm-table align-middle mb-0">

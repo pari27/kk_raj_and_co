@@ -7,6 +7,7 @@ use App\Models\Setting;
 use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class SettingController extends Controller
@@ -16,6 +17,54 @@ class SettingController extends Controller
         $setting = Setting::current();
 
         return view('admin.settings.firm-profile', compact('setting'));
+    }
+
+    public function updateFirmProfile(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'firm_name' => ['required', 'string', 'max:120'],
+            'firm_address' => ['required', 'string', 'max:500'],
+            'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
+            'remove_logo' => ['nullable', 'boolean'],
+        ]);
+
+        $setting = Setting::current();
+        $changes = [];
+
+        if ($setting->firm_name !== $validated['firm_name']) {
+            $changes[] = 'name';
+        }
+        if ($setting->firm_address !== $validated['firm_address']) {
+            $changes[] = 'address';
+        }
+
+        $data = ['firm_name' => $validated['firm_name'], 'firm_address' => $validated['firm_address']];
+
+        if ($request->hasFile('logo')) {
+            if ($setting->firm_logo_path) {
+                Storage::disk('public')->delete($setting->firm_logo_path);
+            }
+            $data['firm_logo_path'] = $request->file('logo')->store('branding', 'public');
+            $changes[] = 'logo';
+        } elseif ($request->boolean('remove_logo') && $setting->firm_logo_path) {
+            Storage::disk('public')->delete($setting->firm_logo_path);
+            $data['firm_logo_path'] = null;
+            $changes[] = 'logo removed';
+        }
+
+        $setting->update($data);
+
+        if ($changes !== []) {
+            AuditLogger::log(
+                action: 'Updated',
+                module: 'Settings',
+                recordLabel: 'Firm profile',
+                details: 'Firm profile changed: '.implode(', ', $changes),
+                subject: $setting,
+            );
+        }
+
+        return redirect()->route('admin.settings.firm-profile');
     }
 
     public function update(Request $request): RedirectResponse

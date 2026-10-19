@@ -9,6 +9,7 @@
         "php": "^8.3",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
+        "resend/resend-php": "^1.16",
         "vinkla/hashids": "^14.0"
     },
     "require-dev": {

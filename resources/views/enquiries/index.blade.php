@@ -5,17 +5,11 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
-<style>
-    #enquiriesTable.tm-table thead th:first-child,
-    #enquiriesTable.tm-table thead th:last-child {
-        border-radius: 0;
-    }
-</style>
 @endpush
 
 @section('content')
 @php
-    $isAdmin = auth()->user()->isSuperAdmin() || auth()->user()->isAdmin();
+    $isAdmin = auth()->user()->isAdmin();
     $totalCount = $enquiries->count();
     $openCount = $enquiries->where('status', 'Open')->count();
     $closedCount = $totalCount - $openCount;
@@ -39,12 +33,12 @@
     @foreach ($statCards as $card)
         <div class="col-6 col-xl-3">
             <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                <span class="position-absolute rounded-circle" style="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                <span class="position-absolute rounded-circle" style="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
+                <span class="position-absolute rounded-circle u-943986"></span>
+                <span class="position-absolute rounded-circle u-e46b84"></span>
                 <div class="position-relative">
-                    <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
+                    <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ number_format($card['count']) }}</div>
-                    <div style="color: rgba(255,255,255,.75); font-size: .72rem;">{{ $card['caption'] }}</div>
+                    <div class="u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -53,18 +47,18 @@
 
 <div class="tm-card p-0">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 p-3">
-        <div class="tm-search d-flex align-items-center gap-2 px-3 py-2" style="max-width: 320px; background: #fff; border: 1px solid var(--tm-surface-border);">
+        <div class="tm-search d-flex align-items-center gap-2 px-3 py-2 u-a559f1">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" id="enquiriesSearch" placeholder="Search enquiry, client, service, creator, status or amount" style="background: transparent; border: 0; outline: none; color: var(--tm-text); width: 100%; font-size: .85rem;">
+            <input type="text" id="enquiriesSearch" placeholder="Search your details here" class="u-d0e030">
         </div>
 
         <div class="d-flex flex-wrap align-items-center gap-2">
-            <div style="min-width: 180px;">
+            <div class="u-94a14c">
                 <button type="button" id="enquiryDateRangeBtn" class="btn btn-outline-secondary d-flex align-items-center gap-2 w-100">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    <span id="enquiryDateRangeLabel" class="flex-grow-1 text-start" style="font-weight: 400;">All time</span>
+                    <span id="enquiryDateRangeLabel" class="flex-grow-1 text-start u-fe3f5c">All time</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
                 <input type="hidden" id="enquiryDateFrom">
@@ -97,37 +91,37 @@
                     @endphp
                     <tr data-status="{{ $enquiry->status }}" data-creator="{{ $enquiry->createdBy?->name }}" data-created-ts="{{ $enquiry->created_at->timestamp }}">
                         <td data-order="{{ $enquiry->created_at->timestamp }}">
-                            <div class="fw-semibold" style="font-size: .8rem;">{{ $enquiry->number }}</div>
-                            <div class="tm-muted" style="font-size: .72rem;">{{ $enquiry->created_at->format('j M Y') }}</div>
+                            <div class="fw-semibold u-5a305f">{{ $enquiry->number }}</div>
+                            <div class="tm-muted u-31578e">{{ $enquiry->created_at->format('j M Y') }}</div>
                         </td>
                         <td>
-                            <div class="fw-semibold" style="font-size: .8rem;">{{ $enquiry->customer->name }}</div>
-                            <div class="tm-muted" style="font-size: .72rem;">{{ $enquiry->customer->phone }}</div>
+                            <div class="fw-semibold u-5a305f"><a href="{{ route('customers.show', $enquiry->customer) }}" class="text-reset text-decoration-none">{{ $enquiry->customer->name }}</a></div>
+                            <div class="tm-muted u-31578e"><a href="tel:{{ preg_replace('/[^0-9+]/', '', (string) $enquiry->customer->phone) }}" class="text-reset text-decoration-none">{{ $enquiry->customer->phone }}</a></div>
                         </td>
                         <td>
                             @foreach ($enquiry->tickets as $ticket)
-                                <span class="badge rounded-pill text-bg-light border fw-normal mb-1" style="color: #2f5fbe; border-color: #cfe0ff !important; background: #eef4ff !important;">{{ $ticket->service->name }}</span>
+                                <span class="badge rounded-pill text-bg-light border fw-normal mb-1 u-ad9361">{{ $ticket->service->name }}</span>
                             @endforeach
                         </td>
-                        <td data-order="{{ $ticketsClosed }}" style="min-width: 110px;">
+                        <td data-order="{{ $ticketsClosed }}" class="u-fc5653">
                             <div class="small fw-semibold mb-1">{{ $ticketsClosed }} of {{ $ticketsTotal }} closed</div>
                             <div class="tm-progress-track">
                                 <div class="tm-progress-fill" style="width: {{ $ratio * 100 }}%;"></div>
                             </div>
                         </td>
                         <td>
-                            <div style="font-size: .8rem;">{{ $enquiry->createdBy?->name ?? '—' }}</div>
-                            <div class="tm-muted" style="font-size: .72rem;">{{ $enquiry->created_at->format('j M Y') }}</div>
+                            <div class="u-5a305f">{{ $enquiry->createdBy?->name ?? '—' }}</div>
+                            <div class="tm-muted u-31578e">{{ $enquiry->created_at->format('j M Y') }}</div>
                         </td>
                         <td data-order="{{ $enquiry->total }}">
-                            <div class="fw-semibold" style="font-size: .8rem;">₹{{ number_format((float) $enquiry->total) }}</div>
+                            <div class="fw-semibold u-5a305f">₹{{ number_format((float) $enquiry->total) }}</div>
                             @if ($enquiry->discount > 0)
-                                <div style="font-size: .72rem; color: #1f6b30;">₹{{ number_format((float) $enquiry->discount) }} off</div>
+                                <div class="u-c9deee">₹{{ number_format((float) $enquiry->discount) }} off</div>
                             @endif
                         </td>
                         <td data-order="{{ $enquiry->status === 'Open' ? 0 : 1 }}">
                             <span class="badge rounded-pill fw-normal px-3 py-2" style="{{ $enquiry->status === 'Open' ? 'background:#eef4ff;color:#2f5fbe;' : 'background:#e5f5e0;color:#2f8f3e;' }}">
-                                <span class="rounded-circle d-inline-block me-1" style="width:6px;height:6px;background:currentColor;"></span>{{ $enquiry->status }}
+                                <span class="rounded-circle d-inline-block me-1 u-998d08"></span>{{ $enquiry->status }}
                             </span>
                         </td>
                         <td class="text-end" data-order="0">

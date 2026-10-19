@@ -88,7 +88,7 @@ class ReportService
             'clients' => $clients,
             'designations' => EmployeeDesignation::query()->orderBy('name')->get(['id', 'name']),
             'creators' => User::query()
-                ->whereIn('role', [UserRole::SuperAdmin->value, UserRole::Admin->value, UserRole::Employee->value])
+                ->whereIn('role', [UserRole::Admin->value, UserRole::Employee->value])
                 ->when($user->isEmployee(), fn (Builder $query) => $query->whereKey($user->id))
                 ->orderBy('name')->get(['id', 'name']),
             'statuses' => array_map(fn (TicketStatus $status) => $status->value, TicketStatus::cases()),

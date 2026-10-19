@@ -7,12 +7,12 @@ use App\Models\User;
 class UserPolicy
 {
     /**
-     * SuperAdmin and Admin share the same access to the Employees master; Employees
+     * Admins share the same access to the Employees master; Employees
      * never reach this screen (see roles-permissions.md).
      */
     private function isAdminLike(User $user): bool
     {
-        return $user->isSuperAdmin() || $user->isAdmin();
+        return $user->isAdmin();
     }
 
     public function viewAnyEmployees(User $user): bool

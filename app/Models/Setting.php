@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['test_mode', 'notifications_enabled', 'service_prefix', 'enquiry_prefix'])]
+#[Fillable(['test_mode', 'notifications_enabled', 'service_prefix', 'enquiry_prefix', 'firm_name', 'firm_address', 'firm_logo_path'])]
 class Setting extends Model
 {
     protected function casts(): array
@@ -44,6 +44,30 @@ class Setting extends Model
     public static function enquiryPrefix(): string
     {
         return static::current()->enquiry_prefix ?: 'ENQ';
+    }
+
+    /**
+     * Make the firm profile (Settings > Firm Profile) the source for the firm name, address
+     * and logo used across the app, falling back to the .env values and the default logo.
+     * Does nothing before the settings table exists (e.g. while migrating).
+     */
+    public static function applyFirmProfile(): void
+    {
+        try {
+            $setting = static::query()->first();
+        } catch (\Throwable) {
+            config(['app.firm_logo_url' => asset('images/logo.png')]);
+
+            return;
+        }
+
+        config([
+            'app.firm_name' => $setting?->firm_name ?: config('app.firm_name'),
+            'app.firm_address' => $setting?->firm_address ?: config('app.firm_address'),
+            'app.firm_logo_url' => $setting?->firm_logo_path
+                ? \Illuminate\Support\Facades\Storage::disk('public')->url($setting->firm_logo_path)
+                : asset('images/logo.png'),
+        ]);
     }
 
     public static function testModeEnabled(): bool

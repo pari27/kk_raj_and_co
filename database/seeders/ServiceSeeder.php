@@ -14,7 +14,7 @@ class ServiceSeeder extends Seeder
      */
     public function run(): void
     {
-        $createdBy = User::query()->where('role', UserRole::SuperAdmin)->value('id');
+        $createdBy = User::query()->where('role', UserRole::Admin)->value('id');
 
         $services = [
             ['name' => 'GST Return Filing', 'description' => 'Monthly/quarterly GST return filing', 'default_price' => 2500, 'gst_percent' => 18, 'is_active' => true, 'created_by' => $createdBy],

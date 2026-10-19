@@ -63,7 +63,7 @@
                     <span class="chip {{ $item['tone'] }}">{{ $item['action'] }}</span>
                 </a>
             @empty
-                <div class="p-card-body text-center tm-muted" style="font-size: .85rem;">You're all caught up. Nothing needs your attention.</div>
+                <div class="p-card-body text-center tm-muted u-8ae449">You're all caught up. Nothing needs your attention.</div>
             @endforelse
         </div>
     </div>
@@ -75,7 +75,7 @@
 
                 @foreach ($contacts as $item)
                     <div class="p-card-body {{ $item['contact'] ? '' : 'p-unassigned' }}" style="{{ $loop->last ? '' : 'border-bottom: 1px solid var(--p-line);' }}">
-                        <div class="tm-muted fw-bold text-uppercase" style="font-size: .68rem; letter-spacing: .08em; margin-bottom: .6rem;">For {{ $item['service'] }}</div>
+                        <div class="tm-muted fw-bold text-uppercase u-bb809f">For {{ $item['service'] }}</div>
 
                         @if ($item['contact'])
                             <div class="p-contact">

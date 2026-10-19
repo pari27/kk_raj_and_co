@@ -30,6 +30,10 @@ return [
 
     'firm_hours' => env('FIRM_HOURS'),
 
+    // Which admin dashboard to show: "new" (live practice overview) or "classic" (the earlier chart-based design,
+    // kept in resources/views/admin/dashboard-classic.blade.php). Set ADMIN_DASHBOARD_DESIGN=classic to switch back.
+    'admin_dashboard_design' => env('ADMIN_DASHBOARD_DESIGN', 'new'),
+
     // Where clients can pay. Each is optional: the "How to pay" popup only shows the ways that are set.
     'firm_address' => env('FIRM_ADDRESS'),
 

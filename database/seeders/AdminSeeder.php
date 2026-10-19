@@ -7,10 +7,10 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use RuntimeException;
 
-class SuperAdminSeeder extends Seeder
+class AdminSeeder extends Seeder
 {
     /**
-     * Seed the fixed Super Admin account.
+     * Seed the fixed Admin account.
      */
     public function run(): void
     {
@@ -29,9 +29,9 @@ class SuperAdminSeeder extends Seeder
         }
 
         User::query()->updateOrCreate(
-            ['role' => UserRole::SuperAdmin],
+            ['role' => UserRole::Admin],
             [
-                'name' => env('SUPER_ADMIN_NAME', 'Super Admin'),
+                'name' => env('SUPER_ADMIN_NAME', 'Admin'),
                 'email' => $email,
                 'password' => $password,
                 'is_active' => true,

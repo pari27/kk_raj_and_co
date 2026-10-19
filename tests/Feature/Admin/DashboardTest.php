@@ -13,17 +13,28 @@ class DashboardTest extends TestCase
 
     public function test_super_admin_sees_the_admin_dashboard(): void
     {
-        $user = User::factory()->create(['role' => UserRole::SuperAdmin]);
+        $user = User::factory()->create(['role' => UserRole::Admin]);
+
+        $response = $this->actingAs($user)->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('Needs attention');
+        $response->assertSee('Open services by status');
+        $response->assertSee('Recent enquiries');
+        $response->assertSee('Staff workload');
+        $response->assertSee('Recent payments');
+    }
+
+    public function test_the_classic_admin_dashboard_can_be_switched_back_on(): void
+    {
+        config(['app.admin_dashboard_design' => 'classic']);
+        $user = User::factory()->create(['role' => UserRole::Admin]);
 
         $response = $this->actingAs($user)->get(route('dashboard'));
 
         $response->assertOk();
         $response->assertSee('Enquiries vs completed services');
-        $response->assertSee('Open services by status');
-        $response->assertSee('Fees by month');
-        $response->assertSee('Fee collection');
         $response->assertSee('Employee workload');
-        $response->assertSee('Services by type');
     }
 
     public function test_admin_sees_the_admin_dashboard(): void
@@ -33,7 +44,7 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($user)->get(route('dashboard'));
 
         $response->assertOk();
-        $response->assertSee('Enquiries vs completed services');
+        $response->assertSee('Needs attention');
     }
 
     public function test_employee_sees_their_own_dashboard_at_the_same_url(): void
@@ -57,7 +68,7 @@ class DashboardTest extends TestCase
     public function test_super_admin_is_redirected_to_the_dashboard_after_login(): void
     {
         $user = User::factory()->create([
-            'role' => UserRole::SuperAdmin,
+            'role' => UserRole::Admin,
             'password' => 'password',
         ]);
 

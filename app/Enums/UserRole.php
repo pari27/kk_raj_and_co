@@ -14,15 +14,13 @@ use App\Models\User;
  */
 enum UserRole: int
 {
-    case SuperAdmin = 0;
-    case Admin = 1;
+    case Admin = 0;
     case Employee = 2;
     case Customer = 3;
 
     public function label(): string
     {
         return match ($this) {
-            self::SuperAdmin => 'Super Admin',
             self::Admin => 'Admin',
             self::Employee => 'Employee',
             self::Customer => 'Customer',
@@ -34,6 +32,6 @@ enum UserRole: int
      */
     public static function internalRoles(): array
     {
-        return [self::SuperAdmin, self::Admin, self::Employee];
+        return [self::Admin, self::Employee];
     }
 }

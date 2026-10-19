@@ -5,27 +5,6 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
-<style>
-    #auditLogDateRangeBtn {
-        font-size: .78rem;
-        font-weight: 600;
-        color: var(--tm-text);
-    }
-    #auditLogDateRangeBtn:hover,
-    #auditLogDateRangeBtn:focus,
-    #auditLogDateRangeBtn:active {
-        background-color: transparent !important;
-        color: var(--tm-text) !important;
-        border-color: var(--tm-surface-border) !important;
-    }
-    .daterangepicker td.active, .daterangepicker td.active:hover {
-        background-color: var(--tm-accent);
-    }
-    .daterangepicker .ranges li.active {
-        background-color: #101b3d;
-        color: #fff;
-    }
-</style>
 @endpush
 
 @php
@@ -60,12 +39,12 @@
     @foreach ($statCards as $card)
         <div class="col-6 col-xl-3">
             <div class="tm-stat-card px-3 py-2 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                <span class="position-absolute rounded-circle" style="width: 60px; height: 60px; right: -20px; bottom: -25px; background: rgba(255,255,255,.12);"></span>
-                <span class="position-absolute rounded-circle" style="width: 36px; height: 36px; right: 10px; bottom: -14px; background: rgba(255,255,255,.14);"></span>
+                <span class="position-absolute rounded-circle u-69a6c5"></span>
+                <span class="position-absolute rounded-circle u-751a72"></span>
                 <div class="position-relative">
-                    <div style="color: rgba(255,255,255,.75); font-size: .75rem;">{{ $card['label'] }}</div>
+                    <div class="u-4e3053">{{ $card['label'] }}</div>
                     <div class="fs-5 tm-serif fw-bold text-white">{{ number_format($card['count']) }}</div>
-                    <div style="color: rgba(255,255,255,.75); font-size: .68rem;">{{ $card['caption'] }}</div>
+                    <div class="u-a6f4eb">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -77,15 +56,15 @@
         <div class="row g-2 align-items-center">
             <div class="col-12 col-md-7">
                 <div class="position-relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="auditLogSearch" class="form-control tm-field" style="font-size: .85rem; padding-left: 2.25rem;" placeholder="Search your details here" aria-label="Search your details here">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="position-absolute u-f0de67" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="auditLogSearch" class="form-control tm-field u-1a3a16" placeholder="Search your details here" aria-label="Search your details here">
                 </div>
             </div>
             <div class="col-12 col-md-5">
                 <button type="button" id="auditLogDateRangeBtn" class="btn btn-outline-secondary d-flex align-items-center gap-2 w-100">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    <span class="text-uppercase tm-muted" style="font-size: .68rem;">Date range</span>
-                    <span id="auditLogDateRangeLabel" class="flex-grow-1 text-start" style="font-weight: 400;">All time</span>
+                    <span class="text-uppercase tm-muted u-dcc109">Date range</span>
+                    <span id="auditLogDateRangeLabel" class="flex-grow-1 text-start u-fe3f5c">All time</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
                 <input type="hidden" id="auditLogDateFrom">
@@ -123,7 +102,7 @@
                         </td>
                         <td>
                             @if ($log->record_url)
-                                <a href="{{ $log->record_url }}" class="text-decoration-none" style="color: inherit;">
+                                <a href="{{ $log->record_url }}" class="text-decoration-none u-c610b8">
                                     <span class="tm-muted small d-block">{{ $log->module }}</span>
                                     <span class="fw-semibold small">{{ $log->record_label }}</span>
                                 </a>

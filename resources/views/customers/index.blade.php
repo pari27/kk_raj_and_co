@@ -4,12 +4,6 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
-<style>
-    #clientsTable.tm-table thead th:first-child,
-    #clientsTable.tm-table thead th:last-child {
-        border-radius: 0;
-    }
-</style>
 @endpush
 
 @section('content')
@@ -64,12 +58,12 @@
     @foreach ($statCards as $card)
         <div class="col-6 col-xl-3">
             <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                <span class="position-absolute rounded-circle" style="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                <span class="position-absolute rounded-circle" style="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
+                <span class="position-absolute rounded-circle u-943986"></span>
+                <span class="position-absolute rounded-circle u-e46b84"></span>
                 <div class="position-relative">
-                    <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
+                    <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ number_format($card['count']) }}</div>
-                    <div class="small" style="color: rgba(255,255,255,.75); font-size: .72rem;">{{ $card['caption'] }}</div>
+                    <div class="small u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -78,11 +72,11 @@
 
 <div class="tm-card p-0">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 p-3">
-        <div class="tm-search d-flex align-items-center gap-2 px-3 py-2" style="max-width: 320px; background: #fff; border: 1px solid var(--tm-surface-border);">
+        <div class="tm-search d-flex align-items-center gap-2 px-3 py-2 u-a559f1">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" id="clientsSearch" placeholder="Search by name, phone or email" style="background: transparent; border: 0; outline: none; color: var(--tm-text); width: 100%; font-size: .85rem;">
+            <input type="text" id="clientsSearch" placeholder="Search your details here" class="u-d0e030">
         </div>
 
         <div class="d-flex flex-wrap align-items-center gap-2">
@@ -127,26 +121,26 @@
                                 <div class="tm-client-avatar" style="background: {{ $palette['bg'] }}; color: {{ $palette['text'] }};">{{ $initials }}</div>
                                 <div>
                                     <a href="{{ route('customers.show', $customer) }}" class="fw-semibold text-decoration-none" style="font-size: .8rem; color: {{ $customer->is_active ? 'inherit' : 'var(--tm-muted)' }};">{{ $customer->name }}</a>
-                                    <div class="tm-muted" style="font-size: .78rem;">Client since {{ $customer->created_at->format('M Y') }}</div>
+                                    <div class="tm-muted u-319f32">Client since {{ $customer->created_at->format('M Y') }}</div>
                                 </div>
                             </div>
                         </td>
                         <td>
                             <div class="tm-contact-line mb-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                                {{ $customer->phone }}
+                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', (string) $customer->phone) }}" class="text-reset text-decoration-none">{{ $customer->phone }}</a>
                             </div>
                             <div class="tm-contact-line tm-muted">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                {{ $customer->email ?? '—' }}
+                                @if ($customer->email)<a href="mailto:{{ $customer->email }}" class="text-reset text-decoration-none">{{ $customer->email }}</a>@else—@endif
                             </div>
                         </td>
-                        <td data-order="{{ $row['tickets_total'] }}" style="font-size: .8rem;">{{ $row['tickets_open'] }} open &middot; {{ $row['tickets_total'] }} total</td>
+                        <td data-order="{{ $row['tickets_total'] }}" class="u-5a305f">{{ $row['tickets_open'] }} open &middot; {{ $row['tickets_total'] }} total</td>
                         <td data-order="{{ $row['fees_pending'] }}">
                             @if ($row['fees_pending'] > 0)
-                                <span class="fw-semibold" style="font-size: .8rem; color: #c0392b;">₹{{ number_format($row['fees_pending']) }}</span>
+                                <span class="fw-semibold u-9f77ad">₹{{ number_format($row['fees_pending']) }}</span>
                             @else
-                                <span class="tm-muted" style="font-size: .8rem;">₹0</span>
+                                <span class="tm-muted u-5a305f">₹0</span>
                             @endif
                         </td>
                         <td>

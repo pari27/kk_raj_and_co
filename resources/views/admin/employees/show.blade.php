@@ -2,65 +2,6 @@
 
 @section('title', $employee->name . ' — ' . config('app.name', 'Task Management'))
 
-@push('styles')
-<style>
-    #employee-show-page .emp-stat-card {
-        min-height: 110px;
-        color: #fff;
-        border: 0;
-        border-radius: .85rem;
-        box-shadow: 0 5px 16px rgba(16, 27, 61, .15);
-    }
-    #employee-show-page .emp-section-title {
-        background: #101b3d;
-        color: #fff;
-        padding: .85rem 1.15rem;
-        border-radius: .8rem .8rem 0 0;
-    }
-    #employee-show-page .emp-section-title h2 {
-        font-size: 1rem;
-    }
-    #employee-show-page .emp-side-heading {
-        color: #fff;
-        padding: .5rem 1rem;
-        border-radius: .8rem .8rem 0 0;
-    }
-    #employee-show-page .emp-info-label {
-        color: #6b7280;
-    }
-    #employee-show-page .emp-data-row + .emp-data-row {
-        border-top: 1px solid #edf0f3;
-    }
-    #employee-show-page .emp-data-row,
-    #employee-show-page .emp-data-row * {
-        font-size: .8rem;
-    }
-    #employee-show-page .emp-status-row + .emp-status-row {
-        border-top: 1px solid #edf0f3;
-    }
-    #employee-show-page .emp-status-bar-track {
-        background: #eef0f4;
-        border-radius: 1rem;
-        height: 6px;
-        overflow: hidden;
-    }
-    #employee-show-page .emp-status-bar-fill {
-        height: 100%;
-        border-radius: 1rem;
-    }
-    #assignedTicketsTable.tm-table tbody td {
-        font-size: .8rem;
-    }
-    #assignedTicketsTable.tm-table thead th {
-        background: #f5f6f8;
-        color: #6b7280;
-    }
-    #assignedTicketsTable.tm-table thead th:first-child,
-    #assignedTicketsTable.tm-table thead th:last-child {
-        border-radius: 0;
-    }
-</style>
-@endpush
 
 @section('content')
 @php
@@ -95,20 +36,20 @@
         <div class="d-flex align-items-center gap-3">
             <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px; background: #101b3d; color: #fff; font-weight: 700; border: 2px solid {{ $employee->is_active ? '#1f6b30' : '#9aa1b0' }};">
                 @if ($employee->profile?->photo_path)
-                    <img src="{{ asset('storage/' . $employee->profile->photo_path) }}" alt="" class="rounded-circle object-fit-cover" style="width: 100%; height: 100%;">
+                    <img src="{{ asset('storage/' . $employee->profile->photo_path) }}" alt="" class="rounded-circle object-fit-cover u-a898fd">
                 @else
                     {{ $initials }}
                 @endif
             </div>
             <div>
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                    <h1 class="tm-serif fw-bold mb-0" style="font-size: 1.15rem;">{{ $employee->name }}</h1>
+                    <h1 class="tm-serif fw-bold mb-0 u-e83e11">{{ $employee->name }}</h1>
                     <span class="badge rounded-pill {{ $employee->is_active ? 'text-bg-success' : 'text-bg-secondary' }}">{{ $employee->is_active ? 'Active' : 'Inactive' }}</span>
                     @if ($employee->profile?->designation)
                         <span class="badge rounded-pill text-bg-light border">{{ $employee->profile->designation->name }}</span>
                     @endif
                 </div>
-                <div class="tm-muted" style="font-size: .8rem;">
+                <div class="tm-muted u-5a305f">
                     Added {{ $employee->created_at->format('d M Y') }} by {{ $addedBy?->user?->name ?? 'System' }}
                 </div>
             </div>
@@ -120,31 +61,31 @@
 
     <div class="row g-3 mb-3">
         <div class="col-6 col-xl-3">
-            <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #102b68, #2865d5);">
+            <div class="tm-card emp-stat-card p-3 u-c34d0f">
                 <div class="small mb-2 opacity-75">Open services</div>
                 <div class="h3 fw-bold mb-1">{{ number_format($openTicketsCount) }}</div>
-                <div class="small opacity-75" style="font-size: .72rem;">assigned now</div>
+                <div class="small opacity-75 u-31578e">assigned now</div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
-            <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #0a2e14, #1f6b30);">
+            <div class="tm-card emp-stat-card p-3 u-d30963">
                 <div class="small mb-2 opacity-75">Completed</div>
                 <div class="h3 fw-bold mb-1">{{ number_format($completedTicketsCount) }}</div>
-                <div class="small opacity-75" style="font-size: .72rem;">this FY</div>
+                <div class="small opacity-75 u-31578e">this FY</div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
-            <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #380c33, #6e1d58);">
+            <div class="tm-card emp-stat-card p-3 u-a1d6bd">
                 <div class="small mb-2 opacity-75">Average time</div>
                 <div class="h3 fw-bold mb-1">{{ $avgTurnaroundDays !== null ? $avgTurnaroundDays . ' days' : '—' }}</div>
-                <div class="small opacity-75" style="font-size: .72rem;">enquiry to completion</div>
+                <div class="small opacity-75 u-31578e">enquiry to completion</div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
-            <div class="tm-card emp-stat-card p-3" style="background: linear-gradient(135deg, #5c3d08, #8a5d0d);">
+            <div class="tm-card emp-stat-card p-3 u-397edc">
                 <div class="small mb-2 opacity-75">Waiting on clients</div>
                 <div class="h3 fw-bold mb-1">{{ number_format($waitingOnClientsCount) }}</div>
-                <div class="small opacity-75" style="font-size: .72rem;">documents pending</div>
+                <div class="small opacity-75 u-31578e">documents pending</div>
             </div>
         </div>
     </div>
@@ -184,7 +125,7 @@
             <section class="tm-card p-0 mb-3 overflow-hidden">
                 <div class="emp-section-title d-flex align-items-center justify-content-between">
                     <h2 class="mb-0 fw-bold">Assigned services ({{ $assignedTicketsCount }})</h2>
-                    <a href="{{ route('tickets.index') }}" class="small fw-semibold text-decoration-underline" style="color: #fff;">View all &rarr;</a>
+                    <a href="{{ route('tickets.index') }}" class="small fw-semibold text-decoration-underline u-421b99">View all &rarr;</a>
                 </div>
                 @if ($recentTickets->isEmpty())
                     <div class="p-3"><x-empty-state title="No services yet" description="Services assigned to this employee will appear here." /></div>
@@ -214,8 +155,8 @@
                         <div class="d-flex gap-3 py-2 {{ ! $loop->last ? 'border-bottom' : '' }}">
                             <span class="rounded-circle flex-shrink-0 mt-1" style="width: 8px; height: 8px; background: {{ $dotColor($log->action) }};"></span>
                             <div class="flex-grow-1">
-                                <div class="fw-semibold" style="font-size: .8rem;">{{ $log->details ?: $log->action }}</div>
-                                <div class="tm-muted" style="font-size: .7rem;">{{ $log->created_at->format('j M Y, g:i A') }}</div>
+                                <div class="fw-semibold u-5a305f">{{ $log->details ?: $log->action }}</div>
+                                <div class="tm-muted u-67283f">{{ $log->created_at->format('j M Y, g:i A') }}</div>
                             </div>
                         </div>
                     @empty
@@ -227,7 +168,7 @@
 
         <div class="col-12 col-xl-4">
             <section class="tm-card p-0 mb-3 overflow-hidden">
-                <div class="emp-side-heading" style="background: #1f6b30;"><h2 class="h6 fw-bold mb-0">Open services by status</h2></div>
+                <div class="emp-side-heading u-1fcbae"><h2 class="h6 fw-bold mb-0">Open services by status</h2></div>
                 <div class="p-3">
                     @forelse ($openByStatus as $status => $count)
                         @php
@@ -235,7 +176,7 @@
                             $color = $variantColors[$variant] ?? '#6b7280';
                         @endphp
                         <div class="emp-status-row py-2">
-                            <div class="d-flex justify-content-between gap-3 mb-1" style="font-size: .8rem;">
+                            <div class="d-flex justify-content-between gap-3 mb-1 u-5a305f">
                                 <span>{{ $status }}</span><strong>{{ $count }}</strong>
                             </div>
                             <div class="emp-status-bar-track">
@@ -249,7 +190,7 @@
             </section>
 
             <section class="tm-card p-0 mb-3 overflow-hidden">
-                <div class="emp-side-heading" style="background: #101b3d;"><h2 class="h6 fw-bold mb-0">Login and account</h2></div>
+                <div class="emp-side-heading u-8b012c"><h2 class="h6 fw-bold mb-0">Login and account</h2></div>
                 <div class="p-3">
                     <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">Login email</span><strong class="text-end text-break">{{ $employee->email }}</strong></div>
                     <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">Password</span><strong>{{ $employee->hasSetPassword() ? 'Set' : 'Invitation pending' }}</strong></div>
@@ -264,7 +205,7 @@
             </section>
 
             <section class="tm-card p-0 overflow-hidden">
-                <div class="emp-side-heading" style="background: #0f6b5c;"><h2 class="h6 fw-bold mb-0">Services by type (FY)</h2></div>
+                <div class="emp-side-heading u-e25d39"><h2 class="h6 fw-bold mb-0">Services by type (FY)</h2></div>
                 <div class="p-3">
                     @forelse ($ticketsByService as $serviceName => $count)
                         <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">{{ $serviceName }}</span><strong>{{ $count }}</strong></div>

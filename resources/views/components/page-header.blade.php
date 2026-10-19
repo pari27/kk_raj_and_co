@@ -4,9 +4,9 @@
 @endif
 <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 pb-3 mb-4 {{ $divider ? 'tm-divider-gold' : '' }}">
     <div>
-        <h1 class="tm-serif fw-bold mb-1" style="font-size: 1.15rem;">{{ $title }}</h1>
+        <h1 class="tm-serif fw-bold mb-1 u-e83e11">{{ $title }}</h1>
         @if($subtitle)
-            <p class="tm-muted mb-0" style="font-size: .8rem;">{{ $subtitle }}</p>
+            <p class="tm-muted mb-0 u-5a305f">{{ $subtitle }}</p>
         @endif
     </div>
     @isset($actions)

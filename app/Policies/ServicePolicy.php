@@ -8,12 +8,12 @@ use App\Models\User;
 class ServicePolicy
 {
     /**
-     * SuperAdmin and Admin manage the Services master. Employees may only see the
+     * Admins manage the Services master. Employees may only see the
      * list (viewAny); they cannot open, add, edit or activate/deactivate a service.
      */
     private function isAdminLike(User $user): bool
     {
-        return $user->isSuperAdmin() || $user->isAdmin();
+        return $user->isAdmin();
     }
 
     public function viewAny(User $user): bool

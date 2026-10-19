@@ -88,7 +88,7 @@ class EmailTemplateTest extends TestCase
         $employee = User::factory()->create(['role' => UserRole::Employee, 'name' => 'Neha Kapoor']);
         $mail = new EmployeeInvitationMail($employee, 'https://example.test/set-password');
 
-        $mail->assertHasSubject('Join '.config('app.name').' today');
+        $mail->assertHasSubject('Join '.config('app.firm_name').' today');
         $mail->assertSeeInHtml('Dear Neha Kapoor,');
         $mail->assertSeeInHtml('https://example.test/set-password');
     }

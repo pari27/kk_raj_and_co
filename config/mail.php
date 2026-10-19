@@ -128,4 +128,17 @@ return [
 
     'test_recipient' => env('MAIL_TEST_RECIPIENT'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Copy of client emails
+    |--------------------------------------------------------------------------
+    |
+    | When set, a hidden copy (Bcc) of every email sent to a client goes to this
+    | address too, so the firm can see what clients receive. Login codes are never
+    | copied. Leave empty to switch it off.
+    |
+    */
+
+    'copy_to' => env('MAIL_COPY_TO'),
+
 ];

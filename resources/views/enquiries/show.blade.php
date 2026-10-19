@@ -2,27 +2,6 @@
 
 @section('title', $enquiry->number . ' — ' . config('app.name', 'Task Management'))
 
-@push('styles')
-<style>
-    #enquiryTicketsTable.tm-table thead th {
-        background: #eceef2;
-        color: #4b5563;
-    }
-    #enquiryTicketsTable.tm-table thead th:first-child,
-    #enquiryTicketsTable.tm-table thead th:last-child {
-        border-radius: 0;
-    }
-    .btn-outline-navy {
-        color: #101b3d;
-        border-color: #101b3d;
-    }
-    .btn-outline-navy:hover {
-        color: #fff;
-        background: #101b3d;
-        border-color: #101b3d;
-    }
-</style>
-@endpush
 
 @section('content')
 @php
@@ -56,10 +35,10 @@
 <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 pb-3 mb-4 tm-divider-gold">
     <div>
         <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
-            <h1 class="tm-serif fw-bold mb-0" style="font-size: 1.15rem;">{{ $enquiry->number }}</h1>
+            <h1 class="tm-serif fw-bold mb-0 u-e83e11">{{ $enquiry->number }}</h1>
             <span class="badge rounded-pill text-bg-{{ $enquiry->status === 'Open' ? 'primary' : 'secondary' }} fw-normal">{{ $enquiry->status }}</span>
         </div>
-        <p class="tm-muted mb-0" style="font-size: .8rem;">
+        <p class="tm-muted mb-0 u-5a305f">
             Created {{ $enquiry->created_at->format('j M Y, g:i A') }}{{ $enquiry->createdBy ? ' by '.$enquiry->createdBy->name : '' }}
             &middot; Last updated {{ $enquiry->updated_at->diffForHumans() }}
         </p>
@@ -73,12 +52,12 @@
     @foreach ($statCards as $card)
         <div class="col-6 col-xl-3">
             <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                <span class="position-absolute rounded-circle" style="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                <span class="position-absolute rounded-circle" style="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
+                <span class="position-absolute rounded-circle u-943986"></span>
+                <span class="position-absolute rounded-circle u-e46b84"></span>
                 <div class="position-relative">
-                    <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
+                    <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h4 tm-serif fw-bold mb-1 text-white">{{ $card['value'] }}</div>
-                    <div class="small" style="color: rgba(255,255,255,.75); font-size: .72rem;">{{ $card['caption'] }}</div>
+                    <div class="small u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -87,18 +66,18 @@
 
 <div class="row g-3">
     <div class="col-12 col-xl-8">
-        <div class="tm-card p-0 mb-3" style="overflow: hidden;">
-            <div class="p-2 px-3" style="background: #101b3d;">
+        <div class="tm-card p-0 mb-3 u-abf627">
+            <div class="p-2 px-3 u-8b012c">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Client</h2>
             </div>
             <div class="p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 46px; height: 46px; background: #101b3d; color: #fff; font-weight: 700; font-size: .95rem;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 u-2e984d">
                         {{ $initials }}
                     </div>
                     <div>
                         <div class="fw-bold enquiry-client-name">{{ $enquiry->customer->name }}</div>
-                        <div class="tm-muted" style="font-size: .8rem;">
+                        <div class="tm-muted u-5a305f">
                             &#128222; {{ $enquiry->customer->phone }} &nbsp; &#9993; {{ $enquiry->customer->email }}
                         </div>
                     </div>
@@ -112,10 +91,10 @@
             </div>
         </div>
 
-        <div class="tm-card p-0 mb-3" style="overflow: hidden;">
-            <div class="d-flex align-items-center justify-content-between p-2 px-3" style="background: #101b3d;">
+        <div class="tm-card p-0 mb-3 u-abf627">
+            <div class="d-flex align-items-center justify-content-between p-2 px-3 u-8b012c">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Services in this enquiry ({{ $enquiry->tickets->count() }})</h2>
-                <span class="enquiry-ticket-heading-note" style="color: rgba(255,255,255,.7); font-size: .72rem;">One entry per service</span>
+                <span class="enquiry-ticket-heading-note u-f3c187">One entry per service</span>
             </div>
             @if ($enquiry->tickets->isEmpty())
                 <div class="p-4">
@@ -151,8 +130,8 @@
             @endif
         </div>
 
-        <div class="tm-card p-0" style="overflow: hidden;">
-            <div class="p-2 px-3" style="background: #101b3d;">
+        <div class="tm-card p-0 u-abf627">
+            <div class="p-2 px-3 u-8b012c">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Activity</h2>
             </div>
             <div class="p-4">
@@ -161,7 +140,7 @@
                         <span class="rounded-circle flex-shrink-0 mt-1" style="width: 8px; height: 8px; background: {{ $dotColor($log->action) }};"></span>
                         <div class="flex-grow-1">
                             <div class="small fw-semibold activity-list-title">{{ $log->details ?? $log->action }}</div>
-                            <div class="tm-muted" style="font-size: .75rem;">{{ $log->created_at->format('j M Y, g:i A') }}{{ $log->user ? ' · '.$log->user->name : '' }}</div>
+                            <div class="tm-muted u-cc37c5">{{ $log->created_at->format('j M Y, g:i A') }}{{ $log->user ? ' · '.$log->user->name : '' }}</div>
                         </div>
                     </div>
                 @empty
@@ -172,14 +151,14 @@
     </div>
 
     <div class="col-12 col-xl-4">
-        <div class="tm-card p-0 mb-3" style="overflow: hidden;">
-            <div class="d-flex align-items-center justify-content-between gap-2 p-2 px-3" style="background: #1f6b30;">
+        <div class="tm-card p-0 mb-3 u-abf627">
+            <div class="d-flex align-items-center justify-content-between gap-2 p-2 px-3 u-1fcbae">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Fee breakdown</h2>
                 @if ($feesPending > 0)
                     <a href="#enquiryPaymentModal" role="button" data-bs-toggle="modal" class="enquiry-make-payment-button flex-shrink-0">Make payment</a>
                 @endif
             </div>
-            <ul class="list-unstyled p-3 mb-0" style="font-size: .85rem;">
+            <ul class="list-unstyled p-3 mb-0 u-8ae449">
                 @foreach ($enquiry->tickets as $ticket)
                     <li class="d-flex justify-content-between py-2 border-bottom">
                         <span class="tm-muted">{{ $ticket->service?->name }}</span>
@@ -195,21 +174,21 @@
                     <span class="fw-bold">₹{{ number_format((float) $enquiry->discount) }}</span>
                 </li>
             </ul>
-            <div class="mx-3 mb-2 rounded-3 p-3 d-flex justify-content-between align-items-center" style="background: #e5f5e0;">
+            <div class="mx-3 mb-2 rounded-3 p-3 d-flex justify-content-between align-items-center u-389ec9">
                 <div>
                     <div class="fw-bold">Total</div>
-                    <div class="tm-muted" style="font-size: .72rem;">including GST</div>
+                    <div class="tm-muted u-31578e">including GST</div>
                 </div>
-                <div class="h5 tm-serif fw-bold mb-0" style="color: #1f6b30;">₹{{ number_format((float) $enquiry->total) }}</div>
+                <div class="h5 tm-serif fw-bold mb-0 u-f63532">₹{{ number_format((float) $enquiry->total) }}</div>
             </div>
-            <div class="mx-3 mb-3 rounded-3 p-3 d-flex justify-content-between align-items-center" style="background: #fbe5e5;">
-                <div class="fw-bold" style="color: #7f1616;">Pending</div>
-                <div class="h6 fw-bold mb-0" style="color: #7f1616;">₹{{ number_format($feesPending) }}</div>
+            <div class="mx-3 mb-3 rounded-3 p-3 d-flex justify-content-between align-items-center u-57f634">
+                <div class="fw-bold u-a8cc8a">Pending</div>
+                <div class="h6 fw-bold mb-0 u-a8cc8a">₹{{ number_format($feesPending) }}</div>
             </div>
         </div>
 
-        <div class="tm-card p-0 mb-3" style="overflow: hidden;">
-            <div class="p-2 px-3" style="background: #101b3d;">
+        <div class="tm-card p-0 mb-3 u-abf627">
+            <div class="p-2 px-3 u-8b012c">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Enquiry details</h2>
             </div>
             <ul class="list-unstyled p-3 mb-0 enquiry-details-list">
@@ -233,8 +212,8 @@
         </div>
 
         @if ($enquiry->notes)
-            <div class="tm-card p-0" style="overflow: hidden;">
-                <div class="p-2 px-3" style="background: #1f6b30;">
+            <div class="tm-card p-0 u-abf627">
+                <div class="p-2 px-3 u-1fcbae">
                     <h2 class="h6 tm-serif fw-bold mb-0 text-white">Notes</h2>
                 </div>
                 <div class="p-3 small">{{ $enquiry->notes }}</div>

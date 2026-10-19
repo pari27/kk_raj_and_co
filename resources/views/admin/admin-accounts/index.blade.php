@@ -5,12 +5,12 @@
 @section('content')
 @php
     $accounts = [
-        ['name' => 'Shashi Kumar', 'email' => 'shashi@firm.com', 'role' => 'Super Admin', 'active' => true, 'locked' => true],
+        ['name' => 'Shashi Kumar', 'email' => 'shashi@firm.com', 'role' => 'Admin', 'active' => true, 'locked' => true],
         ['name' => 'Neha Verma', 'email' => 'neha.verma@firm.com', 'role' => 'Admin', 'active' => true, 'locked' => false],
     ];
 @endphp
 
-<x-page-header title="Admin Accounts" subtitle="Users with Super Admin or Admin access to this system" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Admin Accounts']]">
+<x-page-header title="Admin Accounts" subtitle="Users with Admin access to this system" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => 'Admin Accounts']]">
     <x-slot:actions>
         <a href="{{ route('admin.admin-accounts.create') }}" class="btn btn-tm-primary">+ Add Admin</a>
     </x-slot:actions>
@@ -37,7 +37,7 @@
                         <td><span class="badge text-bg-{{ $account['active'] ? 'success' : 'secondary' }}">{{ $account['active'] ? 'Active' : 'Inactive' }}</span></td>
                         <td class="text-end">
                             @if ($account['locked'])
-                                <span class="small tm-muted" title="Super Admin cannot be edited or deactivated">Protected</span>
+                                <span class="small tm-muted" title="The main Admin cannot be edited or deactivated">Protected</span>
                             @else
                                 <a href="{{ route('admin.admin-accounts.edit', $i + 1) }}" class="small text-decoration-underline">Edit</a>
                             @endif

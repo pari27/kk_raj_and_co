@@ -21,10 +21,10 @@
                             <img id="photoPreviewImg" class="d-none" alt="Preview">
                         </div>
                         <div class="flex-grow-1">
-                            <div class="fw-bold mb-1" style="font-size: .8rem;">Profile photo <span class="tm-muted fw-normal">(optional)</span></div>
-                            <div class="tm-muted mb-2" style="font-size: .8rem;">JPG or PNG, up to 2MB. Square photos look best.</div>
+                            <div class="fw-bold mb-1 u-5a305f">Profile photo <span class="tm-muted fw-normal">(optional)</span></div>
+                            <div class="tm-muted mb-2 u-5a305f">JPG or PNG, up to 2MB. Square photos look best.</div>
                             <div class="d-flex gap-2">
-                                <label class="btn btn-sm btn-outline-primary mb-0" style="cursor: pointer;">
+                                <label class="btn btn-sm btn-outline-primary mb-0 u-24b531">
                                     <i class="bi bi-camera me-1"></i> Upload photo
                                     <input type="file" name="photo" id="photoInput" accept="image/png,image/jpeg" class="d-none">
                                 </label>
@@ -106,7 +106,7 @@
                     </div>
 
                     <div class="form-check form-switch d-flex align-items-center gap-2">
-                        <input class="form-check-input flex-shrink-0" type="checkbox" role="switch" id="employeeActive" name="is_active" value="1" style="width: 2.4rem; height: 1.3rem;" {{ old('is_active', true) ? 'checked' : '' }}>
+                        <input class="form-check-input flex-shrink-0 u-88b2c2" type="checkbox" role="switch" id="employeeActive" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
                         <label class="mb-0 small" for="employeeActive">Active</label>
                     </div>
                 </div>
@@ -119,27 +119,27 @@
         </div>
 
         <div class="col-12 col-xl-4">
-            <div class="tm-card p-0 mb-3" style="overflow: hidden;">
-                <div class="tm-side-card-header" style="background: #101b3d;">Login access</div>
-                <ul class="list-unstyled p-3 mb-0" style="font-size: .82rem;">
+            <div class="tm-card p-0 mb-3 u-abf627">
+                <div class="tm-side-card-header u-8b012c">Login access</div>
+                <ul class="list-unstyled p-3 mb-0 u-cafaae">
                     <li class="d-flex gap-2 mb-3">
-                        <span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold" style="width:20px;height:20px;background:#eef2fb;color:#2f5fbe;font-size:.7rem;">1</span>
+                        <span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold u-e1bddb">1</span>
                         <span><strong class="d-block">Account is created</strong><span class="tm-muted">as soon as you save</span></span>
                     </li>
                     <li class="d-flex gap-2 mb-3">
-                        <span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold" style="width:20px;height:20px;background:#eef2fb;color:#2f5fbe;font-size:.7rem;">2</span>
+                        <span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold u-e1bddb">2</span>
                         <span><strong class="d-block">Login details are emailed</strong><span class="tm-muted">to the address you enter above</span></span>
                     </li>
                     <li class="d-flex gap-2 mb-0">
-                        <span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold" style="width:20px;height:20px;background:#eef2fb;color:#2f5fbe;font-size:.7rem;">3</span>
+                        <span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold u-e1bddb">3</span>
                         <span><strong class="d-block">First login</strong><span class="tm-muted">they set their own password</span></span>
                     </li>
                 </ul>
             </div>
 
-            <div class="tm-card p-0" style="overflow: hidden;">
-                <div class="tm-side-card-header" style="background: #1f6b30;">What employee can do</div>
-                <ul class="list-unstyled p-3 mb-0" style="font-size: .82rem;">
+            <div class="tm-card p-0 u-abf627">
+                <div class="tm-side-card-header u-1fcbae">What employee can do</div>
+                <ul class="list-unstyled p-3 mb-0 u-cafaae">
                     <li class="d-flex gap-2 mb-2"><span class="text-success">&#10003;</span> See and work on services assigned to them</li>
                     <li class="d-flex gap-2 mb-2"><span class="text-success">&#10003;</span> Add clients and create enquiries</li>
                     <li class="d-flex gap-2 mb-2"><span class="text-success">&#10003;</span> Upload, verify and reject documents</li>

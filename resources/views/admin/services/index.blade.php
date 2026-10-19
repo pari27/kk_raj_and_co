@@ -38,12 +38,12 @@
     @foreach ($statCards as $card)
         <div class="col-6 col-xl-3">
             <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                <span class="position-absolute rounded-circle" style="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                <span class="position-absolute rounded-circle" style="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
+                <span class="position-absolute rounded-circle u-943986"></span>
+                <span class="position-absolute rounded-circle u-e46b84"></span>
                 <div class="position-relative">
-                    <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
+                    <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] }}{{ number_format($card['count']) }}</div>
-                    <div class="small" style="color: rgba(255,255,255,.75); font-size: .72rem;">{{ $card['caption'] }}</div>
+                    <div class="small u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -116,11 +116,11 @@
                                         @if ($canManage)
                                             <a
                                                 href="{{ route('admin.services.show', $service) }}"
-                                                class="fw-semibold text-decoration-none {{ $service->is_active ? 'text-body' : 'tm-muted' }}"
-                                                style="font-size: .8rem;"
+                                                class="fw-semibold text-decoration-none {{ $service->is_active ? 'text-body' : 'tm-muted' }} u-5a305f"
+                                               
                                             >{{ $service->name }}</a>
                                         @else
-                                            <span class="fw-semibold {{ $service->is_active ? '' : 'tm-muted' }}" style="font-size: .8rem;">{{ $service->name }}</span>
+                                            <span class="fw-semibold {{ $service->is_active ? '' : 'tm-muted' }} u-5a305f">{{ $service->name }}</span>
                                         @endif
                                         @if ($service->description)
                                             <div class="tm-muted small">{{ $service->description }}</div>
@@ -191,7 +191,7 @@
             </table>
         </div>
 
-        <div class="d-flex align-items-center justify-content-between p-3 tm-muted" style="font-size: .75rem;">
+        <div class="d-flex align-items-center justify-content-between p-3 tm-muted u-cc37c5">
             <span id="servicesPaginationSummary"></span>
             <ul class="pagination pagination-sm mb-0" id="servicesPaginationPages"></ul>
         </div>
@@ -199,15 +199,15 @@
 </div>
 
 <div class="modal fade" id="serviceDocumentsModal" tabindex="-1" aria-labelledby="serviceDocumentsTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 560px;">
-        <div class="modal-content border-0" style="border-radius: 14px; overflow: hidden;">
-            <div class="d-flex align-items-center gap-3 px-4 py-3 text-white" style="background: #101b3d;">
-                <span class="d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.12);">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable u-55acce">
+        <div class="modal-content border-0 u-c4d3d8">
+            <div class="d-flex align-items-center gap-3 px-4 py-3 text-white u-8b012c">
+                <span class="d-inline-flex align-items-center justify-content-center flex-shrink-0 u-bd8f47">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path><path d="M14 2v6h6"></path></svg>
                 </span>
                 <div class="flex-grow-1">
                     <h2 class="modal-title h6 fw-bold mb-0" id="serviceDocumentsTitle">Required documents</h2>
-                    <div class="small" style="color: rgba(255,255,255,.75);" id="serviceDocumentsService"></div>
+                    <div class="small u-bbebd4" id="serviceDocumentsService"></div>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -220,13 +220,13 @@
 
             <div class="modal-body px-4 py-3" id="serviceDocumentsBody"></div>
 
-            <div class="d-flex align-items-center justify-content-between px-4 py-3" style="background: #fafbfc;">
+            <div class="d-flex align-items-center justify-content-between px-4 py-3 u-28a9d5">
                 @if ($canManage)
                     <a href="#" id="serviceDocumentsEdit" class="btn btn-outline-success btn-sm">Edit documents</a>
                 @else
                     <span></span>
                 @endif
-                <button type="button" class="btn btn-sm text-white px-3" style="background: #101b3d;" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-sm text-white px-3 u-8b012c" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

@@ -12,6 +12,7 @@
     @stack('styles')
 </head>
 <body class="portal">
+    @include('partials.flash-toast')
     @php
         $pClient = auth('customer')->user();
         $pInitial = mb_strtoupper(mb_substr(trim($pClient?->name ?? ''), 0, 1));
@@ -29,7 +30,7 @@
     <div class="d-flex flex-column flex-md-row">
         <aside class="tm-sidebar pt-4 pb-3 d-none d-md-flex flex-column" id="pSidebar">
             <div class="px-3 mb-3">
-                <a href="{{ route('customer.dashboard') }}"><img src="{{ asset('images/logo.png') }}" alt="{{ config('app.firm_name') }}" class="tm-brand-logo"></a>
+                <a href="{{ route('customer.dashboard') }}"><img src="{{ config('app.firm_logo_url') }}" alt="{{ config('app.firm_name') }}" class="tm-brand-logo"></a>
             </div>
 
             <nav class="d-flex flex-column gap-1 px-2">
@@ -37,7 +38,7 @@
                     <a href="{{ route($item['route']) }}" class="tm-nav-link {{ request()->routeIs(...$item['match']) ? 'active' : '' }}">
                         <span class="tm-nav-icon"><x-portal-icon :name="$item['icon']" :size="17" /></span>
                         {{ $item['label'] }}
-                        @if (! empty($item['badge']))<span class="badge rounded-pill bg-danger ms-auto" style="font-size: .65rem;">{{ $item['badge'] }}</span>@endif
+                        @if (! empty($item['badge']))<span class="badge rounded-pill bg-danger ms-auto u-87458d">{{ $item['badge'] }}</span>@endif
                     </a>
                 @endforeach
             </nav>
@@ -58,12 +59,12 @@
                 <button class="tm-icon-btn d-none d-md-inline-flex" type="button" id="pSidebarToggle" aria-label="Show or hide the menu">
                     <x-portal-icon name="menu" :size="18" />
                 </button>
-                <a href="{{ route('customer.dashboard') }}" class="d-md-none"><img src="{{ asset('images/logo.png') }}" alt="{{ config('app.firm_name') }}" class="tm-brand-logo" style="height: 30px;"></a>
+                <a href="{{ route('customer.dashboard') }}" class="d-md-none"><img src="{{ config('app.firm_logo_url') }}" alt="{{ config('app.firm_name') }}" class="tm-brand-logo u-871e53"></a>
 
                 <div class="d-flex align-items-center gap-3 ms-auto">
-                    <a href="{{ route('customer.updates') }}" class="tm-icon-btn position-relative text-decoration-none" style="width: 36px; height: 36px;" aria-label="Updates">
+                    <a href="{{ route('customer.updates') }}" class="tm-icon-btn position-relative text-decoration-none u-e63c6b" aria-label="Updates">
                         <x-portal-icon name="bell" :size="17" />
-                        @if ($pUnread)<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: .55rem;">{{ $pUnread }}</span>@endif
+                        @if ($pUnread)<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger u-d95e57">{{ $pUnread }}</span>@endif
                     </a>
 
                     <div class="dropdown">
@@ -71,19 +72,19 @@
                             <div class="tm-avatar">{{ $pInitial }}</div>
                             <div class="text-start d-none d-md-block">
                                 <div class="small fw-semibold text-white">{{ $pClient?->name }}</div>
-                                <div style="font-size: .72rem; color: rgba(255,255,255,.6);">Client</div>
+                                <div class="u-be643c">Client</div>
                             </div>
                             <svg class="d-none d-md-block" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
                                 <a href="{{ route('customer.profile') }}" class="dropdown-item d-flex align-items-center gap-2 tm-dropdown-item">
-                                    <span class="d-flex" style="color: var(--tm-accent);"><x-portal-icon name="user" :size="14" /></span> Profile
+                                    <span class="d-flex u-60cf33"><x-portal-icon name="user" :size="14" /></span> Profile
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('customer.password.edit') }}" class="dropdown-item d-flex align-items-center gap-2 tm-dropdown-item">
-                                    <span class="d-flex" style="color: var(--tm-accent);"><x-portal-icon name="lock" :size="14" /></span> Change Password
+                                    <span class="d-flex u-60cf33"><x-portal-icon name="lock" :size="14" /></span> Change Password
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
@@ -99,9 +100,6 @@
             </header>
 
             <main class="px-4 pb-5 pt-0 p-main">
-                @if (session('status'))
-                    <div class="alert alert-success py-2 small mt-3 mb-0" role="status">{{ session('status') }}</div>
-                @endif
                 @if ($errors->any())
                     <div class="alert alert-danger py-2 small mt-3 mb-0" role="alert">
                         @foreach ($errors->all() as $error)<div>{{ $error }}</div>@endforeach

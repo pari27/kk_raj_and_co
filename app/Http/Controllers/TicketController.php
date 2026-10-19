@@ -58,9 +58,9 @@ class TicketController extends Controller
         $ticket->load(['service.documents', 'customer', 'enquiry.tickets', 'enquiry.payments', 'assignedTo', 'createdBy', 'documents.uploadedBy', 'documents.verifiedBy']);
 
         $employees = User::query()
-            ->whereIn('role', [UserRole::Admin, UserRole::SuperAdmin, UserRole::Employee])
+            ->whereIn('role', [UserRole::Admin, UserRole::Employee])
             ->where('is_active', true)
-            ->orderByRaw('CASE role WHEN ? THEN 0 WHEN ? THEN 1 ELSE 2 END', [UserRole::Admin->value, UserRole::SuperAdmin->value])
+            ->orderByRaw('CASE role WHEN ? THEN 0 ELSE 1 END', [UserRole::Admin->value])
             ->orderBy('name')
             ->get(['id', 'name', 'role']);
 
@@ -121,7 +121,7 @@ class TicketController extends Controller
     {
         $this->authorize('reassign', Ticket::class);
 
-        $assignableRoles = [UserRole::Admin->value, UserRole::SuperAdmin->value, UserRole::Employee->value];
+        $assignableRoles = [UserRole::Admin->value, UserRole::Employee->value];
         $validated = Validator::make(request()->all(), [
             'assigned_to' => [
                 'nullable',

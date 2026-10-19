@@ -305,3 +305,41 @@ body.portal .tm-table thead th:last-child {
 .p-prof-contact .nm { font-size: .85rem; font-weight: 700; }
 .p-prof-contact .sb { font-size: .72rem; color: var(--tm-muted); }
 .p-prof-contact .call { width: 32px; height: 32px; border-radius: 50%; background: #e3f4ea; color: var(--p-green); display: grid; place-items: center; }
+
+
+/* ==========================================================================
+   Former inline style="" attributes. Doubled class keeps the weight an inline
+   style had, so Bootstrap and other rules still lose to it.
+   ========================================================================== */
+.u-09d558.u-09d558 { font-size: .7rem; letter-spacing: .08em; font-weight: 700; }
+.u-0b9c7b.u-0b9c7b { width: 2.6rem; height: 1.4rem; float: none; }
+.u-1fcbae.u-1fcbae { background: #1f6b30; }
+.u-24d101.u-24d101 { background: #fff; border: 1px solid #f0b8b3; color: #b3261e; font-weight: 700; }
+.u-2fbbac.u-2fbbac { color: var(--p-green); font-size: .9rem; }
+.u-31d897.u-31d897 { font-size: .75rem; color: #000; }
+.u-43a94f.u-43a94f { font-size: .8rem; font-weight: 700; }
+.u-53e7d7.u-53e7d7 { padding: 0; border: 0; }
+.u-5a305f.u-5a305f { font-size: .8rem; }
+.u-60cf33.u-60cf33 { color: var(--tm-accent); }
+.u-6baed3.u-6baed3 { font-size: .66rem; }
+.u-73dcfa.u-73dcfa { background: #fdf3e0; color: #7a5b12; }
+.u-7a963a.u-7a963a { line-height: 1.7; font-size: .8rem; color: #000; }
+.u-871e53.u-871e53 { height: 30px; }
+.u-87458d.u-87458d { font-size: .65rem; }
+.u-8ae449.u-8ae449 { font-size: .85rem; }
+.u-8b012c.u-8b012c { background: #101b3d; }
+.u-9d3471.u-9d3471 { width: 38px; height: 38px; background: var(--tm-accent); color: #fff; }
+.u-abf627.u-abf627 { overflow: hidden; }
+.u-b0faf0.u-b0faf0 { background: #e0ebff; color: #1d4fb8; font-weight: 700; font-size: .78rem; }
+.u-b75578.u-b75578 { color:#dc3545; }
+.u-bb809f.u-bb809f { font-size: .68rem; letter-spacing: .08em; margin-bottom: .6rem; }
+.u-bbebd4.u-bbebd4 { color: rgba(255,255,255,.75); }
+.u-be643c.u-be643c { font-size: .72rem; color: rgba(255,255,255,.6); }
+.u-cafcd9.u-cafcd9 { min-width: 32px; }
+.u-cc37c5.u-cc37c5 { font-size: .75rem; }
+.u-d59019.u-d59019 { color:#1f6b30; }
+.u-d95e57.u-d95e57 { font-size: .55rem; }
+.u-e63c6b.u-e63c6b { width: 36px; height: 36px; }
+.u-e83e11.u-e83e11 { font-size: 1.15rem; }
+.u-ea1160.u-ea1160 { background: #dff3ea; color: #0f766e; }
+.u-ef2c44.u-ef2c44 { background: #f8f9fb; }

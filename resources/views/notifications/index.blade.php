@@ -2,11 +2,6 @@
 
 @section('title', 'Notifications — ' . config('app.name', 'Task Management'))
 
-@push('styles')
-<style>
-    .tm-notif, .tm-notif .btn, .tm-notif .badge, .tm-notif .small, .tm-notif .form-check-label, .tm-notif .pagination { font-size: .8rem; }
-</style>
-@endpush
 
 @php
     $groups = $notifications->getCollection()->groupBy(function ($n) {
@@ -50,7 +45,7 @@
             </div>
 
             @forelse ($groups as $label => $items)
-                <div class="px-4 py-2 small fw-bold tm-muted text-uppercase" style="background: var(--tm-surface-muted, #f3f4f8); letter-spacing: .06em;">{{ $label }}</div>
+                <div class="px-4 py-2 small fw-bold tm-muted text-uppercase u-8e4f28">{{ $label }}</div>
                 @foreach ($items as $n)
                     <a href="{{ route('notifications.open', $n) }}" class="d-flex gap-3 px-4 py-3 border-bottom text-decoration-none text-reset" style="{{ $n->isUnread() ? 'background: #f5f8ff;' : '' }}">
                         @include('notifications._icon', ['notification' => $n, 'size' => 42])
@@ -59,7 +54,7 @@
                                 <span class="fw-bold">{{ $n->title }}</span>
                                 <span class="d-flex align-items-center gap-2 small tm-muted flex-shrink-0">
                                     {{ $label === 'Today' ? $n->created_at->diffForHumans(short: true) : $n->created_at->format('g:i A') }}
-                                    <span class="rounded-circle {{ $n->isUnread() ? 'bg-success' : '' }}" style="width: 8px; height: 8px; display: inline-block;"></span>
+                                    <span class="rounded-circle {{ $n->isUnread() ? 'bg-success' : '' }} u-59c4af"></span>
                                 </span>
                             </div>
                             <div class="small">{{ $n->renderBody() }}</div>

@@ -17,7 +17,7 @@ class NotificationTest extends TestCase
     public function test_admins_are_notified_of_a_new_enquiry_but_not_the_creator(): void
     {
         $creator = User::factory()->create(['role' => UserRole::Admin, 'is_active' => true]);
-        $other = User::factory()->create(['role' => UserRole::SuperAdmin, 'is_active' => true]);
+        $other = User::factory()->create(['role' => UserRole::Admin, 'is_active' => true]);
 
         $this->actingAs($creator);
         Enquiry::factory()->create(['created_by' => $creator->id]);
@@ -51,7 +51,7 @@ class NotificationTest extends TestCase
     public function test_admins_and_the_assignee_are_notified_when_a_service_is_assigned(): void
     {
         $actor = User::factory()->create(['role' => UserRole::Admin, 'is_active' => true]);
-        $otherAdmin = User::factory()->create(['role' => UserRole::SuperAdmin, 'is_active' => true]);
+        $otherAdmin = User::factory()->create(['role' => UserRole::Admin, 'is_active' => true]);
         $employee = User::factory()->create(['role' => UserRole::Employee, 'is_active' => true, 'name' => 'Priya Das']);
 
         $this->actingAs($actor);
@@ -71,7 +71,7 @@ class NotificationTest extends TestCase
     public function test_admins_are_notified_when_a_service_is_reassigned(): void
     {
         $actor = User::factory()->create(['role' => UserRole::Admin, 'is_active' => true]);
-        $otherAdmin = User::factory()->create(['role' => UserRole::SuperAdmin, 'is_active' => true]);
+        $otherAdmin = User::factory()->create(['role' => UserRole::Admin, 'is_active' => true]);
         $first = User::factory()->create(['role' => UserRole::Employee, 'is_active' => true]);
         $second = User::factory()->create(['role' => UserRole::Employee, 'is_active' => true, 'name' => 'Tinni Sengupta']);
         $ticket = \App\Models\Ticket::factory()->create(['assigned_to' => $first->id]);
@@ -87,7 +87,7 @@ class NotificationTest extends TestCase
     public function test_an_unassigned_service_notifies_nobody(): void
     {
         $actor = User::factory()->create(['role' => UserRole::Admin, 'is_active' => true]);
-        User::factory()->create(['role' => UserRole::SuperAdmin, 'is_active' => true]);
+        User::factory()->create(['role' => UserRole::Admin, 'is_active' => true]);
 
         $this->actingAs($actor);
         \App\Models\Ticket::factory()->create(['assigned_to' => null]);

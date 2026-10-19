@@ -4,57 +4,11 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
-<style>
-    .tm-ticket-tab {
-        padding: .4rem .9rem;
-        border-radius: 999px;
-        border-bottom: 0;
-        font-size: .8rem;
-        background-color: #6c757d;
-        color: #fff;
-    }
-    .tm-ticket-tab.active {
-        background-color: #101b3d;
-        color: #fff;
-        border-bottom: 0;
-    }
-    .tm-ticket-tab.active .badge {
-        background-color: #fff !important;
-        border-color: #fff !important;
-        color: #101b3d !important;
-    }
-    #paginationBar {
-        font-size: .75rem;
-    }
-    #pendingTable tbody td,
-    #historyTable tbody td {
-        font-size: .8rem;
-    }
-    #ticketDateRangeBtn {
-        font-size: .78rem;
-        font-weight: 600;
-        color: var(--tm-text);
-    }
-    #ticketDateRangeBtn:hover,
-    #ticketDateRangeBtn:focus,
-    #ticketDateRangeBtn:active {
-        background-color: transparent !important;
-        color: var(--tm-text) !important;
-        border-color: var(--tm-surface-border) !important;
-    }
-    .daterangepicker td.active, .daterangepicker td.active:hover {
-        background-color: var(--tm-accent);
-    }
-    .daterangepicker .ranges li.active {
-        background-color: #101b3d;
-        color: #fff;
-    }
-</style>
 @endpush
 
 @section('content')
 @php
-    $isAdmin = auth()->user()->isSuperAdmin() || auth()->user()->isAdmin();
+    $isAdmin = auth()->user()->isAdmin();
 
     $pendingCards = [
         ['label' => 'Pending services', 'count' => $stats['pending_total'], 'caption' => $isAdmin ? 'across the firm' : 'assigned to you', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
@@ -74,8 +28,8 @@
 <x-breadcrumbs :items="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => $isAdmin ? 'Services' : 'My services']]" />
 <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 pb-3 mb-4 tm-divider-gold">
     <div>
-        <h1 class="tm-serif fw-bold mb-1" style="font-size: 1.15rem;">{{ $isAdmin ? 'Services' : 'My services' }}</h1>
-        <p class="tm-muted mb-0" id="ticketsSubtitle" style="font-size: .8rem;">{{ $isAdmin ? 'All services in progress, from new to awaiting final payment' : 'Services assigned to you, from new to awaiting final payment' }}</p>
+        <h1 class="tm-serif fw-bold mb-1 u-e83e11">{{ $isAdmin ? 'Services' : 'My services' }}</h1>
+        <p class="tm-muted mb-0 u-5a305f" id="ticketsSubtitle">{{ $isAdmin ? 'All services in progress, from new to awaiting final payment' : 'Services assigned to you, from new to awaiting final payment' }}</p>
     </div>
     <a href="{{ route('enquiries.create') }}" class="btn btn-tm-primary">+ New Enquiry</a>
 </div>
@@ -84,12 +38,12 @@
     @foreach ($pendingCards as $card)
         <div class="col-6 col-xl-3">
             <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                <span class="position-absolute rounded-circle" style="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                <span class="position-absolute rounded-circle" style="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
+                <span class="position-absolute rounded-circle u-943986"></span>
+                <span class="position-absolute rounded-circle u-e46b84"></span>
                 <div class="position-relative">
-                    <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
+                    <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['count'] }}</div>
-                    <div class="small" style="color: rgba(255,255,255,.75);">{{ $card['caption'] }}</div>
+                    <div class="small u-bbebd4">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -100,12 +54,12 @@
     @foreach ($historyCards as $card)
         <div class="col-6 col-xl-3">
             <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                <span class="position-absolute rounded-circle" style="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                <span class="position-absolute rounded-circle" style="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
+                <span class="position-absolute rounded-circle u-943986"></span>
+                <span class="position-absolute rounded-circle u-e46b84"></span>
                 <div class="position-relative">
-                    <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
+                    <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ number_format($card['count']) }}{{ $card['suffix'] ?? '' }}</div>
-                    <div class="small" style="color: rgba(255,255,255,.75); font-size: .72rem;">{{ $card['caption'] }}</div>
+                    <div class="small u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -124,14 +78,14 @@
     <hr class="mt-2 mb-0">
 
     <div class="p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
-        <div class="flex-grow-1" style="max-width: 320px;">
+        <div class="flex-grow-1 u-ef4432">
             <input type="text" id="ticketSearch" class="form-control tm-field" placeholder="Search service no., client, phone, status or assignee">
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <div id="ticketDateRangeWrap" class="d-none" style="min-width: 220px;">
+            <div id="ticketDateRangeWrap" class="d-none u-ad9e48">
                 <button type="button" id="ticketDateRangeBtn" class="btn btn-outline-secondary d-flex align-items-center gap-2 w-100">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    <span id="ticketDateRangeLabel" class="flex-grow-1 text-start" style="font-weight: 400;">All time</span>
+                    <span id="ticketDateRangeLabel" class="flex-grow-1 text-start u-fe3f5c">All time</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
                 <input type="hidden" id="ticketDateFrom">
@@ -170,7 +124,7 @@
             <tbody>
                 @forelse ($pending as $i => $ticket)
                     @php
-                        $openDays = $ticket->created_at->diffInDays(now());
+                        $openDays = (int) abs($ticket->created_at->diffInDays(now()));
                         $ticketDocs = $ticket->service->documents;
                         $verifiedDocs = $ticketDocs->filter(function ($serviceDocument) use ($ticket) {
                             $current = $ticket->documents->where('service_document_id', $serviceDocument->id)->sortByDesc('version')->first();
@@ -190,11 +144,11 @@
                     >
                         <td>
                             <div class="fw-semibold">{{ $ticket->number }}</div>
-                            <div class="tm-muted" style="font-size: .78rem;">{{ $ticket->service->name }}</div>
+                            <div class="tm-muted u-31578e">{{ $ticket->service->name }}</div>
                         </td>
                         <td>
-                            <div>{{ $ticket->customer->name }}</div>
-                            <div class="tm-muted" style="font-size: .78rem;">{{ $ticket->customer->phone }}</div>
+                            <div class="fw-bold">{{ $ticket->customer->name }}</div>
+                            <div class="tm-muted u-31578e">{{ $ticket->customer->phone }}</div>
                         </td>
                         @if ($isAdmin)
                             <td>{{ $ticket->assignedTo->name ?? 'Unassigned' }}</td>
@@ -514,7 +468,7 @@
             });
         }
 
-        switchTab('pending');
+        switchTab(new URLSearchParams(window.location.search).get('tab') === 'completed' ? 'history' : 'pending');
     })();
 </script>
 @endpush

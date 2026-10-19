@@ -68,11 +68,10 @@ class EnquiryController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'role']);
 
-        if (Auth::user()->isAdmin() || Auth::user()->isSuperAdmin()) {
+        if (Auth::user()->isAdmin()) {
             $adminAssignees = User::query()
-                ->whereIn('role', [UserRole::Admin, UserRole::SuperAdmin])
+                ->whereIn('role', [UserRole::Admin])
                 ->where('is_active', true)
-                ->orderByRaw('CASE role WHEN ? THEN 0 ELSE 1 END', [UserRole::Admin->value])
                 ->orderBy('name')
                 ->get(['id', 'name', 'role']);
 

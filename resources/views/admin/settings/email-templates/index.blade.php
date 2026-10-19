@@ -4,19 +4,6 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
-<style>
-    #emailTemplatesTable.tm-table thead th:first-child,
-    #emailTemplatesTable.tm-table thead th:last-child {
-        border-radius: 0;
-    }
-    #emailTemplatesTable.dataTable {
-        border-collapse: collapse !important;
-    }
-    #emailTemplatesTable tbody td,
-    #emailTemplatesTable tbody td code {
-        font-size: .8rem;
-    }
-</style>
 @endpush
 
 @section('content')
@@ -29,7 +16,7 @@
 
 <div class="tm-card p-0">
     <div class="p-3">
-        <input type="search" id="emailTemplatesSearch" class="form-control form-control-sm tm-field" placeholder="Search by template key or subject" aria-label="Search email templates" style="max-width: 320px;">
+        <input type="search" id="emailTemplatesSearch" class="form-control form-control-sm tm-field u-ef4432" placeholder="Search by template key or subject" aria-label="Search email templates">
     </div>
 
     <div class="table-responsive">

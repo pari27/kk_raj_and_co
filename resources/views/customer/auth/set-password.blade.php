@@ -5,7 +5,7 @@
 @section('content')
 <div class="tm-auth-card">
     <div class="text-center mb-4">
-        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.firm_name') }}" class="d-block mx-auto mb-3" style="height: 26px; width: auto;">
+        <img src="{{ config('app.firm_logo_url') }}" alt="{{ config('app.firm_name') }}" class="d-block mx-auto mb-3 u-a60e1d">
         <h1 class="h4 text-white fw-semibold mb-1">Set your password</h1>
         <p class="tm-muted small mb-0">
             Code verified. Choose a password for your account.

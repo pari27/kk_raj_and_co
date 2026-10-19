@@ -9,7 +9,7 @@ class TicketPolicy
 {
     private function isAdminLike(User $user): bool
     {
-        return $user->isSuperAdmin() || $user->isAdmin();
+        return $user->isAdmin();
     }
 
     public function viewAny(User $user): bool
@@ -18,7 +18,7 @@ class TicketPolicy
     }
 
     /**
-     * Admins/SuperAdmins see every ticket; an Employee only sees tickets assigned to them.
+     * Admins see every ticket; an Employee only sees tickets assigned to them.
      */
     public function view(User $user, Ticket $ticket): bool
     {
@@ -31,7 +31,7 @@ class TicketPolicy
     }
 
     /**
-     * Admins/SuperAdmins and the assigned employee can upload documents on a ticket.
+     * Admins and the assigned employee can upload documents on a ticket.
      */
     public function uploadDocument(User $user, Ticket $ticket): bool
     {
@@ -39,7 +39,7 @@ class TicketPolicy
     }
 
     /**
-     * Admins/SuperAdmins and the assigned employee can verify/reject uploaded documents.
+     * Admins and the assigned employee can verify/reject uploaded documents.
      */
     public function verifyDocument(User $user, Ticket $ticket): bool
     {
@@ -47,7 +47,7 @@ class TicketPolicy
     }
 
     /**
-     * Reassigning a ticket to a different employee is an Admin/SuperAdmin-only action.
+     * Reassigning a ticket to a different employee is an Admin-only action.
      */
     public function reassign(User $user): bool
     {

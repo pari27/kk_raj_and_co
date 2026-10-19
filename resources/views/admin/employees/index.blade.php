@@ -23,12 +23,12 @@
     @foreach ($statCards as $card)
         <div class="col-6 col-xl-3">
             <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                <span class="position-absolute rounded-circle" style="width: 90px; height: 90px; right: -30px; bottom: -35px; background: rgba(255,255,255,.12);"></span>
-                <span class="position-absolute rounded-circle" style="width: 55px; height: 55px; right: 15px; bottom: -20px; background: rgba(255,255,255,.14);"></span>
+                <span class="position-absolute rounded-circle u-943986"></span>
+                <span class="position-absolute rounded-circle u-e46b84"></span>
                 <div class="position-relative">
-                    <div class="small mb-2" style="color: rgba(255,255,255,.75);">{{ $card['label'] }}</div>
+                    <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ number_format($card['count']) }}</div>
-                    <div class="small" style="color: rgba(255,255,255,.75); font-size: .72rem;">{{ $card['caption'] }}</div>
+                    <div class="small u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -47,9 +47,9 @@
             </div>
             <div class="col-12 col-lg-7 d-flex flex-wrap align-items-center justify-content-lg-end gap-2">
                 <div class="d-flex flex-wrap gap-1" role="group" aria-label="Filter employees by status">
-                    <button type="button" class="tm-filter-pill active" style="font-size: .8rem;" data-filter="all">All {{ $employees->count() }}</button>
-                    <button type="button" class="tm-filter-pill" style="font-size: .8rem;" data-filter="active">Active {{ $activeCount }}</button>
-                    <button type="button" class="tm-filter-pill" style="font-size: .8rem;" data-filter="inactive">Inactive {{ $inactiveCount }}</button>
+                    <button type="button" class="tm-filter-pill active u-5a305f" data-filter="all">All {{ $employees->count() }}</button>
+                    <button type="button" class="tm-filter-pill u-5a305f" data-filter="active">Active {{ $activeCount }}</button>
+                    <button type="button" class="tm-filter-pill u-5a305f" data-filter="inactive">Inactive {{ $inactiveCount }}</button>
                 </div>
             </div>
         </div>
@@ -75,14 +75,14 @@
                                     @else
                                         <span class="tm-service-avatar rounded-circle bg-primary-subtle text-primary">{{ $initials }}</span>
                                     @endif
-                                    <a href="{{ route('admin.employees.show', $employee) }}" class="fw-semibold text-decoration-none text-body" style="font-size: .8rem;">{{ $employee->name }}</a>
+                                    <a href="{{ route('admin.employees.show', $employee) }}" class="fw-semibold text-decoration-none text-body u-5a305f">{{ $employee->name }}</a>
                                 </div>
                             </td>
                             <td>
-                                <div style="font-size: .8rem;">{{ $employee->email }}</div>
+                                <div class="u-5a305f">{{ $employee->email }}</div>
                                 <div class="tm-muted small">{{ $employee->profile?->mobile ? '+91 ' . $employee->profile->mobile : 'Phone not set' }}</div>
                             </td>
-                            <td style="font-size: .8rem;">{{ $employee->profile?->designation?->name ?? '—' }}</td>
+                            <td class="u-5a305f">{{ $employee->profile?->designation?->name ?? '—' }}</td>
                             <td><span class="badge rounded-pill {{ $employee->is_active ? 'text-bg-success' : 'text-bg-secondary' }}">{{ $employee->is_active ? 'Active' : 'Inactive' }}</span></td>
                             <td class="text-end">
                                 <div class="d-inline-flex justify-content-end gap-1">
@@ -100,7 +100,7 @@
             </table>
         </div>
 
-        <div class="d-flex align-items-center justify-content-between p-3 tm-muted" style="font-size: .75rem;">
+        <div class="d-flex align-items-center justify-content-between p-3 tm-muted u-cc37c5">
             <span id="employeesPaginationSummary"></span>
             <ul class="pagination pagination-sm mb-0" id="employeesPaginationPages"></ul>
         </div>

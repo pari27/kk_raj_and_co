@@ -21,9 +21,8 @@ class StoreEnquiryRequest extends FormRequest
         $hasExistingCustomer = $this->filled('customer_id');
         $assignableRoles = [UserRole::Employee->value];
 
-        if ($this->user()?->isAdmin() || $this->user()?->isSuperAdmin()) {
+        if ($this->user()?->isAdmin()) {
             $assignableRoles[] = UserRole::Admin->value;
-            $assignableRoles[] = UserRole::SuperAdmin->value;
         }
 
         return [
