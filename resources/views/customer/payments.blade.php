@@ -93,6 +93,9 @@
                         Please add <strong>{{ $reference }}</strong> in the payment note so we can match it to your account.
                         Once we record your payment, it shows as <strong>Paid</strong> here.
                     </div>
+                    @if (config('app.payment_instructions'))
+                        <div class="p-pay-note p-pay-extra">{!! nl2br(e(config('app.payment_instructions'))) !!}</div>
+                    @endif
                 </div>
                 <div class="p-pay-foot">
                     <span>@if (config('app.firm_phone')) Questions? {{ config('app.firm_phone') }} @endif</span>

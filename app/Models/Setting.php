@@ -5,7 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['test_mode', 'notifications_enabled', 'service_prefix', 'enquiry_prefix', 'firm_name', 'firm_address', 'firm_logo_path'])]
+#[Fillable([
+    'test_mode', 'notifications_enabled', 'service_prefix', 'enquiry_prefix',
+    'firm_name', 'firm_address', 'firm_logo_path',
+    'payment_upi_id', 'payment_bank_account_name', 'payment_bank_account_number',
+    'payment_bank_ifsc', 'payment_bank_branch', 'payment_instructions',
+])]
 class Setting extends Model
 {
     protected function casts(): array
@@ -67,6 +72,14 @@ class Setting extends Model
             'app.firm_logo_url' => $setting?->firm_logo_path
                 ? \Illuminate\Support\Facades\Storage::disk('public')->url($setting->firm_logo_path)
                 : asset('images/logo.png'),
+
+            // How clients can pay (Settings > Payment Details), shown in the client portal.
+            'app.firm_upi_id' => $setting?->payment_upi_id ?: config('app.firm_upi_id'),
+            'app.firm_bank_account_name' => $setting?->payment_bank_account_name ?: config('app.firm_bank_account_name'),
+            'app.firm_bank_account_number' => $setting?->payment_bank_account_number ?: config('app.firm_bank_account_number'),
+            'app.firm_bank_ifsc' => $setting?->payment_bank_ifsc ?: config('app.firm_bank_ifsc'),
+            'app.firm_bank_branch' => $setting?->payment_bank_branch ?: config('app.firm_bank_branch'),
+            'app.payment_instructions' => $setting?->payment_instructions,
         ]);
     }
 

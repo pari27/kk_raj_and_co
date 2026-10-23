@@ -2588,3 +2588,6 @@ body.route-tickets-show .ts-wrapper.form-select.focus { border-color: var(--tm-a
 /* Firm profile: current logo preview */
 .firm-logo-preview { display: inline-block; background: #101b3d; border-radius: .5rem; padding: .6rem 1rem; }
 .firm-logo-preview img { display: block; height: 34px; width: auto; max-width: 240px; }
+
+/* Payment details: "Where clients see this" help text */
+.payment-help { font-size: .8rem; }

@@ -207,8 +207,8 @@ body.portal > .d-flex { flex: 1 0 auto; }
 .p-upd .ico.red { background: #fde8e6; color: #b3261e; }
 .p-upd .ico.green { background: #e3f4e8; color: #1f6b30; }
 .p-upd .ico.gray { background: #eceee9; color: #5a5f55; }
-.p-upd .tt { font-weight: 700; font-size: .92rem; }
-.p-upd .bd { font-size: .85rem; color: var(--tm-muted); }
+.p-upd .tt { font-weight: 700; font-size: .8rem; }
+.p-upd .bd { font-size: .72rem; color: var(--tm-muted); }
 .p-upd .tm { margin-left: auto; font-size: .78rem; color: var(--tm-muted); white-space: nowrap; display: flex; align-items: flex-start; gap: .5rem; }
 .p-upd .tm i { width: 8px; height: 8px; border-radius: 50%; background: #2f9e58; display: inline-block; margin-top: .35rem; }
 
@@ -343,3 +343,5 @@ body.portal .tm-table thead th:last-child {
 .u-e83e11.u-e83e11 { font-size: 1.15rem; }
 .u-ea1160.u-ea1160 { background: #dff3ea; color: #0f766e; }
 .u-ef2c44.u-ef2c44 { background: #f8f9fb; }
+
+.p-pay-extra { background: #f3f4f7; margin-top: .6rem; }

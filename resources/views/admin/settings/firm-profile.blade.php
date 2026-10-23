@@ -7,6 +7,7 @@
 
 <ul class="nav nav-tabs mb-4">
     <li class="nav-item"><span class="nav-link active">Firm Profile</span></li>
+    <li class="nav-item"><a class="nav-link" href="{{ route('admin.settings.payment-details') }}">Payment Details</a></li>
     <li class="nav-item"><a class="nav-link" href="{{ route('admin.settings.email-templates.index') }}">Email Templates</a></li>
 </ul>
 

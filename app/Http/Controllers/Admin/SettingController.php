@@ -19,6 +19,47 @@ class SettingController extends Controller
         return view('admin.settings.firm-profile', compact('setting'));
     }
 
+    public function editPaymentDetails(): View
+    {
+        return view('admin.settings.payment-details', ['setting' => Setting::current()]);
+    }
+
+    public function updatePaymentDetails(Request $request): RedirectResponse
+    {
+        $request->merge(['payment_bank_ifsc' => strtoupper(trim((string) $request->input('payment_bank_ifsc')))]);
+
+        $validated = $request->validate([
+            'payment_upi_id' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9._-]{2,}@[A-Za-z0-9]{2,}$/'],
+            'payment_bank_account_name' => ['nullable', 'string', 'max:120'],
+            'payment_bank_account_number' => ['nullable', 'string', 'max:40', 'regex:/^[0-9 ]{6,40}$/'],
+            'payment_bank_ifsc' => ['nullable', 'string', 'regex:/^[A-Z]{4}0[A-Z0-9]{6}$/'],
+            'payment_bank_branch' => ['nullable', 'string', 'max:160'],
+            'payment_instructions' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'payment_upi_id.regex' => 'Enter a UPI ID like name@bank.',
+            'payment_bank_account_number.regex' => 'The account number can only have digits (and spaces), 6 or more.',
+            'payment_bank_ifsc.regex' => 'An IFSC code has 4 letters, a 0, then 6 letters or digits (for example HDFC0001234).',
+        ]);
+
+        $setting = Setting::current();
+        $fields = array_keys($validated);
+        $before = $setting->only($fields);
+
+        $setting->update(array_map(fn ($value) => $value === null || trim($value) === '' ? null : trim($value), $validated));
+
+        if ($before !== $setting->fresh()->only($fields)) {
+            AuditLogger::log(
+                action: 'Updated',
+                module: 'Settings',
+                recordLabel: 'Payment details',
+                details: 'Payment details shown to clients were changed',
+                subject: $setting,
+            );
+        }
+
+        return redirect()->route('admin.settings.payment-details');
+    }
+
     public function updateFirmProfile(Request $request): RedirectResponse
     {
         $validated = $request->validate([

@@ -11,6 +11,7 @@
 
 <ul class="nav nav-tabs mb-4">
     <li class="nav-item"><a class="nav-link" href="{{ route('admin.settings.firm-profile') }}">Firm Profile</a></li>
+    <li class="nav-item"><a class="nav-link" href="{{ route('admin.settings.payment-details') }}">Payment Details</a></li>
     <li class="nav-item"><span class="nav-link active">Email Templates</span></li>
 </ul>
 

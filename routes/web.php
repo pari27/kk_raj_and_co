@@ -148,6 +148,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('settings/firm-profile', [SettingController::class, 'edit'])->name('settings.firm-profile');
         Route::put('settings/firm-profile', [SettingController::class, 'updateFirmProfile'])->name('settings.firm-profile.update');
+        Route::get('settings/payment-details', [SettingController::class, 'editPaymentDetails'])->name('settings.payment-details');
+        Route::put('settings/payment-details', [SettingController::class, 'updatePaymentDetails'])->name('settings.payment-details.update');
         Route::put('settings/system', [SettingController::class, 'update'])->name('settings.system.update');
         Route::put('settings/numbering', [SettingController::class, 'updateNumbering'])->name('settings.numbering.update');
         Route::get('settings/email-templates', [EmailTemplateController::class, 'index'])->name('settings.email-templates.index');
