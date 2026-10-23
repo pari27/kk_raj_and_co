@@ -345,3 +345,6 @@ body.portal .tm-table thead th:last-child {
 .u-ef2c44.u-ef2c44 { background: #f8f9fb; }
 
 .p-pay-extra { background: #f3f4f7; margin-top: .6rem; }
+
+a.p-stat { display: block; color: #fff; text-decoration: none; transition: transform .15s ease, box-shadow .15s ease; }
+a.p-stat:hover { color: #fff; transform: translateY(-3px); box-shadow: 0 10px 22px rgba(16, 27, 61, .25); }

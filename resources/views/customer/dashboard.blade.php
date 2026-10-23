@@ -19,32 +19,32 @@
 
 <div class="row g-3 mb-3">
     <div class="col-6 col-xl-3 d-none d-md-block">
-        <div class="p-stat blue">
+        <a href="{{ route('customer.tickets.index') }}" class="p-stat blue">
             <div class="lb">Active services</div>
             <div class="vl">{{ $stats['active'] }}</div>
             <div class="sb">in progress</div>
-        </div>
+        </a>
     </div>
     <div class="col-6 col-xl-3">
-        <div class="p-stat amber">
+        <a href="{{ $firstUpload['url'] ?? route('customer.tickets.index') }}" class="p-stat amber">
             <div class="lb">Documents needed</div>
             <div class="vl">{{ $stats['documents'] }}</div>
             <div class="sb">{{ $stats['documentServices'] }}</div>
-        </div>
+        </a>
     </div>
     <div class="col-6 col-xl-3">
-        <div class="p-stat maroon">
+        <a href="{{ route('customer.payments.index') }}" class="p-stat maroon">
             <div class="lb">Amount due</div>
             <div class="vl">{{ $money($stats['due']) }}</div>
             <div class="sb">{{ $stats['dueServices'] ? 'across '.$stats['dueServices'].' '.($stats['dueServices'] === 1 ? 'service' : 'services') : 'nothing due' }}</div>
-        </div>
+        </a>
     </div>
     <div class="col-6 col-xl-3 d-none d-md-block">
-        <div class="p-stat green">
+        <a href="{{ route('customer.tickets.index') }}" class="p-stat green">
             <div class="lb">Completed</div>
             <div class="vl">{{ $stats['completed'] }}</div>
             <div class="sb">this year</div>
-        </div>
+        </a>
     </div>
 </div>
 
