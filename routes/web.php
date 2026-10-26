@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAccountController;
+use App\Http\Controllers\Admin\SystemController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\EmailTemplateController;
@@ -119,6 +120,25 @@ Route::middleware('auth')->group(function () {
         Route::get('audit-log/export', [AuditLogController::class, 'export'])->name('audit-log.export');
     });
 
+    // The software team only: who has Admin access to the system.
+    Route::middleware('role:SuperAdmin')->name('admin.')->group(function () {
+        Route::get('admin-accounts', [AdminAccountController::class, 'index'])->name('admin-accounts.index');
+        Route::get('admin-accounts/create', [AdminAccountController::class, 'create'])->name('admin-accounts.create');
+        Route::post('admin-accounts', [AdminAccountController::class, 'store'])->name('admin-accounts.store');
+        Route::get('admin-accounts/{adminAccount}/edit', [AdminAccountController::class, 'edit'])->name('admin-accounts.edit');
+        Route::put('admin-accounts/{adminAccount}', [AdminAccountController::class, 'update'])->name('admin-accounts.update');
+        Route::post('admin-accounts/{adminAccount}/resend-invite', [AdminAccountController::class, 'resendInvitation'])->name('admin-accounts.resend-invite');
+    });
+
+    // The software team only: system health and recent errors.
+    Route::middleware('role:SuperAdmin')->prefix('system')->name('super.')->group(function () {
+        Route::get('/', [SystemController::class, 'index'])->name('system');
+        Route::get('log', [SystemController::class, 'downloadLog'])->name('system.log');
+        Route::post('errors/resolve', [SystemController::class, 'resolve'])->name('system.errors.resolve');
+        Route::post('errors/resolve-all', [SystemController::class, 'resolveAll'])->name('system.errors.resolve-all');
+        Route::post('errors/reopen', [SystemController::class, 'reopen'])->name('system.errors.reopen');
+    });
+
     Route::middleware('role:Admin')->name('admin.')->group(function () {
         Route::get('master-services/create', [ServiceController::class, 'create'])->name('services.create');
         Route::post('master-services', [ServiceController::class, 'store'])->name('services.store');
@@ -143,12 +163,6 @@ Route::middleware('auth')->group(function () {
         Route::patch('master-employees/{employee}/toggle-active', [EmployeeController::class, 'toggleActive'])->name('employees.toggle-active');
         Route::post('master-employees/{employee}/resend-invite', [EmployeeController::class, 'resendInvite'])->name('employees.resend-invite');
 
-        Route::get('admin-accounts', [AdminAccountController::class, 'index'])->name('admin-accounts.index');
-        Route::get('admin-accounts/create', [AdminAccountController::class, 'create'])->name('admin-accounts.create');
-        Route::post('admin-accounts', [AdminAccountController::class, 'store'])->name('admin-accounts.store');
-        Route::get('admin-accounts/{adminAccount}/edit', [AdminAccountController::class, 'edit'])->name('admin-accounts.edit');
-        Route::put('admin-accounts/{adminAccount}', [AdminAccountController::class, 'update'])->name('admin-accounts.update');
-        Route::post('admin-accounts/{adminAccount}/resend-invite', [AdminAccountController::class, 'resendInvitation'])->name('admin-accounts.resend-invite');
 
         Route::get('settings/firm-profile', [SettingController::class, 'edit'])->name('settings.firm-profile');
         Route::put('settings/firm-profile', [SettingController::class, 'updateFirmProfile'])->name('settings.firm-profile.update');

@@ -33,8 +33,6 @@ class UiSmokeTest extends TestCase
             ['admin.designations.index'],
             ['admin.employees.index'],
             ['admin.employees.create'],
-            ['admin.admin-accounts.index'],
-            ['admin.admin-accounts.create'],
             ['admin.audit-log'],
             ['admin.settings.firm-profile'],
             ['admin.settings.email-templates.index'],

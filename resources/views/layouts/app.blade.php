@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', config('app.name', 'Task Management'))</title>
+    @php $tmPageName = \Illuminate\Support\Str::beforeLast(trim($__env->yieldContent('title')), ' — ') ?: 'Dashboard'; @endphp
+    <title>{{ config('app.firm_name') }} - {{ auth()->user()?->role->label() }} - {{ $tmPageName }}</title>
 
     @include('partials.favicon')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -95,15 +96,22 @@
                         </a>
 
                         <div class="tm-nav-section-label">System</div>
-                        <a href="{{ route('admin.admin-accounts.index') }}" class="tm-nav-link {{ request()->routeIs('admin.admin-accounts.*') ? 'active' : '' }}">
-                            <span class="tm-nav-icon">{!! $tmIcon('shield') !!}</span> Admin Accounts
-                        </a>
+                        @if ($tmUser->isSuperAdmin())
+                            <a href="{{ route('admin.admin-accounts.index') }}" class="tm-nav-link {{ request()->routeIs('admin.admin-accounts.*') ? 'active' : '' }}">
+                                <span class="tm-nav-icon">{!! $tmIcon('shield') !!}</span> Admin Accounts
+                            </a>
+                        @endif
                         <a href="{{ route('admin.audit-log') }}" class="tm-nav-link {{ request()->routeIs('admin.audit-log') ? 'active' : '' }}">
                             <span class="tm-nav-icon">{!! $tmIcon('clock') !!}</span> Audit Log
                         </a>
                         <a href="{{ route('admin.settings.firm-profile') }}" class="tm-nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                             <span class="tm-nav-icon">{!! $tmIcon('sliders') !!}</span> Settings
                         </a>
+                        @if ($tmUser->isSuperAdmin())
+                            <a href="{{ route('super.system') }}" class="tm-nav-link {{ request()->routeIs('super.*') ? 'active' : '' }}">
+                                <span class="tm-nav-icon">{!! $tmIcon('shield') !!}</span> System
+                            </a>
+                        @endif
                     @endif
                 </div>
             </nav>

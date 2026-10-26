@@ -94,7 +94,16 @@ class NotificationServiceProvider extends ServiceProvider
             ]);
         });
 
-        $actor = fn (): string => Auth::guard('web')->user()?->name ?? Auth::guard('customer')->user()?->name ?? 'Someone';
+        // Who did it, as words in a notification or email. The software team shows up as plain "Admin".
+        $actor = function (): string {
+            $staff = Auth::guard('web')->user();
+
+            if ($staff) {
+                return $staff->isSuperAdmin() ? 'Admin' : $staff->name;
+            }
+
+            return Auth::guard('customer')->user()?->name ?? 'Someone';
+        };
 
         TicketDocument::created(function (TicketDocument $document) use ($actor) {
             $ticket = $document->ticket;
@@ -351,6 +360,10 @@ class NotificationServiceProvider extends ServiceProvider
         });
 
         Event::listen(function (Failed $event) {
+            if ($event->user instanceof User && $event->user->isSuperAdmin()) {
+                return;
+            }
+
             Notifier::notify(
                 Notifier::admins(),
                 'security',

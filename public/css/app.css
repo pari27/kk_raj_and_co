@@ -2601,3 +2601,15 @@ body.route-tickets-show .ts-wrapper.form-select.focus { border-color: var(--tm-a
 .admin-account-note { background: #eaf1fb; color: #3d4656; font-size: .75rem; border-radius: .5rem; padding: .6rem .85rem; }
 .admin-accounts-table tbody td { font-size: .8rem; }
 .admin-accounts-table tbody td .badge { font-size: .68rem; }
+
+/* System page (Super Admin) */
+.system-table td { font-size: .8rem; padding: .55rem 1rem; }
+.system-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: .4rem; }
+.system-dot-ok { background: #2f9e58; }
+.system-dot-bad { background: #b3261e; }
+.system-error { padding: .75rem 1rem; border-bottom: 1px solid #eef0f4; }
+.system-error:last-child { border-bottom: 0; }
+.system-level { display: inline-block; font-size: .65rem; font-weight: 700; padding: .1rem .5rem; border-radius: 999px; background: #fde2e0; color: #a32020; margin-right: .5rem; }
+.system-time { font-size: .72rem; color: #6b7385; }
+.system-msg { font-size: .8rem; margin-top: .25rem; word-break: break-word; }
+.system-detail { margin: .6rem 0 0; padding: .7rem .85rem; background: #f6f7f9; border-radius: .5rem; font-size: .7rem; max-height: 320px; overflow: auto; white-space: pre-wrap; word-break: break-word; }

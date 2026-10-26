@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -79,10 +78,6 @@ class AdminAccountController extends Controller
         $active = $request->boolean('is_active');
 
         if (! $active && $adminAccount->is_active) {
-            if ($adminAccount->id === Auth::id()) {
-                throw ValidationException::withMessages(['is_active' => 'You cannot deactivate your own account.']);
-            }
-
             $otherActive = User::query()->where('role', UserRole::Admin)->where('is_active', true)->whereKeyNot($adminAccount->id)->exists();
 
             if (! $otherActive) {

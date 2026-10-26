@@ -26,7 +26,7 @@
             <label class="form-check-label small" for="acctActive">Active (can sign in)</label>
         </div>
         @error('is_active')<div class="invalid-feedback d-block mb-2">{{ $message }}</div>@enderror
-        <div class="form-text tm-muted mb-4">You cannot deactivate your own account, and at least one Admin must stay active.</div>
+        <div class="form-text tm-muted mb-4">At least one Admin must stay active.</div>
 
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-tm-primary">Save Changes</button>

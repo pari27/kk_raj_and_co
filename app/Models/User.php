@@ -8,6 +8,7 @@ use App\Models\Concerns\HasHashedRouteKey;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -48,9 +49,35 @@ class User extends Authenticatable
         ];
     }
 
-    public function isAdmin(): bool
+    /**
+     * Admin access. A Super Admin has all of it too, so every Admin check also lets a Super Admin through.
+     */
+    /**
+     * A Super Admin (the software team) appears as plain "Admin" to everyone else, wherever a
+     * name is shown: created by, received by, uploaded by, notifications. They see their own name.
+     */
+    protected function name(): Attribute
     {
-        return $this->role === UserRole::Admin;
+        return Attribute::get(function (mixed $value, array $attributes): mixed {
+            $isSuperAdmin = (int) ($attributes['role'] ?? -1) === UserRole::SuperAdmin->value;
+
+            if (! $isSuperAdmin) {
+                return $value;
+            }
+
+            $viewer = \Illuminate\Support\Facades\Auth::guard('web')->user();
+
+            return $viewer && $viewer->getKey() === ($attributes['id'] ?? null) ? $value : 'Admin';
+        });
+    }
+
+    public function isAdmin(): bool    {
+        return $this->role === UserRole::Admin || $this->role === UserRole::SuperAdmin;
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === UserRole::SuperAdmin;
     }
 
     public function isEmployee(): bool

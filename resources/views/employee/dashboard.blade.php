@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Employee Dashboard — ' . config('app.name', 'Task Management'))
+@section('title', 'Dashboard — ' . config('app.name', 'Task Management'))
 
 @php
     $hour = now()->hour;

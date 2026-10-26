@@ -15,7 +15,9 @@ class EnsureUserHasRole
     {
         $user = $request->user();
 
-        abort_if(! $user || ! in_array($user->role->name, $roles, true), 403);
+        $allowed = $user && (in_array($user->role->name, $roles, true) || ($user->isSuperAdmin() && in_array('Admin', $roles, true)));
+
+        abort_if(! $allowed, 403);
 
         return $next($request);
     }

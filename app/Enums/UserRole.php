@@ -15,6 +15,8 @@ use App\Models\User;
 enum UserRole: int
 {
     case Admin = 0;
+    /** The software team that maintains the system. Created from the command line only; never listed in the app. */
+    case SuperAdmin = 4;
     case Employee = 2;
     case Customer = 3;
 
@@ -22,6 +24,7 @@ enum UserRole: int
     {
         return match ($this) {
             self::Admin => 'Admin',
+            self::SuperAdmin => 'Super Admin',
             self::Employee => 'Employee',
             self::Customer => 'Customer',
         };
@@ -32,6 +35,6 @@ enum UserRole: int
      */
     public static function internalRoles(): array
     {
-        return [self::Admin, self::Employee];
+        return [self::SuperAdmin, self::Admin, self::Employee];
     }
 }
