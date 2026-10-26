@@ -75,7 +75,8 @@ body.portal > .d-flex { flex: 1 0 auto; }
 .p-card-head.green { background: #2f9e58; }
 .p-card-head.teal { background: #0f766e; }
 .p-card-head .meta { font-size: .78rem; font-weight: 400; color: rgba(255, 255, 255, .8); }
-.p-card-head a { color: #fff; font-size: .8rem; text-decoration: underline; }
+.p-card-head a { color: #fff; font-size: .8rem; text-decoration: none; padding: .15rem .55rem; border-radius: .4rem; transition: background-color .15s ease; }
+.p-card-head a:hover { background: rgba(255, 255, 255, .18); color: #fff; }
 .p-card-body { padding: 1rem 1.1rem; }
 
 .p-attn { display: flex; align-items: center; gap: .9rem; padding: .85rem 1.1rem; border-bottom: 1px solid var(--p-line); text-decoration: none; color: inherit; }
@@ -315,7 +316,7 @@ body.portal .tm-table thead th:last-child {
 .u-0b9c7b.u-0b9c7b { width: 2.6rem; height: 1.4rem; float: none; }
 .u-1fcbae.u-1fcbae { background: #1f6b30; }
 .u-24d101.u-24d101 { background: #fff; border: 1px solid #f0b8b3; color: #b3261e; font-weight: 700; }
-.u-2fbbac.u-2fbbac { color: var(--p-green); font-size: .9rem; }
+.u-2fbbac.u-2fbbac { color: var(--p-green); font-size: .8rem; }
 .u-31d897.u-31d897 { font-size: .75rem; color: #000; }
 .u-43a94f.u-43a94f { font-size: .8rem; font-weight: 700; }
 .u-53e7d7.u-53e7d7 { padding: 0; border: 0; }
@@ -330,7 +331,6 @@ body.portal .tm-table thead th:last-child {
 .u-8b012c.u-8b012c { background: #101b3d; }
 .u-9d3471.u-9d3471 { width: 38px; height: 38px; background: var(--tm-accent); color: #fff; }
 .u-abf627.u-abf627 { overflow: hidden; }
-.u-b0faf0.u-b0faf0 { background: #e0ebff; color: #1d4fb8; font-weight: 700; font-size: .78rem; }
 .u-b75578.u-b75578 { color:#dc3545; }
 .u-bb809f.u-bb809f { font-size: .68rem; letter-spacing: .08em; margin-bottom: .6rem; }
 .u-bbebd4.u-bbebd4 { color: rgba(255,255,255,.75); }
@@ -348,3 +348,17 @@ body.portal .tm-table thead th:last-child {
 
 a.p-stat { display: block; color: #fff; text-decoration: none; transition: transform .15s ease, box-shadow .15s ease; }
 a.p-stat:hover { color: #fff; transform: translateY(-3px); box-shadow: 0 10px 22px rgba(16, 27, 61, .25); }
+
+.p-svc-name { font-size: .8rem; }
+
+.p-doc .p-view-btn { font-size: .72rem; padding: .28rem .75rem; }
+
+.p-doc .pbtn-green { background: var(--tm-navy); border-color: var(--tm-navy); }
+.p-doc .pbtn-green:hover { background: #1b2a5a; border-color: #1b2a5a; }
+
+.p-linkbtn { background: none; border: 0; padding: 0; text-decoration: none; cursor: pointer; }
+.p-linkbtn:hover { text-decoration: underline; }
+
+
+/* Footer credit on the client portal: keep it clear of the bottom menu on phones */
+@media (max-width: 767.98px) { body.portal .site-credit { padding-bottom: 3.6rem; } }

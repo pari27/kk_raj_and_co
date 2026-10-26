@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\EmailTemplateController;
@@ -142,9 +143,12 @@ Route::middleware('auth')->group(function () {
         Route::patch('master-employees/{employee}/toggle-active', [EmployeeController::class, 'toggleActive'])->name('employees.toggle-active');
         Route::post('master-employees/{employee}/resend-invite', [EmployeeController::class, 'resendInvite'])->name('employees.resend-invite');
 
-        Route::get('admin-accounts', fn () => view('admin.admin-accounts.index'))->name('admin-accounts.index');
-        Route::get('admin-accounts/create', fn () => view('admin.admin-accounts.create'))->name('admin-accounts.create');
-        Route::get('admin-accounts/{adminAccount}/edit', fn ($adminAccount) => view('admin.admin-accounts.edit', compact('adminAccount')))->name('admin-accounts.edit');
+        Route::get('admin-accounts', [AdminAccountController::class, 'index'])->name('admin-accounts.index');
+        Route::get('admin-accounts/create', [AdminAccountController::class, 'create'])->name('admin-accounts.create');
+        Route::post('admin-accounts', [AdminAccountController::class, 'store'])->name('admin-accounts.store');
+        Route::get('admin-accounts/{adminAccount}/edit', [AdminAccountController::class, 'edit'])->name('admin-accounts.edit');
+        Route::put('admin-accounts/{adminAccount}', [AdminAccountController::class, 'update'])->name('admin-accounts.update');
+        Route::post('admin-accounts/{adminAccount}/resend-invite', [AdminAccountController::class, 'resendInvitation'])->name('admin-accounts.resend-invite');
 
         Route::get('settings/firm-profile', [SettingController::class, 'edit'])->name('settings.firm-profile');
         Route::put('settings/firm-profile', [SettingController::class, 'updateFirmProfile'])->name('settings.firm-profile.update');

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', config('app.firm_name') . ' — Client Portal')</title>
 
+    @include('partials.favicon')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/portal.css') }}" rel="stylesheet">
@@ -27,7 +28,7 @@
         ];
     @endphp
 
-    <div class="d-flex flex-column flex-md-row">
+    <div class="d-flex flex-column flex-md-row flex-grow-1">
         <aside class="tm-sidebar pt-4 pb-3 d-none d-md-flex flex-column" id="pSidebar">
             <div class="px-3 mb-3">
                 <a href="{{ route('customer.dashboard') }}"><img src="{{ config('app.firm_logo_url') }}" alt="{{ config('app.firm_name') }}" class="tm-brand-logo"></a>
@@ -54,7 +55,7 @@
             @endif
         </aside>
 
-        <div class="flex-grow-1 min-vw-0">
+        <div class="flex-grow-1 min-vw-0 d-flex flex-column">
             <header class="tm-topbar d-flex align-items-center gap-3 px-3 px-md-4 py-2 sticky-top">
                 <button class="tm-icon-btn d-none d-md-inline-flex" type="button" id="pSidebarToggle" aria-label="Show or hide the menu">
                     <x-portal-icon name="menu" :size="18" />
@@ -99,7 +100,7 @@
                 </div>
             </header>
 
-            <main class="px-4 pb-5 pt-0 p-main">
+            <main class="px-4 pb-5 pt-0 p-main flex-grow-1">
                 @if ($errors->any())
                     <div class="alert alert-danger py-2 small mt-3 mb-0" role="alert">
                         @foreach ($errors->all() as $error)<div>{{ $error }}</div>@endforeach
@@ -108,6 +109,8 @@
 
                 @yield('content')
             </main>
+
+            @include('partials.credit-footer')
         </div>
     </div>
 

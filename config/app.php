@@ -30,6 +30,11 @@ return [
 
     'firm_hours' => env('FIRM_HOURS'),
 
+    // Shown in the footer of the client portal ("Designed and maintained by ...").
+    'developer_name' => env('DEVELOPER_NAME', 'Netiapps Software Pvt Ltd'),
+
+    'developer_url' => env('DEVELOPER_URL', 'https://www.netiapps.com/'),
+
     // Which admin dashboard to show: "new" (live practice overview) or "classic" (the earlier chart-based design,
     // kept in resources/views/admin/dashboard-classic.blade.php). Set ADMIN_DASHBOARD_DESIGN=classic to switch back.
     'admin_dashboard_design' => env('ADMIN_DASHBOARD_DESIGN', 'new'),

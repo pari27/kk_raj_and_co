@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', config('app.name', 'Task Management'))</title>
 
+    @include('partials.favicon')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/guest.css') }}" rel="stylesheet">
 
@@ -15,6 +16,8 @@
     <main class="d-flex align-items-center justify-content-center w-100 px-3">
         @yield('content')
     </main>
+
+    @include('partials.credit-footer')
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

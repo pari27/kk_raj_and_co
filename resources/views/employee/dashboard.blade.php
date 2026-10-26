@@ -94,7 +94,7 @@
                                 <td class="fw-semibold">{{ $ticket->customer?->name ?? '—' }}</td>
                                 <td><span class="emp-pill emp-pill-{{ \Illuminate\Support\Str::slug($ticket->status?->value ?? 'unknown') }}">{{ $ticket->status?->value ?? 'Unknown' }}</span></td>
                                 <td class="text-end fw-semibold {{ $row['days'] >= 30 ? 'text-danger' : '' }}">{{ $row['days'] }} {{ \Illuminate\Support\Str::plural('day', $row['days']) }}</td>
-                                <td class="text-end"><a href="{{ route('tickets.show', $ticket) }}" class="emp-dash-open">Open</a></td>
+                                <td class="text-end"><a href="{{ route('tickets.show', $ticket) }}" class="tm-icon-btn-sm" title="View" aria-label="View service"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2f5fbe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg></a></td>
                             </tr>
                         @empty
                             <tr><td colspan="5" class="text-center text-secondary py-5">No services are assigned to you yet.</td></tr>

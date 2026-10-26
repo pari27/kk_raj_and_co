@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', config('app.name', 'Task Management'))</title>
 
+    @include('partials.favicon')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
@@ -108,7 +109,7 @@
             </nav>
         </aside>
 
-        <div class="flex-grow-1 min-vw-0">
+        <div class="flex-grow-1 min-vw-0 d-flex flex-column min-vh-100">
             <header class="tm-topbar d-flex align-items-center gap-3 px-4 py-2 sticky-top">
                 <button class="tm-icon-btn d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#tmSidebarNav">
                     {!! $tmIcon('grid', 18) !!}
@@ -207,9 +208,11 @@
                 </div>
             </header>
 
-            <main class="px-4 pb-4 pt-0">
+            <main class="px-4 pb-4 pt-0 flex-grow-1">
                 @yield('content')
             </main>
+
+            @include('partials.credit-footer')
         </div>
     </div>
 

@@ -2305,7 +2305,7 @@ body.route-tickets-show .ts-dropdown {
 .u-42e121.u-42e121 { font-size: .76rem; margin-top: .35rem; }
 .u-48932b.u-48932b { color: rgba(255,255,255,.75); font-size: .72rem; }
 .u-497565.u-497565 { width: 30px; font-size: .78rem; }
-.u-4e3053.u-4e3053 { color: rgba(255,255,255,.75); font-size: .75rem; }
+.u-4e3053.u-4e3053 { color: rgba(255,255,255,.75); font-size: .8rem; }
 .u-524b25.u-524b25 { background: linear-gradient(135deg, #5d1117, #981f27); }
 .u-55acce.u-55acce { max-width: 560px; }
 .u-56df19.u-56df19 { color: #fff; cursor: pointer; }
@@ -2499,7 +2499,6 @@ a.emp-dash-stat { display: block; color: #fff; text-decoration: none; cursor: po
 .emp-dash-table tbody td { padding: .6rem 1rem; font-size: .8rem; }
 .emp-dash-table tbody td .small { font-size: .72rem; }
 .emp-dash-no { font-weight: 700; font-size: .88rem; color: #1d4fb8; text-decoration: none; }
-.emp-dash-open { background: #e0ebff; color: #1d4fb8; border-radius: .5rem; font-size: .8rem; font-weight: 700; padding: .35rem .8rem; text-decoration: none; }
 
 .emp-dash-follow { display: flex; align-items: center; gap: .75rem; padding: .7rem 1rem; border-bottom: 1px solid #eef0f4; }
 .emp-dash-follow:last-child { border-bottom: 0; }
@@ -2591,3 +2590,14 @@ body.route-tickets-show .ts-wrapper.form-select.focus { border-color: var(--tm-a
 
 /* Payment details: "Where clients see this" help text */
 .payment-help { font-size: .8rem; }
+
+/* Footer credit ("Designed and maintained by ...") */
+.site-credit { text-align: center; font-size: .72rem; color: var(--tm-muted); background: #fff; padding: .4rem 1rem; border-top: 1px solid #eceef2; margin-top: auto; }
+.site-credit a { color: var(--tm-navy); font-weight: 600; text-decoration: none; }
+.site-credit a:hover { text-decoration: underline; }
+
+/* Admin Accounts forms */
+.admin-account-form { max-width: 560px; }
+.admin-account-note { background: #eaf1fb; color: #3d4656; font-size: .75rem; border-radius: .5rem; padding: .6rem .85rem; }
+.admin-accounts-table tbody td { font-size: .8rem; }
+.admin-accounts-table tbody td .badge { font-size: .68rem; }

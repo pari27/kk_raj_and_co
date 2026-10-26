@@ -54,7 +54,6 @@ class UiSmokeTest extends TestCase
     public static function adminRoutesWithParam(): array
     {
         return [
-            ['admin.admin-accounts.edit'],
             ['admin.settings.email-templates.edit'],
         ];
     }

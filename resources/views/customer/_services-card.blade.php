@@ -30,15 +30,15 @@
                         @endphp
                         <tr>
                             <td>
-                                <div class="fw-semibold">{{ $ticket->service->name }}</div>
+                                <div class="fw-semibold p-svc-name">{{ $ticket->service->name }}</div>
                                 <div class="tm-muted u-cc37c5">{{ $ticket->number }}</div>
                             </td>
                             <td><span class="ppill {{ $stage['tone'] }}">{{ $stage['label'] }}</span></td>
                             <td class="small">{{ $counts['sent'] }} of {{ $counts['total'] }} uploaded</td>
-                            <td class="text-end fw-semibold">{{ $money($ticket->total) }}</td>
+                            <td class="text-end fw-semibold p-svc-name">{{ $money($ticket->total) }}</td>
                             <td><span class="ppill {{ $stage['paid'] ? 'lightgreen' : 'red' }}">{{ $stage['paid'] ? 'Paid' : 'Not paid' }}</span></td>
                             <td class="text-end">
-                                <a href="{{ route('customer.tickets.show', $ticket) }}" class="btn btn-sm u-b0faf0">Open</a>
+                                <a href="{{ route('customer.tickets.show', $ticket) }}" class="tm-icon-btn-sm" title="View" aria-label="View service"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2f5fbe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg></a>
                             </td>
                         </tr>
                     @endforeach

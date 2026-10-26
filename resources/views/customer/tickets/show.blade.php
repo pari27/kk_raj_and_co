@@ -88,9 +88,7 @@
                         <div class="sub">
                             @if ($current)
                                 Uploaded by you on {{ $current->created_at->format('j M Y') }}
-                                @if ($current->text_value !== null)&middot; {{ $current->text_value }}
-                                @elseif ($current->file_path)&middot; <a href="{{ route('customer.documents.view', [$ticket, $current]) }}" class="file" target="_blank" rel="noopener">View</a>
-                                @endif
+                                @if ($current->text_value !== null)&middot; {{ $current->text_value }}@endif
                             @else
                                 Not uploaded yet
                             @endif
@@ -107,6 +105,10 @@
                             <span class="ppill red nodot">Rejected</span>
                         @else
                             <span class="ppill blue nodot">Being checked</span>
+                        @endif
+
+                        @if ($current && $current->text_value === null && $current->file_path)
+                            <a href="{{ route('customer.documents.view', [$ticket, $current]) }}" class="btn btn-sm btn-outline-secondary p-view-btn" target="_blank" rel="noopener">View</a>
                         @endif
 
                         @if ($row['needsUpload'])
@@ -158,7 +160,7 @@
                         </div>
                         <div class="amt">{{ $money($ticket->total) }}</div>
                     </div>
-                    <a href="{{ route('customer.payments.index') }}" class="d-inline-block mt-3 fw-bold text-decoration-none u-2fbbac">How to pay →</a>
+                    <button type="button" class="p-linkbtn d-inline-block mt-3 fw-bold u-2fbbac" data-bs-toggle="modal" data-bs-target="#howToPayModal">How to pay →</button>
                 @else
                     <div class="p-topay paid">
                         <div><div class="tt">Paid</div><div class="sb">Thank you</div></div>
@@ -233,6 +235,15 @@
         </form>
     </div>
 </div>
+
+@if ($fee['balance'] > 0)
+    @include('customer._how-to-pay-modal', [
+        'amount' => $fee['balance'],
+        'lines' => $ticket->service->name.' '.$money($fee['balance']),
+        'reference' => $reference,
+        'autoOpen' => false,
+    ])
+@endif
 @endsection
 
 @push('scripts')

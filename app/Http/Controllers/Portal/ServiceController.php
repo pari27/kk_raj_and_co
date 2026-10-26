@@ -41,6 +41,7 @@ class ServiceController extends Controller
             'documentsDone' => $rows->filter(fn (array $row) => $row['current'] && $row['current']->status === 'Verified')->count(),
             'fee' => $this->portal->feeShare($ticket),
             'timeline' => $this->portal->timeline($ticket),
+            'reference' => $this->portal->paymentReference($customer),
             'portal' => $this->portal,
         ]);
     }

@@ -51,9 +51,9 @@
 <div class="row g-3">
     <div class="{{ $contacts->isNotEmpty() ? 'col-12 col-lg-8' : 'col-12' }}">
         <div class="p-card">
-            <div class="p-card-head navy sm"><span>Needs your attention</span></div>
+            <div class="p-card-head navy sm"><span>Needs your attention</span><a href="{{ route('customer.tickets.index') }}">More →</a></div>
 
-            @forelse ($attention as $item)
+            @forelse ($attention->take(7) as $item)
                 <a href="{{ $item['url'] }}" class="p-attn">
                     <span class="bar {{ $item['tone'] }}"></span>
                     <div>

@@ -228,6 +228,17 @@ class ClientPortalService
     }
 
     /**
+     * A short code the client puts in the payment note so staff can match the payment, e.g. MANOJ-87587.
+     */
+    public function paymentReference(Customer $customer): string
+    {
+        $first = strtoupper(\Illuminate\Support\Str::of($customer->name)->before(' ')->ascii()->replaceMatches('/[^A-Za-z0-9]/', '')->toString());
+        $tail = $customer->phone ? substr(preg_replace('/\D/', '', $customer->phone), -5) : $customer->id;
+
+        return $first.'-'.$tail;
+    }
+
+    /**
      * Fees across the client's enquiries.
      *
      * @return array{billed: float, paid: float, pending: float, services: string}

@@ -150,3 +150,8 @@
    ========================================================================== */
 .u-1a58d1.u-1a58d1 { letter-spacing: .5rem; font-size: 1.1rem; }
 .u-a60e1d.u-a60e1d { height: 26px; width: auto; }
+
+/* Footer credit on the sign-in pages */
+.site-credit { position: fixed; left: 0; right: 0; bottom: 0; text-align: center; font-size: .72rem; color: var(--tm-muted); padding: .5rem 1rem; border-top: 1px solid var(--tm-card-border); }
+.site-credit a { color: #fff; font-weight: 600; text-decoration: none; }
+.site-credit a:hover { text-decoration: underline; }
