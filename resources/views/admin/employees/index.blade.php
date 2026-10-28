@@ -55,10 +55,7 @@
         </div>
     </div>
 
-    @if ($employees->isEmpty())
-        <x-empty-state title="No employees yet" description="Add your first employee to get started." />
-    @else
-        <div class="table-responsive">
+    <div class="table-responsive">
             <table id="employeesTable" class="table tm-table align-middle mb-0 w-100">
                 <thead><tr><th>Employee</th><th>Contact</th><th>Designation</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
                 <tbody>
@@ -96,6 +93,9 @@
                             </td>
                         </tr>
                     @endforeach
+                    @if ($employees->isEmpty())
+                        <tr><td colspan="5"><x-empty-state title="No employees yet" description="Add your first employee to get started." /></td></tr>
+                    @endif
                 </tbody>
             </table>
         </div>
@@ -104,7 +104,6 @@
             <span id="employeesPaginationSummary"></span>
             <ul class="pagination pagination-sm mb-0" id="employeesPaginationPages"></ul>
         </div>
-    @endif
 </div>
 
 <script>

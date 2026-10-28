@@ -2679,3 +2679,13 @@ body.route-tickets-show .ts-wrapper.form-select.focus { border-color: var(--tm-a
 /* Email templates: read-only view for Admins */
 .email-template-readonly { background: #f8f9fb; min-height: 2.4rem; }
 .email-template-body { white-space: pre-wrap; }
+
+/* Master Designations: the "can't be deleted" note */
+.designation-delete-note {
+    background: #fdeceb;
+    border-color: #f3c7c4;
+    color: #7f1616;
+    font-style: italic;
+    padding-top: .4rem;
+    padding-bottom: .4rem;
+}

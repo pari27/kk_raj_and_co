@@ -92,9 +92,6 @@
                     </div>
                 </div>
 
-                @if ($designations->isEmpty())
-                    <x-empty-state title="No designations yet" description="Add a designation for your staff members." />
-                @else
                     <div class="table-responsive">
                         <table id="designationsTable" class="table tm-table align-middle mb-0 w-100">
                             <thead><tr><th>Designation</th><th>Employees</th><th>Created</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
@@ -176,6 +173,9 @@
                                         </td>
                                     </tr>
                                 @endforeach
+                                @if ($designations->isEmpty())
+                                    <tr><td colspan="5"><x-empty-state title="No designations yet" description="Add a designation for your staff members." /></td></tr>
+                                @endif
                             </tbody>
                         </table>
                     </div>
@@ -183,7 +183,6 @@
                         <span id="designationsPaginationSummary"></span>
                         <ul class="pagination pagination-sm mb-0" id="designationsPaginationPages"></ul>
                     </div>
-                @endif
             </div>
         </div>
 
@@ -202,7 +201,7 @@
                         <label class="form-check-label u-5a305f" for="newDesignationActive">Active</label>
                     </div>
                     <button type="submit" class="btn btn-tm-primary w-100">Save designation</button>
-                    <div class="alert alert-light border mt-3 mb-0 u-31578e">Designations can't be deleted. Make one inactive to hide it from new staff; existing staff keep it.</div>
+                    <div class="alert border mt-3 mb-0 u-31578e designation-delete-note">Designations can't be deleted. Make one inactive to hide it from new staff; existing staff keep it.</div>
                 </form>
             </section>
         </div>
