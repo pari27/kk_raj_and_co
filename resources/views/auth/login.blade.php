@@ -5,12 +5,7 @@
 @section('content')
 <div class="tm-auth-card">
     <div class="text-center mb-4">
-        <div class="tm-badge-icon mx-auto mb-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="3"></rect>
-                <path d="m8 12 3 3 5-6"></path>
-            </svg>
-        </div>
+        <img src="{{ config('app.firm_logo_url') }}" alt="{{ config('app.firm_name') }}" class="d-block mx-auto mb-3 u-a60e1d">
         <h1 class="h4 text-white fw-semibold mb-1">Welcome back</h1>
         <p class="tm-muted small mb-0">
             Log in to {{ config('app.name', 'Task Management') }} &middot; {{ config('app.firm_name', '[Firm name]') }}
