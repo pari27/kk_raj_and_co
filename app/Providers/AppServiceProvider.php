@@ -10,6 +10,7 @@ use Illuminate\Auth\Events\Logout;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -30,6 +31,11 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFive();
 
         Setting::applyFirmProfile();
+
+        // Replies to the app's emails go to this address (set MAIL_REPLY_TO_ADDRESS in .env).
+        if (config('mail.reply_to.address')) {
+            Mail::alwaysReplyTo(config('mail.reply_to.address'), config('mail.reply_to.name'));
+        }
 
         $this->registerAuditLogListeners();
 

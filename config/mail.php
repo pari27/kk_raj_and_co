@@ -116,6 +116,14 @@ return [
     ],
 
     /*
+     * Where a recipient's reply goes. Leave MAIL_REPLY_TO_ADDRESS empty to send no reply-to.
+     */
+    'reply_to' => [
+        'address' => env('MAIL_REPLY_TO_ADDRESS'),
+        'name' => env('MAIL_REPLY_TO_NAME', env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel'))),
+    ],
+
+    /*
     |--------------------------------------------------------------------------
     | Test Mode Recipient
     |--------------------------------------------------------------------------
