@@ -19,6 +19,26 @@ class FirmProfileTest extends TestCase
         return User::factory()->create(['role' => UserRole::Admin, 'is_active' => true]);
     }
 
+    public function test_the_client_login_page_shows_the_firms_saved_phone_number(): void
+    {
+        Setting::current()->update(['firm_phone' => '+91 98765 43210']);
+        Setting::applyFirmProfile();
+
+        $this->get(route('customer.login'))
+            ->assertOk()
+            ->assertSee('Need help? Call')
+            ->assertSee('+91 98765 43210')
+            ->assertDontSee('XXXXXXXXXX');
+    }
+
+    public function test_the_client_login_page_hides_the_help_line_when_no_phone_is_saved(): void
+    {
+        Setting::current()->update(['firm_phone' => null]);
+        config(['app.firm_phone' => null]);
+
+        $this->get(route('customer.login'))->assertOk()->assertDontSee('Need help?');
+    }
+
     public function test_the_firm_profile_page_shows_the_saved_details(): void
     {
         Setting::current()->update(['firm_name' => 'Sharma & Co', 'firm_address' => '12 Park Street, Kolkata']);
@@ -36,6 +56,7 @@ class FirmProfileTest extends TestCase
         $this->actingAs($this->admin())->put(route('admin.settings.firm-profile.update'), [
             'firm_name' => 'Sharma & Co',
             'firm_address' => '12 Park Street, Kolkata',
+            'firm_phone' => '033 4000 1234', 'firm_email' => 'info@firm.com',
             'logo' => UploadedFile::fake()->image('logo.png', 200, 60),
         ])->assertRedirect(route('admin.settings.firm-profile'));
 
@@ -46,8 +67,9 @@ class FirmProfileTest extends TestCase
         Storage::disk('public')->assertExists($setting->firm_logo_path);
     }
 
-    public function test_the_firms_phone_email_and_hours_can_be_saved_and_cleared(): void
+    public function test_the_firms_phone_and_email_can_be_saved_but_not_left_empty(): void
     {
+        Storage::fake('public');
         $admin = $this->admin();
 
         $this->actingAs($admin)->put(route('admin.settings.firm-profile.update'), [
@@ -55,23 +77,24 @@ class FirmProfileTest extends TestCase
             'firm_address' => 'Kolkata',
             'firm_phone' => '033 4000 1234',
             'firm_email' => 'info@firm.com',
-            'firm_hours' => 'Mon–Sat, 10 am – 7 pm',
+            'logo' => UploadedFile::fake()->image('logo.png'),
         ])->assertRedirect(route('admin.settings.firm-profile'));
 
         $setting = Setting::current()->fresh();
         $this->assertSame('033 4000 1234', $setting->firm_phone);
         $this->assertSame('info@firm.com', $setting->firm_email);
 
+        // Phone and email can no longer be left empty.
         $this->actingAs($admin)->put(route('admin.settings.firm-profile.update'), [
             'firm_name' => 'Sharma & Co', 'firm_address' => 'Kolkata',
-        ]);
-        $this->assertNull(Setting::current()->fresh()->firm_phone);
+        ])->assertSessionHasErrors(['firm_phone', 'firm_email']);
+        $this->assertSame('033 4000 1234', Setting::current()->fresh()->firm_phone);
     }
 
     public function test_a_bad_phone_or_email_is_rejected(): void
     {
         $this->actingAs($this->admin())->put(route('admin.settings.firm-profile.update'), [
-            'firm_name' => 'X', 'firm_address' => 'Y', 'firm_phone' => 'call me', 'firm_email' => 'not-an-email',
+            'firm_name' => 'X', 'firm_address' => 'Y', 'firm_phone' => 'call me', 'firm_email' => 'not-an-email'
         ])->assertSessionHasErrors(['firm_phone', 'firm_email']);
     }
     public function test_name_and_address_are_required_and_the_logo_must_be_an_image(): void
@@ -83,26 +106,23 @@ class FirmProfileTest extends TestCase
         ])->assertSessionHasErrors(['firm_name', 'firm_address', 'logo']);
     }
 
-    public function test_the_logo_can_be_removed_to_go_back_to_the_default(): void
+    public function test_a_logo_is_required_until_one_has_been_saved(): void
     {
         Storage::fake('public');
         $admin = $this->admin();
+        $details = ['firm_name' => 'Sharma & Co', 'firm_address' => 'Kolkata', 'firm_phone' => '033 4000 1234', 'firm_email' => 'info@firm.com'];
 
-        $this->actingAs($admin)->put(route('admin.settings.firm-profile.update'), [
-            'firm_name' => 'Sharma & Co',
-            'firm_address' => 'Kolkata',
-            'logo' => UploadedFile::fake()->image('logo.png'),
-        ]);
+        $this->actingAs($admin)->put(route('admin.settings.firm-profile.update'), $details)
+            ->assertSessionHasErrors('logo');
+
+        $this->actingAs($admin)->put(route('admin.settings.firm-profile.update'), $details + ['logo' => UploadedFile::fake()->image('logo.png')])
+            ->assertSessionHasNoErrors();
+
+        // Once a logo is saved, leaving the box empty keeps it.
         $path = Setting::current()->fresh()->firm_logo_path;
-
-        $this->actingAs($admin)->put(route('admin.settings.firm-profile.update'), [
-            'firm_name' => 'Sharma & Co',
-            'firm_address' => 'Kolkata',
-            'remove_logo' => '1',
-        ]);
-
-        $this->assertNull(Setting::current()->fresh()->firm_logo_path);
-        Storage::disk('public')->assertMissing($path);
+        $this->actingAs($admin)->put(route('admin.settings.firm-profile.update'), $details)
+            ->assertSessionHasNoErrors();
+        $this->assertSame($path, Setting::current()->fresh()->firm_logo_path);
     }
 
     public function test_an_employee_cannot_change_the_firm_profile(): void

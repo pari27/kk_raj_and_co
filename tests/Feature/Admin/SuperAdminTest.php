@@ -47,12 +47,15 @@ class SuperAdminTest extends TestCase
 
     public function test_what_a_super_admin_does_is_not_written_to_the_audit_log_but_an_admins_is(): void
     {
-        $payload = ['payment_upi_id' => 'firm@bank'];
+        $payload = [
+            'payment_upi_id' => 'firm@bank', 'payment_bank_account_name' => 'Firm', 'payment_bank_account_number' => '123456789',
+            'payment_bank_ifsc' => 'HDFC0001234', 'payment_bank_branch' => 'Main branch',
+        ];
 
         $this->actingAs($this->superAdmin())->put(route('admin.settings.payment-details.update'), $payload);
         $this->assertSame(0, AuditLog::count());
 
-        $this->actingAs($this->admin())->put(route('admin.settings.payment-details.update'), ['payment_upi_id' => 'other@bank']);
+        $this->actingAs($this->admin())->put(route('admin.settings.payment-details.update'), array_merge($payload, ['payment_upi_id' => 'other@bank']));
         $this->assertGreaterThan(0, AuditLog::count());
     }
 

@@ -20,36 +20,35 @@
                 @method('PUT')
 
                 <div class="mb-4">
-                    <label class="tm-field-label d-block" for="paymentUpiInput">UPI ID</label>
-                    <input type="text" id="paymentUpiInput" name="payment_upi_id" maxlength="100" placeholder="name@bank" class="form-control tm-field @error('payment_upi_id') is-invalid @enderror" value="{{ old('payment_upi_id', $setting->payment_upi_id) }}">
+                    <label class="tm-field-label d-block" for="paymentUpiInput">UPI ID <span class="text-danger">*</span></label>
+                    <input type="text" id="paymentUpiInput" name="payment_upi_id" required maxlength="100" placeholder="name@bank" class="form-control tm-field @error('payment_upi_id') is-invalid @enderror" value="{{ old('payment_upi_id', $setting->payment_upi_id) }}">
                     @error('payment_upi_id')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                 </div>
 
                 <h2 class="h6 fw-bold mb-3">Bank transfer</h2>
                 <div class="mb-3">
-                    <label class="tm-field-label d-block" for="paymentAccountNameInput">Account name</label>
-                    <input type="text" id="paymentAccountNameInput" name="payment_bank_account_name" maxlength="120" class="form-control tm-field @error('payment_bank_account_name') is-invalid @enderror" value="{{ old('payment_bank_account_name', $setting->payment_bank_account_name) }}">
+                    <label class="tm-field-label d-block" for="paymentAccountNameInput">Account name <span class="text-danger">*</span></label>
+                    <input type="text" id="paymentAccountNameInput" name="payment_bank_account_name" required maxlength="120" class="form-control tm-field @error('payment_bank_account_name') is-invalid @enderror" value="{{ old('payment_bank_account_name', $setting->payment_bank_account_name) }}">
                     @error('payment_bank_account_name')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-12 col-md-7">
-                        <label class="tm-field-label d-block" for="paymentAccountNumberInput">Account number</label>
-                        <input type="text" id="paymentAccountNumberInput" name="payment_bank_account_number" maxlength="40" inputmode="numeric" class="form-control tm-field @error('payment_bank_account_number') is-invalid @enderror" value="{{ old('payment_bank_account_number', $setting->payment_bank_account_number) }}">
+                        <label class="tm-field-label d-block" for="paymentAccountNumberInput">Account number <span class="text-danger">*</span></label>
+                        <input type="text" id="paymentAccountNumberInput" name="payment_bank_account_number" required maxlength="40" inputmode="numeric" class="form-control tm-field @error('payment_bank_account_number') is-invalid @enderror" value="{{ old('payment_bank_account_number', $setting->payment_bank_account_number) }}">
                         @error('payment_bank_account_number')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-12 col-md-5">
-                        <label class="tm-field-label d-block" for="paymentIfscInput">IFSC code</label>
-                        <input type="text" id="paymentIfscInput" name="payment_bank_ifsc" maxlength="11" placeholder="HDFC0001234" class="form-control tm-field text-uppercase @error('payment_bank_ifsc') is-invalid @enderror" value="{{ old('payment_bank_ifsc', $setting->payment_bank_ifsc) }}">
+                        <label class="tm-field-label d-block" for="paymentIfscInput">IFSC code <span class="text-danger">*</span></label>
+                        <input type="text" id="paymentIfscInput" name="payment_bank_ifsc" required maxlength="11" placeholder="HDFC0001234" class="form-control tm-field text-uppercase @error('payment_bank_ifsc') is-invalid @enderror" value="{{ old('payment_bank_ifsc', $setting->payment_bank_ifsc) }}">
                         @error('payment_bank_ifsc')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label class="tm-field-label d-block" for="paymentBranchInput">Bank and branch</label>
-                    <input type="text" id="paymentBranchInput" name="payment_bank_branch" maxlength="160" placeholder="HDFC Bank, Park Street, Kolkata" class="form-control tm-field @error('payment_bank_branch') is-invalid @enderror" value="{{ old('payment_bank_branch', $setting->payment_bank_branch) }}">
+                    <label class="tm-field-label d-block" for="paymentBranchInput">Bank and branch <span class="text-danger">*</span></label>
+                    <input type="text" id="paymentBranchInput" name="payment_bank_branch" required maxlength="160" placeholder="HDFC Bank, Park Street, Kolkata" class="form-control tm-field @error('payment_bank_branch') is-invalid @enderror" value="{{ old('payment_bank_branch', $setting->payment_bank_branch) }}">
                     @error('payment_bank_branch')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                 </div>
 
-                <h2 class="h6 fw-bold mb-3">Anything else clients should know</h2>
                 <div class="mb-4">
                     <label class="tm-field-label d-block" for="paymentInstructionsInput">Extra instructions</label>
                     <textarea id="paymentInstructionsInput" name="payment_instructions" rows="3" maxlength="1000" placeholder="For example: cheques should be drawn in favour of the firm. Payment by cash is accepted at the office." class="form-control tm-field @error('payment_instructions') is-invalid @enderror">{{ old('payment_instructions', $setting->payment_instructions) }}</textarea>

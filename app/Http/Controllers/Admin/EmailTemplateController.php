@@ -19,6 +19,11 @@ class EmailTemplateController extends Controller
         ]);
     }
 
+    public function show(EmailTemplate $template): View
+    {
+        return view('admin.settings.email-templates.show', compact('template'));
+    }
+
     public function edit(EmailTemplate $template): View
     {
         return view('admin.settings.email-templates.edit', compact('template'));

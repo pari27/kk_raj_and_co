@@ -50,7 +50,6 @@
                     <div class="p-help">
                         <div class="p-help-label">Need help?</div>
                         <div class="fw-bold text-white">{{ $pPhone }}</div>
-                        @if (config('app.firm_hours'))<div class="p-help-hours">{{ config('app.firm_hours') }}</div>@endif
                     </div>
                 </div>
             @endif

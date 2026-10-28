@@ -32,34 +32,22 @@
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-12 col-md-6">
-                        <label class="tm-field-label d-block" for="firmPhoneInput">Phone</label>
-                        <input type="text" id="firmPhoneInput" name="firm_phone" maxlength="30" class="form-control tm-field @error('firm_phone') is-invalid @enderror" placeholder="e.g. 033 4000 1234" value="{{ old('firm_phone', $setting->firm_phone ?: config('app.firm_phone')) }}">
+                        <label class="tm-field-label d-block" for="firmPhoneInput">Phone <span class="text-danger">*</span></label>
+                        <input type="text" id="firmPhoneInput" name="firm_phone" maxlength="30" class="form-control tm-field @error('firm_phone') is-invalid @enderror" placeholder="e.g. 033 4000 1234" value="{{ old('firm_phone', $setting->firm_phone ?: config('app.firm_phone')) }}" required>
                         @error('firm_phone')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-12 col-md-6">
-                        <label class="tm-field-label d-block" for="firmEmailInput">Email</label>
-                        <input type="email" id="firmEmailInput" name="firm_email" maxlength="190" class="form-control tm-field @error('firm_email') is-invalid @enderror" placeholder="e.g. info@firm.com" value="{{ old('firm_email', $setting->firm_email ?: config('app.firm_email')) }}">
+                        <label class="tm-field-label d-block" for="firmEmailInput">Email <span class="text-danger">*</span></label>
+                        <input type="email" id="firmEmailInput" name="firm_email" maxlength="190" class="form-control tm-field @error('firm_email') is-invalid @enderror" placeholder="e.g. info@firm.com" value="{{ old('firm_email', $setting->firm_email ?: config('app.firm_email')) }}" required>
                         @error('firm_email')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="tm-field-label d-block" for="firmHoursInput">Opening hours</label>
-                    <input type="text" id="firmHoursInput" name="firm_hours" maxlength="120" class="form-control tm-field @error('firm_hours') is-invalid @enderror" placeholder="e.g. Mon–Sat, 10 am – 7 pm" value="{{ old('firm_hours', $setting->firm_hours ?: config('app.firm_hours')) }}">
-                    @error('firm_hours')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    <div class="form-text tm-muted">Phone, email and hours are shown to clients on their dashboard. Leave them empty to hide them.</div>
-                </div>
-                <div class="mb-3">
-                    <label class="tm-field-label d-block" for="firmLogoInput">Logo</label>
+                    <label class="tm-field-label d-block" for="firmLogoInput">Logo <span class="text-danger">*</span></label>
                     <div class="firm-logo-preview mb-2"><img src="{{ config('app.firm_logo_url') }}" alt="Current logo"></div>
-                    <input type="file" id="firmLogoInput" name="logo" accept="image/png,image/jpeg,image/webp" class="form-control tm-field @error('logo') is-invalid @enderror">
-                    <div class="form-text tm-muted">PNG, JPG or WebP, up to 2 MB. Leave empty to keep the current logo.</div>
+                    <input type="file" id="firmLogoInput" name="logo" accept="image/png,image/jpeg,image/webp" class="form-control tm-field @error('logo') is-invalid @enderror" @required(! $setting->firm_logo_path)>
+                    <div class="form-text tm-muted firm-logo-hint">PNG, JPG or WebP, up to 2 MB.@if ($setting->firm_logo_path) Leave empty to keep the current logo.@endif</div>
                     @error('logo')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    @if ($setting->firm_logo_path)
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" name="remove_logo" id="removeLogo" value="1">
-                            <label class="form-check-label small" for="removeLogo">Remove my logo and use the default one</label>
-                        </div>
-                    @endif
                 </div>
 
                 <div class="d-flex gap-2">
@@ -72,12 +60,12 @@
     <div class="col-12 col-xl-5">
         <div class="tm-card p-0 overflow-hidden">
             <div class="tm-section-title">Email settings</div>
-            <form method="POST" action="{{ route('admin.settings.system.update') }}">
+            <form method="POST" action="{{ route('admin.settings.system.update') }}" class="email-settings-form">
                 @csrf
                 @method('PUT')
 
-                <div class="p-4 border-bottom">
-                    <div class="form-check form-switch d-flex align-items-center gap-2 mb-3">
+                <div class="px-3 py-2 border-bottom">
+                    <div class="form-check form-switch d-flex align-items-center gap-2 mb-1">
                         <input class="form-check-input flex-shrink-0 u-32106b" type="checkbox" role="switch" id="notificationsEnabledToggle" name="notifications_enabled" value="1" {{ $setting->notifications_enabled ? 'checked' : '' }} onchange="this.form.requestSubmit()">
                         <label class="mb-0 fw-semibold u-8ae449" for="notificationsEnabledToggle">Email notifications: {{ $setting->notifications_enabled ? 'On' : 'Off' }}</label>
                     </div>
@@ -86,8 +74,8 @@
                     </p>
                 </div>
 
-                <div class="p-4">
-                    <div class="form-check form-switch d-flex align-items-center gap-2 mb-3">
+                <div class="px-3 pt-2 pb-4">
+                    <div class="form-check form-switch d-flex align-items-center gap-2 mb-1">
                         <input class="form-check-input flex-shrink-0 u-32106b" type="checkbox" role="switch" id="testModeToggle" name="test_mode" value="1" {{ $setting->test_mode ? 'checked' : '' }} onchange="this.form.requestSubmit()">
                         <label class="mb-0 fw-semibold u-8ae449" for="testModeToggle">Test mode: {{ $setting->test_mode ? 'On' : 'Off' }}</label>
                     </div>

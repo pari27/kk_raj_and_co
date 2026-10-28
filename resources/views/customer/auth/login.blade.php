@@ -88,7 +88,9 @@
             </svg>
         </a>
 
-        <p class="text-center tm-muted small mb-2">Need help? Call {{ config('app.firm_name') }} at <a  class="tm-link text-decoration-underline" href="tel:+91 XXXXXXXXXX">+91 XXXXXXXXXX</a></p>
+        @if (config('app.firm_phone'))
+            <p class="text-center tm-muted small mb-2">Need help? Call {{ config('app.firm_name') }} at <a class="tm-link text-decoration-underline" href="tel:{{ preg_replace('/[^\d+]/', '', config('app.firm_phone')) }}">{{ config('app.firm_phone') }}</a></p>
+        @endif
     </form>
 </div>
 @endsection

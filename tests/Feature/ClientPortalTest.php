@@ -664,7 +664,6 @@ class ClientPortalTest extends TestCase
         config([
             'app.firm_phone' => '033 4000 1234',
             'app.firm_email' => 'info@firm.test',
-            'app.firm_hours' => 'Mon–Sat, 10 am – 7 pm',
             'app.firm_address' => '12 Park Street, Kolkata',
         ]);
 
@@ -679,14 +678,13 @@ class ClientPortalTest extends TestCase
             ->assertSee('All updates')
             ->assertSee('tel:0334000123', false)->assertSee('033 4000 1234')
             ->assertSee('mailto:info@firm.test', false)
-            ->assertSee('Mon–Sat, 10 am – 7 pm')
             ->assertSee('12 Park Street, Kolkata');
     }
 
     public function test_the_contact_panel_hides_details_the_firm_has_not_set(): void
     {
         [$client] = $this->clientWithService();
-        config(['app.firm_phone' => null, 'app.firm_email' => null, 'app.firm_hours' => null, 'app.firm_address' => null]);
+        config(['app.firm_phone' => null, 'app.firm_email' => null, 'app.firm_address' => null]);
 
         $this->asClient($client)->get(route('customer.dashboard'))
             ->assertOk()
@@ -703,8 +701,8 @@ class ClientPortalTest extends TestCase
         config(['app.firm_phone' => null]);
         $this->asClient($client)->get(route('customer.dashboard'))->assertDontSee('Need help?');
 
-        config(['app.firm_phone' => '033 4000 1234', 'app.firm_hours' => 'Mon–Sat, 10 am – 7 pm']);
-        $this->asClient($client)->get(route('customer.dashboard'))->assertSee('Need help?')->assertSee('033 4000 1234')->assertSee('10 am');
+        config(['app.firm_phone' => '033 4000 1234']);
+        $this->asClient($client)->get(route('customer.dashboard'))->assertSee('Need help?')->assertSee('033 4000 1234');
     }
 
     public function test_the_client_is_told_when_a_document_is_verified_or_rejected(): void

@@ -29,11 +29,11 @@ class SettingController extends Controller
         $request->merge(['payment_bank_ifsc' => strtoupper(trim((string) $request->input('payment_bank_ifsc')))]);
 
         $validated = $request->validate([
-            'payment_upi_id' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9._-]{2,}@[A-Za-z0-9]{2,}$/'],
-            'payment_bank_account_name' => ['nullable', 'string', 'max:120'],
-            'payment_bank_account_number' => ['nullable', 'string', 'max:40', 'regex:/^[0-9 ]{6,40}$/'],
-            'payment_bank_ifsc' => ['nullable', 'string', 'regex:/^[A-Z]{4}0[A-Z0-9]{6}$/'],
-            'payment_bank_branch' => ['nullable', 'string', 'max:160'],
+            'payment_upi_id' => ['required', 'string', 'max:100', 'regex:/^[A-Za-z0-9._-]{2,}@[A-Za-z0-9]{2,}$/'],
+            'payment_bank_account_name' => ['required', 'string', 'max:120'],
+            'payment_bank_account_number' => ['required', 'string', 'max:40', 'regex:/^[0-9 ]{6,40}$/'],
+            'payment_bank_ifsc' => ['required', 'string', 'regex:/^[A-Z]{4}0[A-Z0-9]{6}$/'],
+            'payment_bank_branch' => ['required', 'string', 'max:160'],
             'payment_instructions' => ['nullable', 'string', 'max:1000'],
         ], [
             'payment_upi_id.regex' => 'Enter a UPI ID like name@bank.',
@@ -65,11 +65,10 @@ class SettingController extends Controller
         $validated = $request->validate([
             'firm_name' => ['required', 'string', 'max:120'],
             'firm_address' => ['required', 'string', 'max:500'],
-            'firm_phone' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+()\-\s]{6,30}$/'],
-            'firm_email' => ['nullable', 'email:rfc', 'max:190'],
-            'firm_hours' => ['nullable', 'string', 'max:120'],
-            'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
-            'remove_logo' => ['nullable', 'boolean'],
+            'firm_phone' => ['required', 'string', 'max:30', 'regex:/^[0-9+()\-\s]{6,30}$/'],
+            'firm_email' => ['required', 'email:rfc', 'max:190'],
+            // A logo is required; once one is saved, leaving the box empty keeps it.
+            'logo' => [Setting::current()->firm_logo_path ? 'nullable' : 'required', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
         ]);
 
         $setting = Setting::current();
@@ -81,7 +80,7 @@ class SettingController extends Controller
         if ($setting->firm_address !== $validated['firm_address']) {
             $changes[] = 'address';
         }
-        foreach (['firm_phone' => 'phone', 'firm_email' => 'email', 'firm_hours' => 'hours'] as $field => $label) {
+        foreach (['firm_phone' => 'phone', 'firm_email' => 'email'] as $field => $label) {
             if ((string) $setting->{$field} !== trim((string) ($validated[$field] ?? ''))) {
                 $changes[] = $label;
             }
@@ -92,7 +91,6 @@ class SettingController extends Controller
             'firm_address' => $validated['firm_address'],
             'firm_phone' => trim((string) ($validated['firm_phone'] ?? '')) ?: null,
             'firm_email' => trim((string) ($validated['firm_email'] ?? '')) ?: null,
-            'firm_hours' => trim((string) ($validated['firm_hours'] ?? '')) ?: null,
         ];
 
         if ($request->hasFile('logo')) {
@@ -101,10 +99,6 @@ class SettingController extends Controller
             }
             $data['firm_logo_path'] = $request->file('logo')->store('branding', 'public');
             $changes[] = 'logo';
-        } elseif ($request->boolean('remove_logo') && $setting->firm_logo_path) {
-            Storage::disk('public')->delete($setting->firm_logo_path);
-            $data['firm_logo_path'] = null;
-            $changes[] = 'logo removed';
         }
 
         $setting->update($data);

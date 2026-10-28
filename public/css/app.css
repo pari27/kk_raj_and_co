@@ -2665,3 +2665,17 @@ body.route-tickets-show .ts-wrapper.form-select.focus { border-color: var(--tm-a
 }
 .search-box .search-box-input::placeholder { color: #6b7280; font-size: .8rem; }
 .search-box .search-box-input:focus { border-color: var(--tm-accent); box-shadow: 0 0 0 .2rem var(--tm-accent-soft); }
+
+/* Firm Profile: the small hint under the logo box */
+.firm-logo-hint {
+    font-size: .75rem;
+    font-style: italic;
+}
+
+/* Settings > Email settings: compact switches with small text */
+.email-settings-form label.u-8ae449 { font-size: .8rem; }
+.email-settings-form p.u-5a305f { font-size: .75rem; }
+
+/* Email templates: read-only view for Admins */
+.email-template-readonly { background: #f8f9fb; min-height: 2.4rem; }
+.email-template-body { white-space: pre-wrap; }

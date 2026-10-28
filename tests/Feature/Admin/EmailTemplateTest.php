@@ -18,6 +18,11 @@ class EmailTemplateTest extends TestCase
         return User::factory()->create(['role' => UserRole::Admin]);
     }
 
+    private function superAdmin(): User
+    {
+        return User::factory()->create(['role' => UserRole::SuperAdmin]);
+    }
+
     public function test_list_shows_the_templates_from_the_database(): void
     {
         EmailTemplate::where('key', 'customer_otp')->update(['subject' => 'Your OTP is ready']);
@@ -29,22 +34,22 @@ class EmailTemplateTest extends TestCase
             ->assertSee('Your OTP is ready');
     }
 
-    public function test_edit_page_shows_the_saved_text_and_its_placeholders(): void
+    public function test_the_super_admin_edit_page_shows_the_saved_text_and_its_placeholders(): void
     {
         $template = EmailTemplate::where('key', 'customer_otp')->firstOrFail();
 
-        $this->actingAs($this->admin())
+        $this->actingAs($this->superAdmin())
             ->get(route('admin.settings.email-templates.edit', $template))
             ->assertOk()
             ->assertSee($template->subject)
             ->assertSee('{{otp_code}}', false);
     }
 
-    public function test_admin_can_save_a_template(): void
+    public function test_super_admin_can_save_a_template(): void
     {
         $template = EmailTemplate::where('key', 'payment_received')->firstOrFail();
 
-        $this->actingAs($this->admin())
+        $this->actingAs($this->superAdmin())
             ->put(route('admin.settings.email-templates.update', $template), [
                 'subject' => 'Thanks for paying',
                 'body' => 'Hi {{customer_name}}, we got {{amount}}.',
@@ -58,7 +63,7 @@ class EmailTemplateTest extends TestCase
     {
         $template = EmailTemplate::where('key', 'payment_received')->firstOrFail();
 
-        $this->actingAs($this->admin())
+        $this->actingAs($this->superAdmin())
             ->put(route('admin.settings.email-templates.update', $template), [
                 'subject' => 'Hi',
                 'body' => 'Hello {{nonsense}}',
@@ -70,7 +75,7 @@ class EmailTemplateTest extends TestCase
     {
         $template = EmailTemplate::where('key', 'employee_welcome')->firstOrFail();
 
-        $this->actingAs($this->admin())
+        $this->actingAs($this->superAdmin())
             ->put(route('admin.settings.email-templates.update', $template), [
                 'subject' => 'Welcome',
                 'body' => 'Hi {{employee_name}}, welcome aboard.',
@@ -91,6 +96,26 @@ class EmailTemplateTest extends TestCase
         $mail->assertHasSubject('Join '.config('app.firm_name').' today');
         $mail->assertSeeInHtml('Dear Neha Kapoor,');
         $mail->assertSeeInHtml('https://example.test/set-password');
+    }
+
+    public function test_an_admin_can_read_a_template_but_not_change_it(): void
+    {
+        $template = EmailTemplate::where('key', 'customer_otp')->firstOrFail();
+
+        $this->actingAs($this->admin())->get(route('admin.settings.email-templates.show', $template))
+            ->assertOk()
+            ->assertSee($template->subject)
+            ->assertDontSee('Save Template');
+
+        $this->actingAs($this->admin())->get(route('admin.settings.email-templates.edit', $template))->assertForbidden();
+        $this->actingAs($this->admin())
+            ->put(route('admin.settings.email-templates.update', $template), ['subject' => 'Changed', 'body' => 'Changed {{otp_code}}'])
+            ->assertForbidden();
+        $this->assertNotSame('Changed', $template->fresh()->subject);
+
+        // The list gives the Admin a view icon and the Super Admin an edit icon.
+        $this->actingAs($this->admin())->get(route('admin.settings.email-templates.index'))->assertSee('title="View"', false)->assertDontSee('title="Edit"', false);
+        $this->actingAs($this->superAdmin())->get(route('admin.settings.email-templates.index'))->assertSee('title="Edit"', false);
     }
 
     public function test_employees_cannot_edit_templates(): void

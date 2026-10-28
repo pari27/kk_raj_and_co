@@ -90,25 +90,25 @@
         @php
             $firmPhone = config('app.firm_phone');
             $firmEmail = config('app.firm_email');
-            $firmHours = config('app.firm_hours');
             $firmAddress = config('app.firm_address');
         @endphp
         <div class="p-card">
             <div class="p-card-head navy sm"><span>Contact {{ config('app.firm_name') }}</span></div>
             <div class="p-card-body p-firm-contact">
-                @if ($firmPhone)
-                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $firmPhone) }}" class="line"><x-portal-icon name="phone" :size="16" /> <span><strong>{{ $firmPhone }}</strong><small>Tap to call</small></span></a>
-                @endif
-                @if ($firmEmail)
-                    <a href="mailto:{{ $firmEmail }}" class="line"><x-portal-icon name="mail" :size="16" /> <span><strong>{{ $firmEmail }}</strong><small>Write to us</small></span></a>
-                @endif
-                @if ($firmHours)
-                    <div class="line"><x-portal-icon name="list" :size="16" /> <span><strong>{{ $firmHours }}</strong><small>Opening hours</small></span></div>
+                @if ($firmPhone || $firmEmail)
+                    <div class="pair">
+                    @if ($firmPhone)
+                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $firmPhone) }}" class="line"><x-portal-icon name="phone" :size="16" /> <span><strong>{{ $firmPhone }}</strong></span></a>
+                    @endif
+                    @if ($firmEmail)
+                        <a href="mailto:{{ $firmEmail }}" class="line"><x-portal-icon name="mail" :size="16" /> <span><strong>{{ $firmEmail }}</strong></span></a>
+                    @endif
+                    </div>
                 @endif
                 @if ($firmAddress)
-                    <div class="line"><x-portal-icon name="home" :size="16" /> <span><strong>{{ $firmAddress }}</strong><small>Our office</small></span></div>
+                    <div class="line"><x-portal-icon name="home" :size="16" /> <span><strong>{{ $firmAddress }}</strong></span></div>
                 @endif
-                @unless ($firmPhone || $firmEmail || $firmHours || $firmAddress)
+                @unless ($firmPhone || $firmEmail || $firmAddress)
                     <div class="tm-muted small">The firm's contact details will appear here soon.</div>
                 @endunless
             </div>

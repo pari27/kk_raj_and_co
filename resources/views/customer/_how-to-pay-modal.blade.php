@@ -17,7 +17,7 @@
         'Bank and branch' => config('app.firm_bank_branch'),
     ]);
     $copyable = ['Account name', 'Account number', 'IFSC code'];
-    $office = array_filter(['Address' => config('app.firm_address'), 'Hours' => config('app.firm_hours')]);
+    $office = array_filter(['Address' => config('app.firm_address')]);
     $tabs = array_filter([
         'upi' => $upi ? 'UPI' : null,
         'bank' => $bank ? 'Bank transfer' : null,

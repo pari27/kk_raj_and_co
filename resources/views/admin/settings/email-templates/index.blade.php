@@ -35,12 +35,18 @@
                         <td class="fw-semibold"><code>{{ $template->key }}</code></td>
                         <td>{{ $template->subject }}</td>
                         <td class="text-end">
+                            @if (auth()->user()->isSuperAdmin())
                             <a href="{{ route('admin.settings.email-templates.edit', $template) }}" class="tm-icon-btn-sm text-decoration-none" aria-label="Edit {{ $template->key }}" title="Edit">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4a9b3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                     <path d="m18.5 2.5 3 3L12 15l-4 1 1-4Z"></path>
                                 </svg>
                             </a>
+                            @else
+                            <a href="{{ route('admin.settings.email-templates.show', $template) }}" class="tm-icon-btn-sm text-decoration-none" aria-label="View {{ $template->key }}" title="View">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4a9b3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </a>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

@@ -40,7 +40,7 @@ class PaymentDetailsTest extends TestCase
         $this->assertSame('5020 0012 3456 78', $setting->payment_bank_account_number);
     }
 
-    public function test_bad_values_are_rejected_and_empty_sections_are_allowed(): void
+    public function test_bad_values_are_rejected_and_every_bank_field_is_required(): void
     {
         $admin = $this->admin();
 
@@ -51,7 +51,7 @@ class PaymentDetailsTest extends TestCase
         ])->assertSessionHasErrors(['payment_upi_id', 'payment_bank_account_number', 'payment_bank_ifsc']);
 
         $this->actingAs($admin)->put(route('admin.settings.payment-details.update'), [])
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasErrors(['payment_upi_id', 'payment_bank_account_name', 'payment_bank_account_number', 'payment_bank_ifsc', 'payment_bank_branch']);
     }
 
     public function test_an_employee_cannot_open_or_change_payment_details(): void

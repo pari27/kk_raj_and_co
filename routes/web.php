@@ -120,8 +120,11 @@ Route::middleware('auth')->group(function () {
         Route::get('audit-log/export', [AuditLogController::class, 'export'])->name('audit-log.export');
     });
 
-    // The software team only: who has Admin access to the system.
+    // The software team only: who has Admin access to the system, and editing the email templates
+    // (Admins can open a template to read it, but not change it).
     Route::middleware('role:SuperAdmin')->name('admin.')->group(function () {
+        Route::get('settings/email-templates/{template}/edit', [EmailTemplateController::class, 'edit'])->name('settings.email-templates.edit');
+        Route::put('settings/email-templates/{template}', [EmailTemplateController::class, 'update'])->name('settings.email-templates.update');
         Route::get('admin-accounts', [AdminAccountController::class, 'index'])->name('admin-accounts.index');
         Route::get('admin-accounts/create', [AdminAccountController::class, 'create'])->name('admin-accounts.create');
         Route::post('admin-accounts', [AdminAccountController::class, 'store'])->name('admin-accounts.store');
@@ -172,8 +175,7 @@ Route::middleware('auth')->group(function () {
         Route::put('settings/system', [SettingController::class, 'update'])->name('settings.system.update');
         Route::put('settings/numbering', [SettingController::class, 'updateNumbering'])->name('settings.numbering.update');
         Route::get('settings/email-templates', [EmailTemplateController::class, 'index'])->name('settings.email-templates.index');
-        Route::get('settings/email-templates/{template}/edit', [EmailTemplateController::class, 'edit'])->name('settings.email-templates.edit');
-        Route::put('settings/email-templates/{template}', [EmailTemplateController::class, 'update'])->name('settings.email-templates.update');
+        Route::get('settings/email-templates/{template}', [EmailTemplateController::class, 'show'])->name('settings.email-templates.show');
     });
 });
 
