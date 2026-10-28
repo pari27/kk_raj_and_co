@@ -5,24 +5,17 @@
 @section('content')
 <div class="tm-auth-card">
     <div class="text-center mb-4">
-        <div class="tm-badge-icon mx-auto mb-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="10" rx="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-        </div>
+        <img src="{{ config('app.firm_logo_url') }}" alt="{{ config('app.firm_name') }}" class="d-block mx-auto mb-3 u-a60e1d">
         <h1 class="h4 text-white fw-semibold mb-1">Reset your password</h1>
-        <p class="tm-muted small mb-0">Choose a new password for your employee account.</p>
+        <p class="tm-muted small mb-0">Choose a new password for your account.</p>
     </div>
 
     @if ($errors->any())
         <div class="alert alert-danger py-2 small" role="alert">{{ $errors->first() }}</div>
     @endif
 
-    <form method="POST" action="{{ route('employee.password.reset.store') }}" novalidate>
+    <form method="POST" action="{{ route('password.reset.store') }}" novalidate>
         @csrf
-        <input type="hidden" name="token" value="{{ $token }}">
-        <input type="hidden" name="email" value="{{ old('email', $email) }}">
 
         <div class="mb-3">
             <label for="password" class="tm-field-label d-block">New password <span class="text-danger">*</span></label>

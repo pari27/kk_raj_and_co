@@ -34,7 +34,13 @@
         <div class="mb-4">
             <label for="code" class="tm-field-label d-block">6-digit code <span class="text-danger">*</span></label>
             <input id="code" name="code" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" class="form-control tm-field text-center u-1a58d1" placeholder="••••••">
-            <div class="form-text tm-muted">The code expires in 10 minutes and works once.</div>
+            @if (session('otp_expires_at'))
+                <div class="form-text tm-muted" id="otp-timer" data-expires-at="{{ session('otp_expires_at') }}">
+                    The code expires in <strong id="otp-remaining"></strong> and works once.
+                </div>
+            @else
+                <div class="form-text tm-muted">The code expires in {{ \App\Services\ClientOtpService::EXPIRES_IN_MINUTES }} minutes and works once.</div>
+            @endif
         </div>
 
         <button type="submit" class="btn btn-tm-primary w-100 mb-3">Verify code</button>
@@ -44,4 +50,29 @@
         </p>
     </form>
 </div>
+
+@if (session('otp_expires_at'))
+<script>
+    (function () {
+        var timer = document.getElementById('otp-timer');
+        var label = document.getElementById('otp-remaining');
+        var expiresAt = parseInt(timer.dataset.expiresAt, 10) * 1000;
+        // Use the gap between the server's time and this device's clock so a wrong PC clock doesn't skew it.
+        var offset = {{ now()->timestamp }} * 1000 - Date.now();
+
+        function tick() {
+            var left = Math.max(0, Math.round((expiresAt - (Date.now() + offset)) / 1000));
+            if (left === 0) {
+                timer.textContent = 'The code has expired. Please request a new one.';
+                clearInterval(handle);
+                return;
+            }
+            label.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+        }
+
+        var handle = setInterval(tick, 1000);
+        tick();
+    })();
+</script>
+@endif
 @endsection

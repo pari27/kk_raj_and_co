@@ -46,7 +46,8 @@ class OtpController extends Controller
 
         return back()
             ->withInput($request->only('email'))
-            ->with('status', 'If an active client account exists for that email, we have emailed a 6-digit code. It expires in '.ClientOtpService::EXPIRES_IN_MINUTES.' minutes.');
+            ->with('status', 'If an active client account exists for that email, we have emailed a 6-digit code. It expires in '.ClientOtpService::EXPIRES_IN_MINUTES.' minutes.')
+            ->with('otp_expires_at', now()->addMinutes(ClientOtpService::EXPIRES_IN_MINUTES)->timestamp);
     }
 
     public function verify(VerifyCodeRequest $request): RedirectResponse
@@ -64,6 +65,9 @@ class OtpController extends Controller
 
         if (! $customer || ! $this->otps->verify($customer, $request->input('code'))) {
             RateLimiter::hit($key, 60);
+
+            // Keep the countdown running after a wrong code.
+            $request->session()->keep('otp_expires_at');
 
             return back()->withInput($request->only('email'))->withErrors([
                 'code' => 'That code is not right or has expired. Request a new one and try again.',

@@ -5,7 +5,7 @@ namespace App\Http\Requests\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
-class EmployeePasswordResetRequest extends FormRequest
+class StaffResetPasswordRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -17,13 +17,7 @@ class EmployeePasswordResetRequest extends FormRequest
      */
     public function rules(): array
     {
-        if ($this->isMethod('get')) {
-            return [];
-        }
-
         return [
-            'email' => ['required', 'string', 'email'],
-            'token' => ['required', 'string'],
             'password' => ['required', 'string', 'confirmed', Password::min(8)],
         ];
     }

@@ -10,8 +10,7 @@ use App\Http\Controllers\Admin\EmployeeDesignationController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\EmployeePasswordResetController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\StaffPasswordResetController;
 use App\Http\Controllers\Auth\SetEmployeePasswordController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
@@ -44,16 +43,18 @@ Route::middleware('guest')->group(function () {
         ->middleware('throttle:10,1')
         ->name('login.store');
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-        ->middleware('throttle:10,1')
+    Route::get('forgot-password', [StaffPasswordResetController::class, 'create'])->name('password.request');
+    Route::post('forgot-password', [StaffPasswordResetController::class, 'send'])
+        ->middleware('throttle:5,1')
         ->name('password.email');
-
-    Route::get('reset-password/{token}', [EmployeePasswordResetController::class, 'create'])
-        ->name('password.reset');
-    Route::post('reset-password', [EmployeePasswordResetController::class, 'store'])
+    Route::post('forgot-password/verify', [StaffPasswordResetController::class, 'verify'])
         ->middleware('throttle:10,1')
-        ->name('employee.password.reset.store');
+        ->name('password.verify');
+
+    Route::get('reset-password', [StaffPasswordResetController::class, 'edit'])->name('password.reset');
+    Route::post('reset-password', [StaffPasswordResetController::class, 'update'])
+        ->middleware('throttle:10,1')
+        ->name('password.reset.store');
 });
 
 Route::middleware(['guest', 'signed'])->group(function () {

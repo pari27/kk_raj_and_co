@@ -5,62 +5,74 @@
 @section('content')
 <div class="tm-auth-card">
     <div class="text-center mb-4">
-        <div class="tm-badge-icon mx-auto mb-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="10" rx="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-        </div>
+        <img src="{{ config('app.firm_logo_url') }}" alt="{{ config('app.firm_name') }}" class="d-block mx-auto mb-3 u-a60e1d">
         <h1 class="h4 text-white fw-semibold mb-1">Forgot password?</h1>
         <p class="tm-muted small mb-0">
-            Enter your email and we'll send you instructions to reset it.
+            We'll email a one-time code to reset your password.
         </p>
     </div>
 
     @if (session('status'))
-        <div class="alert alert-success py-2 small" role="alert">
-            {{ session('status') }}
-        </div>
-        <p class="text-center mb-0">
-            <a href="{{ route('login') }}" class="tm-link small text-decoration-underline">Back to login</a>
-        </p>
-    @else
-        @if ($errors->any())
-            <div class="alert alert-danger py-2 small" role="alert">
-                {{ $errors->first() }}
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('password.email') }}" novalidate>
-            @csrf
-
-            <div class="mb-4">
-                <label for="email" class="tm-field-label d-block">Email <span class="text-danger">*</span></label>
-                <div class="d-flex align-items-center gap-2">
-                    <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value="{{ old('email') }}"
-                        class="form-control tm-field"
-                        placeholder="you@yourfirm.com"
-                        required
-                        autofocus
-                        autocomplete="username"
-                    >
-                    <button type="submit" class="tm-submit-circle" aria-label="Send reset instructions">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M5 12h14"></path>
-                            <path d="m12 5 7 7-7 7"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <p class="text-center tm-muted small mb-0">
-                <a href="{{ route('login') }}" class="tm-link text-decoration-underline">Back to login</a>
-            </p>
-        </form>
+        <div class="alert alert-success py-2 small" role="alert">{{ session('status') }}</div>
     @endif
+
+    @if ($errors->any())
+        <div class="alert alert-danger py-2 small" role="alert">{{ $errors->first() }}</div>
+    @endif
+
+    <form method="POST" action="{{ route('password.verify') }}" novalidate>
+        @csrf
+
+        <div class="mb-3">
+            <label for="email" class="tm-field-label d-block">Email <span class="text-danger">*</span></label>
+            <div class="d-flex gap-2">
+                <input id="email" type="email" name="email" value="{{ old('email') }}" class="form-control tm-field" placeholder="you@yourfirm.com" required autofocus autocomplete="username">
+                <button type="submit" formaction="{{ route('password.email') }}" class="btn btn-outline-secondary flex-shrink-0">Send me a code</button>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label for="code" class="tm-field-label d-block">6-digit code <span class="text-danger">*</span></label>
+            <input id="code" name="code" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" class="form-control tm-field text-center u-1a58d1" placeholder="••••••">
+            @if (session('otp_expires_at'))
+                <div class="form-text tm-muted" id="otp-timer" data-expires-at="{{ session('otp_expires_at') }}">
+                    The code expires in <strong id="otp-remaining"></strong> and works once.
+                </div>
+            @else
+                <div class="form-text tm-muted">The code expires in {{ \App\Services\ClientOtpService::EXPIRES_IN_MINUTES }} minutes and works once.</div>
+            @endif
+        </div>
+
+        <button type="submit" class="btn btn-tm-primary w-100 mb-3">Verify code</button>
+
+        <p class="text-center tm-muted small mb-0">
+            <a href="{{ route('login') }}" class="tm-link text-decoration-underline">Back to login</a>
+        </p>
+    </form>
 </div>
+
+@if (session('otp_expires_at'))
+<script>
+    (function () {
+        var timer = document.getElementById('otp-timer');
+        var label = document.getElementById('otp-remaining');
+        var expiresAt = parseInt(timer.dataset.expiresAt, 10) * 1000;
+        // Use the gap between the server's time and this device's clock so a wrong PC clock doesn't skew it.
+        var offset = {{ now()->timestamp }} * 1000 - Date.now();
+
+        function tick() {
+            var left = Math.max(0, Math.round((expiresAt - (Date.now() + offset)) / 1000));
+            if (left === 0) {
+                timer.textContent = 'The code has expired. Please request a new one.';
+                clearInterval(handle);
+                return;
+            }
+            label.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+        }
+
+        var handle = setInterval(tick, 1000);
+        tick();
+    })();
+</script>
+@endif
 @endsection
