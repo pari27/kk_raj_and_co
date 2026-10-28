@@ -25,7 +25,6 @@
             <{!! isset($card['url']) ? 'a href="'.e($card['url']).'"' : 'div' !!} class="tm-stat-card emp-dash-stat emp-dash-stat-{{ $card['gradient'] }}">
                 <div class="lb">{{ $card['label'] }}</div>
                 <div class="vl js-count-up" data-count="{{ $card['count'] }}">{{ $card['count'] }}</div>
-                <div class="sb">{{ $card['sub'] }}</div>
             </{{ isset($card['url']) ? 'a' : 'div' }}>
         </div>
     @endforeach

@@ -48,17 +48,14 @@ class EmployeeDashboardService
         )->values();
 
         $completedThisMonth = $tickets->filter(fn (Ticket $ticket): bool => $ticket->status?->isClosed() && $ticket->completed_at?->isCurrentMonth())->count();
-        $completedLastMonth = $tickets->filter(fn (Ticket $ticket): bool => $ticket->status?->isClosed() && $ticket->completed_at?->isSameMonth(now()->subMonthNoOverflow()))->count();
-        $change = $completedThisMonth - $completedLastMonth;
 
         $statCards = [
-            ['label' => 'My open services', 'count' => $open->count(), 'sub' => 'assigned to you', 'gradient' => 'blue', 'url' => route('tickets.index')],
-            ['label' => 'Documents to check', 'count' => $toCheck->count(), 'sub' => 'uploaded by clients', 'gradient' => 'purple'],
-            ['label' => 'Waiting for clients', 'count' => $waiting->count(), 'sub' => 'documents not received', 'gradient' => 'amber'],
+            ['label' => 'My open services', 'count' => $open->count(), 'gradient' => 'blue', 'url' => route('tickets.index')],
+            ['label' => 'Documents to check', 'count' => $toCheck->count(), 'gradient' => 'purple'],
+            ['label' => 'Waiting for documents', 'count' => $waiting->count(), 'gradient' => 'amber'],
             [
-                'label' => 'Completed ('.now()->format('M').')',
+                'label' => 'Completed (this month)',
                 'count' => $completedThisMonth,
-                'sub' => ($change >= 0 ? '+' : '−').abs($change).' vs '.now()->subMonthNoOverflow()->format('F'),
                 'gradient' => 'green',
                 'url' => route('tickets.index', ['tab' => 'completed']),
             ],
