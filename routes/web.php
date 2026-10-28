@@ -155,6 +155,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('master-employees', [EmployeeController::class, 'index'])->name('employees.index');
         Route::get('master-employees/create', [EmployeeController::class, 'create'])->name('employees.create');
+        Route::get('master-employees/lookup', [EmployeeController::class, 'lookupByMobile'])->name('employees.lookup');
         Route::get('master-employees/check-email', [EmployeeController::class, 'checkEmail'])->name('employees.check-email');
         Route::post('master-employees', [EmployeeController::class, 'store'])->name('employees.store');
         Route::get('master-employees/{employee}', [EmployeeController::class, 'show'])->name('employees.show');

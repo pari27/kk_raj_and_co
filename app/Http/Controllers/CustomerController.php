@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\AuditLog;
 use App\Models\Customer;
 use App\Services\AuditLogger;
+use App\Services\EventMailer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,6 +53,8 @@ class CustomerController extends Controller
         ]);
 
         $this->log($customer, 'Created');
+
+        EventMailer::welcomeClient($customer);
 
         return redirect()
             ->route('customers.show', $customer)
@@ -202,6 +205,7 @@ class CustomerController extends Controller
                 'email' => $customer->email,
                 'email_notifications_enabled' => $customer->email_notifications_enabled,
                 'since' => $customer->created_at->format('M Y'),
+                'url' => route('customers.show', $customer),
                 'tickets_count' => $customer->tickets_count,
             ],
         ]);

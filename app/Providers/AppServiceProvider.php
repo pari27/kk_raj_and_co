@@ -34,6 +34,11 @@ class AppServiceProvider extends ServiceProvider
         $this->registerAuditLogListeners();
 
         Event::listen(function (NotificationSending $event) {
+            // No email at all for the software team's Super Admin, and none when notifications are off.
+            if ($event->notifiable instanceof \App\Models\User && $event->notifiable->isSuperAdmin()) {
+                return false;
+            }
+
             return Setting::notificationsEnabled();
         });
     }

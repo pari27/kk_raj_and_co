@@ -291,8 +291,9 @@
                                 @endforeach
                             </select>
                             @error('status')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                            <label class="form-label fw-semibold small mt-3">Comment (optional)</label>
-                            <textarea name="comment" class="form-control tm-field ticket-comment" rows="3" maxlength="2000" placeholder="What changed and why"></textarea>
+                            <label class="form-label fw-semibold small mt-3">Comment <span class="text-danger">*</span></label>
+                            <textarea name="comment" required class="form-control tm-field ticket-comment @error('comment') is-invalid @enderror" rows="3" maxlength="2000" placeholder="What changed and why"></textarea>
+                            @error('comment')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             <div class="d-flex justify-content-between align-items-center mt-2">
                                 <small class="tm-muted">Comments become part of the service timeline.</small>
                                 <button type="submit" class="btn btn-tm-primary btn-sm px-3">Save </button>
@@ -329,7 +330,7 @@
                 <div class="ticket-panel-heading">
                     <h2>FeeS</h2>
                     @if ($ticket->paymentStatus() !== \App\Enums\PaymentStatus::FullyPaid)
-                        <a href="{{ route('payments.index', ['enquiry' => $ticket->enquiry_id]) }}" class="badge rounded-pill text-bg-primary fw-normal px-2 py-1 text-decoration-none u-dcc109">Make Payment</a>
+                        <a href="{{ route('payments.index', ['enquiry' => $ticket->enquiry_id]) }}" class="badge rounded-pill text-bg-primary fw-normal px-2 py-1 text-decoration-none u-dcc109">Record payment</a>
                     @endif
                 </div>
                 <div class="ticket-info-row"><span class="tm-muted">Price</span><strong>&#8377;{{ number_format((float) $ticket->price, 2) }}</strong></div>

@@ -15,6 +15,25 @@
             <div class="tm-card tm-section-card p-0 mb-3">
                 <div class="tm-section-title">Employee details</div>
                 <div class="p-4">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="tm-field-label d-block">Mobile number <span class="text-danger">*</span></label>
+                            <div class="tm-mobile-group @error('mobile') is-invalid @enderror">
+                                <span class="tm-mobile-prefix">+91</span>
+                                <input type="text" name="mobile" id="mobileInput" value="{{ old('mobile') }}" maxlength="10" inputmode="numeric" class="form-control tm-field" placeholder="98765 77341">
+                            </div>
+                            <div class="tm-validation-hint" id="mobileHint">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span id="mobileHintText">Valid 10-digit number</span>
+                            </div>
+                            @error('mobile')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div id="employeeLookupBanner" class="client-lookup-banner d-none mb-3" aria-live="polite"></div>
+
                     <div class="tm-photo-dropzone mb-4">
                         <div class="tm-photo-circle" id="photoPreviewWrap">
                             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2f5fbe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="photoPlaceholderIcon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -39,7 +58,8 @@
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label class="tm-field-label d-block">Full name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" value="{{ old('name') }}" class="form-control tm-field @error('name') is-invalid @enderror" placeholder="e.g. Neha Kapoor">
+                            <div class="tm-field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><input type="text" name="name" id="employeeName" value="{{ old('name') }}" class="form-control tm-field @error('name') is-invalid @enderror" placeholder="e.g. Neha Kapoor"></div>
+                            <div class="tm-muted d-none client-record-caption" id="employeeNameCaption">From the employee record</div>
                             @error('name')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
@@ -60,27 +80,14 @@
                         </div>
                     </div>
 
-                    <div class="row g-3 mb-1">
-                        <div class="col-md-6">
-                            <label class="tm-field-label d-block">Mobile number <span class="text-danger">*</span></label>
-                            <div class="tm-mobile-group @error('mobile') is-invalid @enderror">
-                                <span class="tm-mobile-prefix">+91</span>
-                                <input type="text" name="mobile" id="mobileInput" value="{{ old('mobile') }}" maxlength="10" inputmode="numeric" class="form-control tm-field" placeholder="98765 77341">
-                            </div>
-                            <div class="tm-validation-hint" id="mobileHint">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                <span id="mobileHintText">Valid 10-digit number</span>
-                            </div>
-                            @error('mobile')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
+                    <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label class="tm-field-label d-block">Email <span class="text-danger">*</span></label>
                             <div class="tm-field-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                                 <input type="email" name="email" id="emailInput" value="{{ old('email') }}" class="form-control tm-field @error('email') is-invalid @enderror" placeholder="neha.kapoor@firm.com">
                             </div>
+                            <div class="tm-muted d-none client-record-caption" id="employeeEmailCaption">From the employee record</div>
                             @error('email')
                                 <div class="invalid-feedback d-block text-danger fst-italic">{{ $message }}</div>
                             @else
@@ -90,9 +97,7 @@
                                 </div>
                             @enderror
                         </div>
-                    </div>
-
-                    <div class="mb-3">
+                        <div class="col-md-6">
                         <label class="tm-field-label d-block">Designation <span class="text-danger">*</span></label>
                         <select name="designation_id" class="form-select tm-field @error('designation_id') is-invalid @enderror">
                             <option value="">Select a designation</option>
@@ -104,6 +109,7 @@
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
+                    </div>
 
                     <div class="form-check form-switch d-flex align-items-center gap-2">
                         <input class="form-check-input flex-shrink-0 u-88b2c2" type="checkbox" role="switch" id="employeeActive" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
@@ -113,7 +119,7 @@
 
                 <div class="d-flex gap-2 p-4 pt-0">
                     <a href="{{ route('admin.employees.index') }}" class="btn btn-outline-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-tm-primary">Save employee</button>
+                    <button type="submit" id="employeeSubmit" class="btn btn-tm-primary">Save employee</button>
                 </div>
             </div>
         </div>
@@ -243,6 +249,103 @@
                         });
                 }, 400);
             });
+        }
+    })();
+
+    (function () {
+        var phoneInput = document.getElementById('mobileInput');
+        var banner = document.getElementById('employeeLookupBanner');
+        var submit = document.getElementById('employeeSubmit');
+        var nameInput = document.getElementById('employeeName');
+        var emailInput = document.getElementById('emailInput');
+        var nameCaption = document.getElementById('employeeNameCaption');
+        var emailCaption = document.getElementById('employeeEmailCaption');
+        var designation = document.querySelector('select[name="designation_id"]');
+        var genders = document.querySelectorAll('input[name="gender"]');
+        if (! phoneInput || ! banner || ! submit) { return; }
+
+        var lookupUrl = @json(route('admin.employees.lookup'));
+        var timer = null;
+        var token = 0;
+        var filled = false;
+
+        function el(tag, className, text) {
+            var node = document.createElement(tag);
+            if (className) { node.className = className; }
+            if (text !== undefined) { node.textContent = text; }
+            return node;
+        }
+
+        function clearExisting() {
+            banner.classList.add('d-none');
+            banner.textContent = '';
+            submit.disabled = false;
+            if (filled) {
+                nameInput.value = '';
+                emailInput.value = '';
+                nameInput.readOnly = false;
+                emailInput.readOnly = false;
+                nameCaption.classList.add('d-none');
+                emailCaption.classList.add('d-none');
+                if (designation) { designation.value = ''; designation.disabled = false; }
+                genders.forEach(function (radio) { radio.checked = false; radio.disabled = false; });
+                filled = false;
+            }
+        }
+
+        function showExisting(person) {
+            var initials = person.name.trim().split(/\s+/).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase();
+            var work = person.open_services === 1 ? '1 open service' : person.open_services + ' open services';
+
+            banner.textContent = '';
+            var row = el('div', 'd-flex align-items-start justify-content-between gap-2');
+            var left = el('div', 'd-flex align-items-start gap-2');
+            left.appendChild(el('span', 'client-lookup-avatar', initials));
+            var text = el('div');
+            text.appendChild(el('div', 'fw-bold client-lookup-title', 'Existing employee found'));
+            text.appendChild(el('div', 'client-lookup-sub', 'Employee since ' + person.since + ' · ' + (person.designation ? person.designation + ' · ' : '') + work));
+            left.appendChild(text);
+            row.appendChild(left);
+            var link = el('a', 'fw-semibold text-decoration-none flex-shrink-0 client-lookup-link', 'View employee →');
+            link.href = person.url;
+            row.appendChild(link);
+            banner.appendChild(row);
+            banner.classList.remove('d-none');
+
+            nameInput.value = person.name;
+            emailInput.value = person.email || '';
+            nameInput.readOnly = true;
+            emailInput.readOnly = true;
+            nameCaption.classList.remove('d-none');
+            emailCaption.classList.remove('d-none');
+            if (designation && person.designation_id) { designation.value = String(person.designation_id); designation.disabled = true; }
+            genders.forEach(function (radio) { radio.checked = radio.value === person.gender; radio.disabled = true; });
+            filled = true;
+            submit.disabled = true;
+        }
+
+        phoneInput.addEventListener('input', function () {
+            window.clearTimeout(timer);
+            token++;
+            clearExisting();
+
+            var phone = phoneInput.value.trim();
+            if (! /^\d{10}$/.test(phone)) { return; }
+
+            var current = token;
+            timer = window.setTimeout(function () {
+                fetch(lookupUrl + '?phone=' + encodeURIComponent(phone), { headers: { Accept: 'application/json' } })
+                    .then(function (response) { return response.json(); })
+                    .then(function (data) {
+                        if (current !== token || ! data.employee) { return; }
+                        showExisting(data.employee);
+                    })
+                    .catch(function () {});
+            }, 400);
+        });
+
+        if (/^\d{10}$/.test(phoneInput.value.trim())) {
+            phoneInput.dispatchEvent(new Event('input'));
         }
     })();
 </script>

@@ -89,10 +89,10 @@ class ReportTest extends TestCase
         $response->assertOk()->assertSee('Small Service')->assertSee('Big Service')->assertSee('₹3,000')->assertSee('₹1,500');
     }
 
-    public function test_fees_pending_shows_only_completed_services_with_a_balance(): void
+    public function test_fees_pending_shows_every_unpaid_enquiry(): void
     {
         [$enquiry, $small] = $this->enquiryWithPayment();
-        $small->update(['status' => 'Task Completed', 'completed_at' => now()->subDays(20)]);
+        $enquiry->update(['created_at' => now()->subDays(20)]);
 
         $this->actingAs($this->admin())->get(route('reports.index', ['report' => 'fees_pending']))
             ->assertOk()
@@ -118,22 +118,15 @@ class ReportTest extends TestCase
             ->assertDontSee('Done Doc');
     }
 
-    public function test_client_history_opens_on_the_first_client_and_can_switch(): void
+    public function test_client_history_lists_every_client_without_a_client_filter(): void
     {
-        [, , , $customer] = $this->enquiryWithPayment();
-        $admin = $this->admin();
+        $this->enquiryWithPayment();
 
-        // With no client picked it opens on the first one (alphabetically) rather than an empty page.
-        $this->actingAs($admin)->get(route('reports.index', ['report' => 'client_history']))
+        $this->actingAs($this->admin())->get(route('reports.index', ['report' => 'client_history']))
             ->assertOk()
             ->assertSee('Report Client')
-            ->assertSee('Small Service');
-
-        $this->actingAs($admin)->get(route('reports.index', ['report' => 'client_history', 'client_id' => $customer->id]))
-            ->assertOk()
-            ->assertSee('Small Service')
-            ->assertSee('Big Service')
-            ->assertSee('Client since');
+            ->assertSee('Total · 1 client')
+            ->assertDontSee('Choose a client');
     }
 
     public function test_employee_report_only_includes_their_own_services_and_payments(): void
@@ -186,11 +179,11 @@ class ReportTest extends TestCase
         $this->assertStringContainsString('s="6"><v>'.$serial.'</v>', $sheet);
     }
 
-    public function test_client_history_export_puts_the_client_name_in_the_title(): void
+    public function test_client_history_export_lists_every_client(): void
     {
-        [, , , $customer] = $this->enquiryWithPayment();
+        $this->enquiryWithPayment();
 
-        $response = $this->actingAs($this->admin())->get(route('reports.export', ['report' => 'client_history', 'client_id' => $customer->id]));
+        $response = $this->actingAs($this->admin())->get(route('reports.export', ['report' => 'client_history']));
         $response->assertOk();
 
         $zip = new \ZipArchive;
@@ -198,8 +191,8 @@ class ReportTest extends TestCase
         $sheet = $zip->getFromName('xl/worksheets/sheet1.xml');
         $zip->close();
 
-        $this->assertStringContainsString('Client history (Report Client)', $sheet);
-        $this->assertStringContainsString('Small Service', $sheet);
+        $this->assertStringContainsString('Client history', $sheet);
+        $this->assertStringContainsString('Report Client', $sheet);
     }
 
     public function test_long_reports_are_paged_at_25_rows(): void

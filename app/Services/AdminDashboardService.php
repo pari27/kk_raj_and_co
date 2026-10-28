@@ -69,8 +69,8 @@ class AdminDashboardService
             ->when($to, fn ($q) => $q->where($column, '<', $to))
             ->count();
 
-        $enquiriesNow = $count(Enquiry::query(), 'created_at', $monthStart);
-        $enquiriesBefore = $count(Enquiry::query(), 'created_at', $lastStart, $monthStart);
+        $servicesNow = $count(Ticket::query(), 'created_at', $monthStart);
+        $servicesBefore = $count(Ticket::query(), 'created_at', $lastStart, $monthStart);
 
         $completedBase = Ticket::query()->whereNotNull('completed_at');
         $completedNow = $count($completedBase, 'completed_at', $monthStart);
@@ -84,11 +84,11 @@ class AdminDashboardService
         $openedThisWeek = Ticket::query()->where('created_at', '>=', now()->subDays(7))->count();
 
         return [
-            ['label' => 'New enquiries ('.$monthName.')', 'count' => $enquiriesNow, 'prefix' => '', 'sub' => $this->change($enquiriesNow, $enquiriesBefore, $lastName), 'gradient' => 'blue', 'url' => route('enquiries.index')],
+            ['label' => 'New services (this month)', 'count' => $servicesNow, 'prefix' => '', 'sub' => $this->change($servicesNow, $servicesBefore, $lastName), 'gradient' => 'blue', 'url' => route('tickets.index')],
             ['label' => 'Open services', 'count' => $open->count(), 'prefix' => '', 'sub' => $openedThisWeek.' new in the last 7 days', 'gradient' => 'purple', 'url' => route('tickets.index')],
-            ['label' => 'Completed ('.$monthName.')', 'count' => $completedNow, 'prefix' => '', 'sub' => $this->change($completedNow, $completedBefore, $lastName), 'gradient' => 'green', 'url' => route('tickets.index', ['tab' => 'completed'])],
-            ['label' => 'Fees pending', 'count' => (int) round($owing->sum(fn (Enquiry $enquiry): float => $enquiry->balanceDue())), 'prefix' => '₹', 'sub' => 'across '.$owing->pluck('customer_id')->unique()->count().' '.Str::plural('client', $owing->pluck('customer_id')->unique()->count()), 'gradient' => 'maroon', 'url' => route('payments.index')],
-            ['label' => 'Fees received ('.$monthName.')', 'count' => (int) round($receivedNow), 'prefix' => '₹', 'sub' => $this->change($receivedNow, $receivedBefore, $lastName), 'gradient' => 'teal', 'url' => route('payments.index')],
+            ['label' => 'Completed (this month)', 'count' => $completedNow, 'prefix' => '', 'sub' => $this->change($completedNow, $completedBefore, $lastName), 'gradient' => 'green', 'url' => route('tickets.index', ['tab' => 'completed'])],
+            ['label' => 'Pending fees', 'count' => (int) round($owing->sum(fn (Enquiry $enquiry): float => $enquiry->balanceDue())), 'prefix' => '₹', 'sub' => 'across '.$owing->pluck('customer_id')->unique()->count().' '.Str::plural('client', $owing->pluck('customer_id')->unique()->count()), 'gradient' => 'maroon', 'url' => route('payments.index')],
+            ['label' => 'Fees received (this month)', 'count' => (int) round($receivedNow), 'prefix' => '₹', 'sub' => $this->change($receivedNow, $receivedBefore, $lastName), 'gradient' => 'teal', 'url' => route('payments.index')],
         ];
     }
 

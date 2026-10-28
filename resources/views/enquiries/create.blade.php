@@ -263,7 +263,7 @@
                 + '<div><div class="fw-bold u-0b7c80">Existing client found</div>'
                 + '<div class="u-bd1e2f">Client since ' + customer.since + ' &middot; ' + historyText + '</div></div>'
                 + '</div>'
-                + '<a href="{{ url('customers') }}/' + customer.id + '" target="_blank" class="fw-semibold text-decoration-none flex-shrink-0 u-8699ce">View client &rarr;</a>'
+                + '<a href="' + customer.url + '" target="_blank" class="fw-semibold text-decoration-none flex-shrink-0 u-8699ce">View client &rarr;</a>'
                 + '</div>';
             clientNameInput.value = customer.name;
             clientEmailInput.value = customer.email || '';

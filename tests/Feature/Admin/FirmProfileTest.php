@@ -46,6 +46,34 @@ class FirmProfileTest extends TestCase
         Storage::disk('public')->assertExists($setting->firm_logo_path);
     }
 
+    public function test_the_firms_phone_email_and_hours_can_be_saved_and_cleared(): void
+    {
+        $admin = $this->admin();
+
+        $this->actingAs($admin)->put(route('admin.settings.firm-profile.update'), [
+            'firm_name' => 'Sharma & Co',
+            'firm_address' => 'Kolkata',
+            'firm_phone' => '033 4000 1234',
+            'firm_email' => 'info@firm.com',
+            'firm_hours' => 'Mon–Sat, 10 am – 7 pm',
+        ])->assertRedirect(route('admin.settings.firm-profile'));
+
+        $setting = Setting::current()->fresh();
+        $this->assertSame('033 4000 1234', $setting->firm_phone);
+        $this->assertSame('info@firm.com', $setting->firm_email);
+
+        $this->actingAs($admin)->put(route('admin.settings.firm-profile.update'), [
+            'firm_name' => 'Sharma & Co', 'firm_address' => 'Kolkata',
+        ]);
+        $this->assertNull(Setting::current()->fresh()->firm_phone);
+    }
+
+    public function test_a_bad_phone_or_email_is_rejected(): void
+    {
+        $this->actingAs($this->admin())->put(route('admin.settings.firm-profile.update'), [
+            'firm_name' => 'X', 'firm_address' => 'Y', 'firm_phone' => 'call me', 'firm_email' => 'not-an-email',
+        ])->assertSessionHasErrors(['firm_phone', 'firm_email']);
+    }
     public function test_name_and_address_are_required_and_the_logo_must_be_an_image(): void
     {
         $this->actingAs($this->admin())->put(route('admin.settings.firm-profile.update'), [

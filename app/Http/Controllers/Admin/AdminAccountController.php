@@ -49,6 +49,7 @@ class AdminAccountController extends Controller
             'role' => UserRole::Admin,
             'is_active' => $request->boolean('is_active'),
             'password' => $validated['password'],
+            'created_by' => \Illuminate\Support\Facades\Auth::guard('web')->id(),
         ]);
 
         // The password is chosen here, so there is no set-password step: they can sign in straight away.

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClientNotification;
 use App\Services\ClientPortalService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -21,7 +22,7 @@ class DashboardController extends Controller
             'services' => $services,
             'stats' => $this->portal->stats($services, $fees),
             'attention' => $this->portal->attentionItems($services, $fees),
-            'contacts' => $this->portal->pendingContacts($services),
+            'recentUpdates' => ClientNotification::query()->where('customer_id', $customer->id)->latest('created_at')->latest('id')->limit(5)->get(),
             'portal' => $this->portal,
         ]);
     }

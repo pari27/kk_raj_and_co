@@ -72,7 +72,6 @@
                     <div class="position-relative">
                         <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                         <div class="h3 tm-serif fw-bold mb-1 text-white">{{ number_format($card['count']) }}</div>
-                        <div class="u-48932b">{{ $card['caption'] }}</div>
                     </div>
                 </div>
             </div>
@@ -84,7 +83,7 @@
             <div class="tm-card p-0">
                 <div class="p-3">
                     <div class="row g-2 align-items-center">
-                        <div class="col-12 col-lg-6"><input type="search" id="designationsSearch" class="form-control form-control-sm tm-field" placeholder="Search designations" aria-label="Search designations"></div>
+                        <div class="col-12 col-lg-6"><x-search-box id="designationsSearch" /></div>
                         <div class="col-12 col-lg-6 d-flex flex-wrap justify-content-lg-end gap-1" role="group" aria-label="Filter designations by status">
                             <button type="button" class="tm-filter-pill active" data-filter="all">All {{ $totalCount }}</button>
                             <button type="button" class="tm-filter-pill" data-filter="active">Active {{ $activeCount }}</button>

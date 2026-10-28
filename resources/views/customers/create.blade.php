@@ -18,14 +18,6 @@
                 <form method="POST" action="{{ route('customers.store') }}" novalidate>
                     @csrf
                     <div class="client-panel-body">
-                        <div class="mb-3">
-                            <label for="clientName" class="client-form-label">Full name / business name <span class="text-danger">*</span></label>
-                            <input id="clientName" type="text" name="name" value="{{ old('name') }}" class="form-control tm-field client-form-control @error('name') is-invalid @enderror" placeholder="e.g. Meera Traders" required>
-                            @error('name')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-
                         <div class="row g-3 mb-3">
                             <div class="col-12 col-md-6">
                                 <label for="clientPhone" class="client-form-label">Mobile number <span class="text-danger">*</span></label>
@@ -43,9 +35,24 @@
                                     <span id="clientPhoneHintText"></span>
                                 </div>
                             </div>
-                            <div class="col-12 col-md-6">
+                        </div>
+
+                        <div id="clientLookupBanner" class="client-lookup-banner d-none mb-3" aria-live="polite"></div>
+
+                        <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label for="clientName" class="client-form-label">Full name / business name <span class="text-danger">*</span></label>
+                            <div class="tm-field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><input id="clientName" type="text" name="name" value="{{ old('name') }}" class="form-control tm-field client-form-control @error('name') is-invalid @enderror" placeholder="e.g. Meera Traders" required></div>
+                            <div class="tm-muted d-none client-record-caption" id="clientNameCaption">From the client record</div>
+                            @error('name')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-12 col-md-6">
                                 <label for="clientEmail" class="client-form-label">Email <span class="tm-muted fw-normal">(optional)</span></label>
-                                <input id="clientEmail" type="email" name="email" value="{{ old('email') }}" class="form-control tm-field client-form-control @error('email') is-invalid @enderror" placeholder="name@example.com">
+                                <div class="tm-field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><polyline points="3 7 12 13 21 7"></polyline></svg><input id="clientEmail" type="email" name="email" value="{{ old('email') }}" class="form-control tm-field client-form-control @error('email') is-invalid @enderror" placeholder="name@example.com"></div>
+                                <div class="tm-muted d-none client-record-caption" id="clientEmailCaption">From the client record</div>
                                 @error('email')
                                     @if($message !== 'This email is already registered.')
                                         <div class="invalid-feedback d-block text-danger fst-italic" id="clientEmailServerError">{{ $message }}</div>
@@ -56,6 +63,7 @@
                                     <span id="clientEmailHintText"></span>
                                 </div>
                             </div>
+
                         </div>
 
                         <div class="form-check mb-3">
@@ -73,7 +81,7 @@
                     </div>
                     <div class="client-form-footer">
                         <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary px-4 py-2 fw-semibold">Cancel</a>
-                        <button type="submit" class="btn btn-tm-primary px-4 py-2 fw-semibold">Save client</button>
+                        <button type="submit" id="clientSubmit" class="btn btn-tm-primary px-4 py-2 fw-semibold">Save client</button>
                     </div>
                 </form>
             </div>
@@ -182,7 +190,10 @@
                                         hint.classList.remove('is-invalid-hint');
                         input.classList.add('is-valid');
                         icon.innerHTML = check;
-                        text.textContent = 'Available, used for login';
+                        text.textContent = 'No client registered with this email-id';
+                    } else if (window.existingClientFound) {
+                        hint.classList.remove('is-visible', 'is-invalid-hint');
+                        input.classList.remove('is-valid', 'is-invalid');
                     } else {
                         hint.classList.add('is-invalid-hint');
                         input.classList.remove('is-valid');
@@ -253,7 +264,10 @@
                         hint.classList.remove('is-invalid-hint');
                         input.classList.add('is-valid');
                         icon.innerHTML = check;
-                        text.textContent = 'Available';
+                        text.textContent = 'No client registered with this mobile no.';
+                    } else if (window.existingClientFound) {
+                        hint.classList.remove('is-visible', 'is-invalid-hint');
+                        input.classList.remove('is-valid', 'is-invalid');
                     } else {
                         hint.classList.add('is-invalid-hint');
                         input.classList.remove('is-valid');
@@ -274,6 +288,107 @@
         checkAvailability();
     });
     if (input.value.trim() !== '' && ! hasServerPhoneError) { checkAvailability(); }
+})();
+
+(function () {
+    var phoneInput = document.getElementById('clientPhone');
+    var nameInput = document.getElementById('clientName');
+    var emailInput = document.getElementById('clientEmail');
+    var banner = document.getElementById('clientLookupBanner');
+    var submit = document.getElementById('clientSubmit');
+    var notify = document.getElementById('clientNotifyCheckbox');
+    var nameCaption = document.getElementById('clientNameCaption');
+    var emailCaption = document.getElementById('clientEmailCaption');
+    if (! phoneInput || ! banner || ! submit) { return; }
+
+    var lookupUrl = @json(route('customers.lookup'));
+    var timer = null;
+    var token = 0;
+    var filled = false;
+    var phoneHint = document.getElementById('clientPhoneHint');
+    var emailHint = document.getElementById('clientEmailHint');
+
+    function clearExisting() {
+        window.existingClientFound = false;
+        banner.classList.add('d-none');
+        banner.textContent = '';
+        submit.disabled = false;
+        if (filled) {
+            nameInput.value = '';
+            emailInput.value = '';
+            nameInput.readOnly = false;
+            emailInput.readOnly = false;
+            nameCaption.classList.add('d-none');
+            emailCaption.classList.add('d-none');
+            filled = false;
+        }
+    }
+
+    function el(tag, className, text) {
+        var node = document.createElement(tag);
+        if (className) { node.className = className; }
+        if (text !== undefined) { node.textContent = text; }
+        return node;
+    }
+
+    function showExisting(client) {
+        var initials = client.name.trim().split(/\s+/).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase();
+        var history = client.tickets_count === 1 ? '1 past service' : client.tickets_count + ' past services';
+
+        banner.textContent = '';
+        var row = el('div', 'd-flex align-items-start justify-content-between gap-2');
+        var left = el('div', 'd-flex align-items-start gap-2');
+        left.appendChild(el('span', 'client-lookup-avatar', initials));
+        var text = el('div');
+        text.appendChild(el('div', 'fw-bold client-lookup-title', 'Existing client found'));
+        text.appendChild(el('div', 'client-lookup-sub', 'Client since ' + client.since + ' · ' + history));
+        left.appendChild(text);
+        row.appendChild(left);
+        var link = el('a', 'fw-semibold text-decoration-none flex-shrink-0 client-lookup-link', 'View client →');
+        link.href = client.url;
+        row.appendChild(link);
+        banner.appendChild(row);
+        banner.classList.remove('d-none');
+
+        nameInput.value = client.name;
+        emailInput.value = client.email || '';
+        nameInput.readOnly = true;
+        emailInput.readOnly = true;
+        nameCaption.classList.remove('d-none');
+        if (client.email) { emailCaption.classList.remove('d-none'); }
+        filled = true;
+        window.existingClientFound = true;
+        if (notify) { notify.checked = !! client.email_notifications_enabled; }
+        [phoneInput, emailInput].forEach(function (field) { field.classList.remove('is-invalid', 'is-valid'); });
+        [phoneHint, emailHint].forEach(function (hint) { if (hint) { hint.classList.remove('is-visible', 'is-invalid-hint'); } });
+        var serverError = document.getElementById('clientPhoneServerError');
+        if (serverError) { serverError.hidden = true; }
+        submit.disabled = true;
+    }
+
+    phoneInput.addEventListener('input', function () {
+        window.clearTimeout(timer);
+        token++;
+        clearExisting();
+
+        var phone = phoneInput.value.trim();
+        if (! /^\d{10}$/.test(phone)) { return; }
+
+        var current = token;
+        timer = window.setTimeout(function () {
+            fetch(lookupUrl + '?phone=' + encodeURIComponent(phone), { headers: { Accept: 'application/json' } })
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (current !== token || ! data.customer) { return; }
+                    showExisting(data.customer);
+                })
+                .catch(function () {});
+        }, 400);
+    });
+
+    if (/^\d{10}$/.test(phoneInput.value.trim())) {
+        phoneInput.dispatchEvent(new Event('input'));
+    }
 })();
 </script>
 @endpush

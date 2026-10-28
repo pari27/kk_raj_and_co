@@ -94,27 +94,27 @@
         <div class="col-12 col-xl-8">
             <section class="tm-card p-0 mb-3 overflow-hidden">
                 <div class="emp-section-title"><h2 class="mb-0 fw-bold">Profile</h2></div>
-                <div class="p-3 px-lg-4">
+                <div class="px-3 pb-2 pt-1 px-lg-4">
                     <div class="row g-0">
                         <div class="col-12 col-md-6 pe-md-4">
-                            <div class="emp-data-row d-flex justify-content-between gap-3 py-3">
+                            <div class="emp-data-row d-flex justify-content-between gap-3 py-2">
                                 <span class="emp-info-label">Full name</span><strong class="text-end">{{ $employee->name }}</strong>
                             </div>
-                            <div class="emp-data-row d-flex justify-content-between gap-3 py-3">
+                            <div class="emp-data-row d-flex justify-content-between gap-3 py-2">
                                 <span class="emp-info-label">Mobile</span><strong class="text-end">{{ $employee->profile?->mobile ? '+91 ' . $employee->profile->mobile : '—' }}</strong>
                             </div>
-                            <div class="emp-data-row d-flex justify-content-between gap-3 py-3">
+                            <div class="emp-data-row d-flex justify-content-between gap-3 py-2">
                                 <span class="emp-info-label">Designation</span><strong class="text-end">{{ $employee->profile?->designation?->name ?? '—' }}</strong>
                             </div>
                         </div>
                         <div class="col-12 col-md-6 ps-md-4">
-                            <div class="emp-data-row d-flex justify-content-between gap-3 py-3">
+                            <div class="emp-data-row d-flex justify-content-between gap-3 py-2">
                                 <span class="emp-info-label">Gender</span><strong class="text-end">{{ $employee->profile?->gender ?? '—' }}</strong>
                             </div>
-                            <div class="emp-data-row d-flex justify-content-between gap-3 py-3">
+                            <div class="emp-data-row d-flex justify-content-between gap-3 py-2">
                                 <span class="emp-info-label">Email</span><strong class="text-end text-break">{{ $employee->email }}</strong>
                             </div>
-                            <div class="emp-data-row d-flex justify-content-between gap-3 py-3">
+                            <div class="emp-data-row d-flex justify-content-between gap-3 py-2">
                                 <span class="emp-info-label">Status</span><strong class="text-end {{ $employee->is_active ? 'text-success' : 'text-secondary' }}">{{ $employee->is_active ? 'Active' : 'Inactive' }}</strong>
                             </div>
                         </div>
@@ -130,7 +130,7 @@
                 @if ($recentTickets->isEmpty())
                     <div class="p-3"><x-empty-state title="No services yet" description="Services assigned to this employee will appear here." /></div>
                 @else
-                    <div class="table-responsive">
+                    <div class="table-responsive pb-2">
                         <table id="assignedTicketsTable" class="table tm-table align-middle mb-0">
                             <thead><tr><th>Service</th><th>Client</th><th>Status</th><th>Open for</th></tr></thead>
                             <tbody>
@@ -150,7 +150,7 @@
 
             <section class="tm-card p-0 overflow-hidden">
                 <div class="emp-section-title"><h2 class="mb-0 fw-bold">Recent activity</h2></div>
-                <div class="p-4">
+                <div class="px-4 pb-2 pt-1">
                     @forelse ($activity as $log)
                         <div class="d-flex gap-3 py-2 {{ ! $loop->last ? 'border-bottom' : '' }}">
                             <span class="rounded-circle flex-shrink-0 mt-1" style="width: 8px; height: 8px; background: {{ $dotColor($log->action) }};"></span>
@@ -169,7 +169,7 @@
         <div class="col-12 col-xl-4">
             <section class="tm-card p-0 mb-3 overflow-hidden">
                 <div class="emp-side-heading u-1fcbae"><h2 class="h6 fw-bold mb-0">Open services by status</h2></div>
-                <div class="p-3">
+                <div class="px-3 pb-2 pt-1">
                     @forelse ($openByStatus as $status => $count)
                         @php
                             $variant = \App\Enums\TicketStatus::tryFrom($status)?->badgeVariant() ?? 'secondary';
@@ -191,10 +191,12 @@
 
             <section class="tm-card p-0 mb-3 overflow-hidden">
                 <div class="emp-side-heading u-8b012c"><h2 class="h6 fw-bold mb-0">Login and account</h2></div>
-                <div class="p-3">
+                <div class="px-3 pb-2 pt-1">
                     <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">Login email</span><strong class="text-end text-break">{{ $employee->email }}</strong></div>
                     <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">Password</span><strong>{{ $employee->hasSetPassword() ? 'Set' : 'Invitation pending' }}</strong></div>
-                    <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">Added by</span><strong>{{ $addedBy?->user?->name ?? '—' }}</strong></div>
+                    <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">Last login</span>@if ($lastLogin)<strong class="text-end">{{ $lastLogin->created_at->isToday() ? 'Today' : ($lastLogin->created_at->isYesterday() ? 'Yesterday' : $lastLogin->created_at->format('j M Y')) }}, {{ $lastLogin->created_at->format('g:i A') }}<span class="d-block fw-normal small tm-muted">{{ $lastLogin->device() }}</span></strong>@else<span class="tm-muted">Has not signed in yet</span>@endif</div>
+                    <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">Added by</span>@if ($addedBy)<strong>{{ $addedBy->name }}</strong>@else<span class="tm-muted">Not recorded</span>@endif</div>
+                    <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">Added on</span><strong>{{ $employee->created_at->format('j M Y, g:i A') }}</strong></div>
                     @if (! $employee->hasSetPassword())
                         <form method="POST" action="{{ route('admin.employees.resend-invite', $employee) }}" class="mt-3">
                             @csrf
@@ -206,7 +208,7 @@
 
             <section class="tm-card p-0 overflow-hidden">
                 <div class="emp-side-heading u-e25d39"><h2 class="h6 fw-bold mb-0">Services by type (FY)</h2></div>
-                <div class="p-3">
+                <div class="px-3 pb-2 pt-1">
                     @forelse ($ticketsByService as $serviceName => $count)
                         <div class="emp-data-row d-flex justify-content-between gap-3 py-2"><span class="emp-info-label">{{ $serviceName }}</span><strong>{{ $count }}</strong></div>
                     @empty

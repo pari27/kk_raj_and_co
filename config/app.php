@@ -30,6 +30,8 @@ return [
 
     'firm_hours' => env('FIRM_HOURS'),
 
+    'firm_email' => env('FIRM_EMAIL'),
+
     // Shown in the footer of the client portal ("Designed and maintained by ...").
     'developer_name' => env('DEVELOPER_NAME', 'Netiapps Software Pvt Ltd'),
 

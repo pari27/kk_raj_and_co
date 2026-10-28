@@ -38,7 +38,6 @@
         <p class="tm-muted mb-0 u-5a305f">Fees received and still pending across all enquiries</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
-        <a href="{{ route('payments.export') }}" class="btn btn-outline-secondary">&darr; Export</a>
         <button type="button" class="btn btn-tm-primary" data-bs-toggle="modal" data-bs-target="#recordPaymentModal">+ Record payment</button>
     </div>
 </div>
@@ -52,7 +51,6 @@
                 <div class="position-relative">
                     <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['value'] }}</div>
-                    <div class="small u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -72,12 +70,7 @@
     <hr class="mt-2 mb-0">
 
     <div class="p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
-        <div class="tm-search d-flex align-items-center gap-2 px-3 py-2 u-a559f1">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" id="paymentsSearch" placeholder="Search client, enquiry or reference" class="u-d0e030">
-        </div>
+        <x-search-box id="paymentsSearch" />
 
         <div class="d-flex flex-wrap gap-2">
             <div class="u-94a14c">
@@ -88,22 +81,6 @@
                 </button>
                 <input type="hidden" id="paymentDateFrom">
                 <input type="hidden" id="paymentDateTo">
-            </div>
-
-            <div id="receivedFilters" class="d-flex flex-wrap gap-2 d-none">
-                <select id="modeFilter" class="form-select form-select-sm u-11b8dd">
-                    <option value="">Mode: All</option>
-                    <option value="UPI">UPI</option>
-                    <option value="Bank transfer">Bank transfer</option>
-                    <option value="Cash">Cash</option>
-                    <option value="Cheque">Cheque</option>
-                </select>
-                <select id="receivedByFilter" class="form-select form-select-sm u-11b8dd">
-                    <option value="">Received by: All</option>
-                    @foreach ($receivedByUsers as $user)
-                        <option value="{{ $user->name }}">{{ $user->name }}</option>
-                    @endforeach
-                </select>
             </div>
         </div>
     </div>
@@ -228,6 +205,7 @@
                     <th>Enquiry</th>
                     <th>Client</th>
                     <th>Services</th>
+                    <th class="text-end">Total fees</th>
                     <th class="text-end">Balance due</th>
                     <th class="text-end">Action</th>
                 </tr>
@@ -261,6 +239,7 @@
                             <div class="tm-muted u-cc37c5">{{ $enquiry->customer->phone ?? '' }}</div>
                         </td>
                         <td>{{ $pendingServices ?: '—' }}</td>
+                        <td class="text-end">₹{{ number_format($enquiry->total) }}</td>
                         <td class="text-end fw-semibold u-a8cc8a">₹{{ number_format($enquiry->balanceDue()) }}</td>
                         <td class="text-end">
                             <button
@@ -276,7 +255,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5">
+                        <td colspan="6">
                             <x-empty-state title="Nothing pending" description="Every enquiry has been paid in full." />
                         </td>
                     </tr>
@@ -332,7 +311,7 @@
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Largest pending fees</h2>
                 <span class="small text-decoration-underline u-56df19" onclick="document.querySelector('[data-tab=pending]').click();">All {{ $pendingEnquiries->count() }} &rarr;</span>
             </div>
-            <div class="p-3">
+            <div class="px-3 pb-3 pt-1">
                 @forelse ($pendingEnquiries->take(4) as $enquiry)
                     <div class="d-flex align-items-center justify-content-between gap-3 py-2 {{ ! $loop->last ? 'border-bottom' : '' }}">
                         <div>
@@ -613,7 +592,6 @@
         var tabs = document.querySelectorAll('.tm-ticket-tab');
         var receivedTable = document.getElementById('receivedTable');
         var pendingTable = document.getElementById('pendingTable');
-        var receivedFilters = document.getElementById('receivedFilters');
         var activeTab = 'pending';
         var PAGE_SIZE = 10;
         var currentPage = 1;
@@ -631,8 +609,8 @@
             if (!keepPage) { currentPage = 1; }
             var search = document.getElementById('paymentsSearch').value.trim().toLowerCase();
             var searchAmount = search.replace(/,/g, '');
-            var mode = document.getElementById('modeFilter').value;
-            var receivedBy = document.getElementById('receivedByFilter').value;
+            var mode = '';
+            var receivedBy = '';
 
             var matched = [];
             activeRows().forEach(function (row) {
@@ -710,14 +688,11 @@
                 tabs.forEach(function (b) { b.classList.toggle('active', b === btn); });
                 receivedTable.classList.toggle('d-none', activeTab !== 'received');
                 pendingTable.classList.toggle('d-none', activeTab !== 'pending');
-                receivedFilters.classList.toggle('d-none', activeTab !== 'received');
                 refresh();
             });
         });
 
         document.getElementById('paymentsSearch').addEventListener('input', refresh);
-        document.getElementById('modeFilter').addEventListener('change', refresh);
-        document.getElementById('receivedByFilter').addEventListener('change', refresh);
         refresh();
 
         if (window.jQuery) {

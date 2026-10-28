@@ -26,4 +26,21 @@ class ClientNotification extends Model
     {
         return $this->read_at === null;
     }
-}
+
+    /**
+     * The colour and icon this update is shown with, from what it is about.
+     *
+     * @return array{0: string, 1: string}
+     */
+    public function look(): array
+    {
+        $title = strtolower($this->title);
+
+        return match (true) {
+            str_contains($title, 'verified') => ['green', 'check'],
+            str_contains($title, 're-upload') => ['red', 'upload'],
+            str_contains($title, 'completed') => ['green', 'download'],
+            $this->type === 'payment' => ['red', 'rupee'],
+            default => ['gray', 'list'],
+        };
+    }}

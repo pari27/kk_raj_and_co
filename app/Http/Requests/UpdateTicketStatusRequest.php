@@ -20,7 +20,7 @@ class UpdateTicketStatusRequest extends FormRequest
     {
         return [
             'status' => ['required', Rule::in(array_map(fn (TicketStatus $s) => $s->value, TicketStatus::manualOptions()))],
-            'comment' => ['nullable', 'string', 'max:2000'],
+            'comment' => ['required', 'string', 'max:2000'],
         ];
     }
 }

@@ -137,7 +137,7 @@
                 <div class="svc-section-title d-flex align-items-center justify-content-between">
                     <h2 class="mb-0 fw-bold">Change history</h2>
                 </div>
-                <div class="p-4">
+                <div class="px-4 pb-2 pt-1">
                     @forelse ($service->activityLogs as $log)
                         <div class="d-flex gap-3 py-2 {{ ! $loop->last ? 'border-bottom' : '' }}">
                             <span class="rounded-circle flex-shrink-0 mt-1" style="width: 8px; height: 8px; background: {{ $dotColor($log->action) }};"></span>
@@ -156,7 +156,7 @@
         <div class="col-12 col-xl-4">
             <section class="tm-card p-0 mb-3 overflow-hidden">
                 <div class="svc-side-heading u-1fcbae"><h2 class="h6 fw-bold mb-0">Fee summary</h2></div>
-                <div class="p-3">
+                <div class="px-3 pb-2 pt-1">
                     <div class="svc-data-row d-flex justify-content-between gap-3 py-2"><span class="svc-info-label">Base price</span><strong>₹{{ number_format($basePrice, 2) }}</strong></div>
                     <div class="svc-data-row d-flex justify-content-between gap-3 py-2"><span class="svc-info-label">GST ({{ $gstPercentLabel }}%)</span><strong>₹{{ number_format($gstAmount, 2) }}</strong></div>
                     <div class="mt-3 p-3 rounded d-flex justify-content-between align-items-center gap-2 u-389ec9">
@@ -169,7 +169,7 @@
 
             <section class="tm-card p-0 mb-3 overflow-hidden">
                 <div class="svc-side-heading u-8b012c"><h2 class="h6 fw-bold mb-0">Service details</h2></div>
-                <div class="p-3">
+                <div class="px-3 pb-2 pt-1">
                     <div class="svc-data-row d-flex justify-content-between align-items-center gap-3 py-2"><span class="svc-info-label">Status</span><span class="badge rounded-pill {{ $service->is_active ? 'text-bg-success' : 'text-bg-secondary' }}">{{ $service->is_active ? 'Active' : 'Inactive' }}</span></div>
                     <div class="svc-data-row d-flex justify-content-between gap-3 py-2"><span class="svc-info-label">Documents</span><strong>{{ $mandatoryCount }} mandatory, {{ $optionalCount }} optional</strong></div>
                     <div class="svc-data-row d-flex justify-content-between gap-3 py-2"><span class="svc-info-label">GST rate</span><strong>{{ $gstPercentLabel }}%</strong></div>
@@ -178,7 +178,7 @@
 
             <section class="tm-card p-0 overflow-hidden">
                 <div class="svc-side-heading u-e25d39"><h2 class="h6 fw-bold mb-0">Usage this FY</h2></div>
-                <div class="p-3">
+                <div class="px-3 pb-3 svc-usage-body">
                     <div class="d-flex gap-2 mb-3">
                         <div class="svc-mini-stat u-5c1733">
                             <div class="small u-fb13a0">Open</div>

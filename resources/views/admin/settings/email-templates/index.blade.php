@@ -17,7 +17,7 @@
 
 <div class="tm-card p-0">
     <div class="p-3">
-        <input type="search" id="emailTemplatesSearch" class="form-control form-control-sm tm-field u-ef4432" placeholder="Search by template key or subject" aria-label="Search email templates">
+        <x-search-box id="emailTemplatesSearch" />
     </div>
 
     <div class="table-responsive">

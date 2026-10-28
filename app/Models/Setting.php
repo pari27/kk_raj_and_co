@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 #[Fillable([
     'test_mode', 'notifications_enabled', 'service_prefix', 'enquiry_prefix',
-    'firm_name', 'firm_address', 'firm_logo_path',
+    'firm_name', 'firm_address', 'firm_logo_path', 'firm_phone', 'firm_email', 'firm_hours',
     'payment_upi_id', 'payment_bank_account_name', 'payment_bank_account_number',
     'payment_bank_ifsc', 'payment_bank_branch', 'payment_instructions',
 ])]
@@ -69,6 +69,9 @@ class Setting extends Model
         config([
             'app.firm_name' => $setting?->firm_name ?: config('app.firm_name'),
             'app.firm_address' => $setting?->firm_address ?: config('app.firm_address'),
+            'app.firm_phone' => $setting?->firm_phone ?: config('app.firm_phone'),
+            'app.firm_email' => $setting?->firm_email ?: config('app.firm_email'),
+            'app.firm_hours' => $setting?->firm_hours ?: config('app.firm_hours'),
             'app.firm_logo_url' => $setting?->firm_logo_path
                 ? \Illuminate\Support\Facades\Storage::disk('public')->url($setting->firm_logo_path)
                 : asset('images/logo.png'),

@@ -183,7 +183,7 @@
                                         hint.classList.remove('is-invalid-hint');
                         input.classList.add('is-valid');
                         icon.innerHTML = check;
-                        text.textContent = 'Available, used for login';
+                        text.textContent = 'No client registered with this email-id';
                     } else {
                         hint.classList.add('is-invalid-hint');
                         input.classList.remove('is-valid');
@@ -256,7 +256,7 @@
                         hint.classList.remove('is-invalid-hint');
                         input.classList.add('is-valid');
                         icon.innerHTML = check;
-                        text.textContent = 'Available';
+                        text.textContent = 'No client registered with this mobile no.';
                     } else {
                         hint.classList.add('is-invalid-hint');
                         input.classList.remove('is-valid');

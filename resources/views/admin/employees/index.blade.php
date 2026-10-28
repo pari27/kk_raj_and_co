@@ -28,7 +28,6 @@
                 <div class="position-relative">
                     <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ number_format($card['count']) }}</div>
-                    <div class="small u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -43,14 +42,15 @@
     <div class="p-3">
         <div class="row g-2 align-items-center">
             <div class="col-12 col-lg-5">
-                <input type="search" id="employeesSearch" class="form-control form-control-sm tm-field" placeholder="Search by name, email, phone, designation or status" aria-label="Search by name, email, phone, designation or status">
+                <x-search-box id="employeesSearch" />
             </div>
             <div class="col-12 col-lg-7 d-flex flex-wrap align-items-center justify-content-lg-end gap-2">
-                <div class="d-flex flex-wrap gap-1" role="group" aria-label="Filter employees by status">
-                    <button type="button" class="tm-filter-pill active u-5a305f" data-filter="all">All {{ $employees->count() }}</button>
-                    <button type="button" class="tm-filter-pill u-5a305f" data-filter="active">Active {{ $activeCount }}</button>
-                    <button type="button" class="tm-filter-pill u-5a305f" data-filter="inactive">Inactive {{ $inactiveCount }}</button>
-                </div>
+                <select id="employeesSort" class="form-select form-select-sm tm-field employees-sort" aria-label="Sort employees">
+                    <option value="newest">Sort by: Newest first</option>
+                    <option value="oldest">Sort by: Oldest first</option>
+                    <option value="name-asc">Sort by: Name A–Z</option>
+                    <option value="name-desc">Sort by: Name Z–A</option>
+                </select>
             </div>
         </div>
     </div>
@@ -67,7 +67,7 @@
                             $nameParts = collect(explode(' ', trim($employee->name)))->filter();
                             $initials = strtoupper($nameParts->take(2)->map(fn ($part) => substr($part, 0, 1))->implode(''));
                         @endphp
-                        <tr data-status="{{ $employee->is_active ? 'active' : 'inactive' }}">
+                        <tr data-status="{{ $employee->is_active ? 'active' : 'inactive' }}" data-name="{{ strtolower($employee->name) }}" data-created="{{ $employee->created_at?->timestamp }}">
                             <td>
                                 <div class="d-flex align-items-center gap-3">
                                     @if ($employee->profile?->photo_path)
@@ -176,6 +176,21 @@
                 : 'No employees found';
             renderPagination(totalPages);
         }
+
+        const sortSelect = document.getElementById('employeesSort');
+        const tbody = table.querySelector('tbody');
+        const sorters = {
+            'newest': (a, b) => Number(b.dataset.created) - Number(a.dataset.created),
+            'oldest': (a, b) => Number(a.dataset.created) - Number(b.dataset.created),
+            'name-asc': (a, b) => a.dataset.name.localeCompare(b.dataset.name),
+            'name-desc': (a, b) => b.dataset.name.localeCompare(a.dataset.name),
+        };
+
+        sortSelect.addEventListener('change', () => {
+            rows.sort(sorters[sortSelect.value]);
+            rows.forEach((row) => tbody.appendChild(row));
+            applyFilter();
+        });
 
         queryInput.addEventListener('input', () => applyFilter());
         buttons.forEach((button) => button.addEventListener('click', () => {

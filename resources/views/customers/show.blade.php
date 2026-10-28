@@ -5,6 +5,13 @@
 
 @section('content')
 @php
+    $lastLogin = $customer->last_login_at;
+    $lastLoginText = $lastLogin
+        ? collect([
+            ($lastLogin->isToday() ? 'Today' : ($lastLogin->isYesterday() ? 'Yesterday' : $lastLogin->format('j M Y'))).', '.$lastLogin->format('g:i A'),
+            $customer->last_login_device,
+        ])->filter()->implode(' · ')
+        : null;
     $tickets = $customer->tickets->sortByDesc('created_at')->values();
     $pendingTickets = $tickets->filter(fn ($ticket) => ! $ticket->status->isClosed())->values();
     $historyTickets = $tickets->filter(fn ($ticket) => $ticket->status->isClosed())->values();
@@ -116,10 +123,10 @@
                         <tbody>
                             @forelse ($pendingTickets as $ticket)
                                 <tr>
-                                    <td><a href="{{ route('tickets.show', $ticket) }}" class="fw-semibold text-decoration-none">{{ $ticket->number }}</a><div class="tm-muted small">{{ $ticket->service->name }}</div></td>
-                                    <td>{{ $ticket->assignedTo?->name ?? 'Unassigned' }}</td>
+                                    <td><a href="{{ route('tickets.show', $ticket) }}" class="fw-semibold text-decoration-none client-svc-id">{{ $ticket->number }}</a><div class="tm-muted small">{{ $ticket->service->name }}</div></td>
+                                    <td class="client-svc-cell">{{ $ticket->assignedTo?->name ?? 'Unassigned' }}</td>
                                     <td><x-status-badge :status="$ticket->status->value" /></td>
-                                    <td class="text-end fw-semibold">₹{{ number_format((float) $ticket->total) }}</td>
+                                    <td class="text-end fw-semibold client-svc-cell">₹{{ number_format((float) $ticket->total) }}</td>
                                 </tr>
                             @empty
                                 <tr><td colspan="4" class="text-center tm-muted py-4 u-5a305f">No pending services.</td></tr>
@@ -145,7 +152,7 @@
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 <strong>₹{{ number_format((float) $enquiry->total) }}</strong>
-                                <span class="badge rounded-pill {{ $enquiry->status === 'Open' ? 'text-bg-primary' : 'text-bg-success' }}">{{ $enquiry->status }}</span>
+                                <span class="badge rounded-pill fw-normal {{ $enquiry->status === 'Open' ? 'text-bg-primary' : 'text-bg-success' }}">{{ $enquiry->status }}</span>
                             </div>
                         </div>
                     @empty
@@ -170,8 +177,8 @@
                 <div class="p-3 px-lg-4">
                     <div class="client-summary-row d-flex justify-content-between align-items-center gap-3 py-3"><span class="client-info-label">Status</span><span class="badge rounded-pill {{ $portalInfo['class'] }}">{{ $portalInfo['label'] }}</span></div>
                     <div class="client-summary-row d-flex justify-content-between gap-3 py-3"><span class="client-info-label">Login email</span><strong class="text-end text-break">{{ $customer->email ?: '—' }}</strong></div>
-                    <div class="client-summary-row d-flex justify-content-between gap-3 py-3"><span class="client-info-label">Last login</span><span class="tm-muted text-end">Not recorded</span></div>
-                    <div class="client-detail-note small tm-muted border-top pt-3">Portal login history and resend links are not available yet.</div>
+                    <div class="client-summary-row d-flex justify-content-between gap-3 py-3"><span class="client-info-label">Last login</span><span class="text-end {{ $lastLoginText ? 'fw-semibold' : 'tm-muted' }}">{{ $lastLoginText ?: 'Has not signed in yet' }}</span></div>
+                    <div class="client-detail-note small tm-muted border-top pt-3">Shows the client's most recent sign-in to the client portal.</div>
                 </div>
             </section>
 

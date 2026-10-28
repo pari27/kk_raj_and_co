@@ -137,6 +137,7 @@ class PaymentTest extends TestCase
 
         $response = $this->actingAs($admin)->patch(route('tickets.update-status', $ticket), [
             'status' => TicketStatus::TaskCompleted->value,
+            'comment' => 'Test note',
         ]);
 
         $response->assertRedirect(route('tickets.show', $ticket));
@@ -164,6 +165,7 @@ class PaymentTest extends TestCase
 
         $this->actingAs($admin)->patch(route('tickets.update-status', $ticketTwo), [
             'status' => TicketStatus::TaskCompleted->value,
+            'comment' => 'Test note',
         ]);
 
         $this->assertSame('Closed', $enquiry->refresh()->status);

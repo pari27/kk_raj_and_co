@@ -10,11 +10,22 @@
 @php
     $isAdmin = auth()->user()->isAdmin();
 
+    // Indian digit grouping, e.g. 1,19,330
+    $indian = function (int $n): string {
+        $digits = (string) $n;
+
+        if (strlen($digits) <= 3) {
+            return $digits;
+        }
+
+        return preg_replace('/\B(?=(\d{2})+$)/', ',', substr($digits, 0, -3)).','.substr($digits, -3);
+    };
+
     $pendingCards = [
         ['label' => 'Pending services', 'count' => $stats['pending_total'], 'caption' => $isAdmin ? 'across the firm' : 'assigned to you', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
-        ['label' => 'Waiting for client', 'count' => $stats['waiting_for_client'], 'caption' => 'documents not received', 'gradient' => 'linear-gradient(135deg, #3a2205, #8a5a10)'],
+        ['label' => 'Waiting for documents', 'count' => $stats['waiting_for_client'], 'caption' => 'documents not received', 'gradient' => 'linear-gradient(135deg, #3a2205, #8a5a10)'],
         ['label' => 'In progress', 'count' => $stats['in_progress'], 'caption' => 'being worked on', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
-        ['label' => 'Awaiting payment', 'count' => $stats['awaiting_payment'], 'caption' => 'task completed', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
+        ['label' => 'Pending payment', 'count' => $stats['awaiting_payment'], 'prefix' => '₹', 'caption' => 'task completed', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
     ];
 
     $historyCards = [
@@ -42,8 +53,7 @@
                 <span class="position-absolute rounded-circle u-e46b84"></span>
                 <div class="position-relative">
                     <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
-                    <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['count'] }}</div>
-                    <div class="small u-bbebd4">{{ $card['caption'] }}</div>
+                    <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ $indian($card['count']) }}</div>
                 </div>
             </div>
         </div>
@@ -58,7 +68,7 @@
                 <span class="position-absolute rounded-circle u-e46b84"></span>
                 <div class="position-relative">
                     <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
-                    <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ number_format($card['count']) }}{{ $card['suffix'] ?? '' }}</div>
+                    <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ $indian($card['count']) }}{{ $card['suffix'] ?? '' }}</div>
                     <div class="small u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
@@ -78,8 +88,8 @@
     <hr class="mt-2 mb-0">
 
     <div class="p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
-        <div class="flex-grow-1 u-ef4432">
-            <input type="text" id="ticketSearch" class="form-control tm-field" placeholder="Search service no., client, phone, status or assignee">
+        <div class="u-ef4432">
+            <x-search-box id="ticketSearch" />
         </div>
         <div class="d-flex flex-wrap gap-2">
             <div id="ticketDateRangeWrap" class="d-none u-ad9e48">
@@ -91,14 +101,6 @@
                 <input type="hidden" id="ticketDateFrom">
                 <input type="hidden" id="ticketDateTo">
             </div>
-            @if ($isAdmin)
-                <select id="assigneeFilter" class="form-select tm-field" aria-label="Filter by assigned to">
-                    <option value="">Assigned to: All</option>
-                    @foreach ($pending->concat($history)->map(fn ($t) => $t->assignedTo->name ?? 'Unassigned')->unique()->sort()->values() as $assigneeName)
-                        <option value="{{ $assigneeName }}">{{ $assigneeName }}</option>
-                    @endforeach
-                </select>
-            @endif
             <select id="sortOrder" class="form-select tm-field">
                 <option value="desc" selected>Newest first</option>
                 <option value="asc">Oldest first</option>
@@ -143,11 +145,11 @@
                         data-sort="{{ $i }}"
                     >
                         <td>
-                            <div class="fw-semibold">{{ $ticket->number }}</div>
+                            <a href="{{ route('tickets.show', $ticket) }}" class="ticket-id-link fw-semibold">{{ $ticket->number }}</a>
                             <div class="tm-muted u-31578e">{{ $ticket->service->name }}</div>
                         </td>
                         <td>
-                            <div class="fw-bold">{{ $ticket->customer->name }}</div>
+                            <div class="fw-bold"><a href="{{ route('customers.show', $ticket->customer) }}" class="ticket-id-link">{{ $ticket->customer->name }}</a></div>
                             <div class="tm-muted u-31578e">{{ $ticket->customer->phone }}</div>
                         </td>
                         @if ($isAdmin)
@@ -209,8 +211,8 @@
                         data-fee="{{ $ticket->total }}"
                         data-sort="{{ $i }}"
                     >
-                        <td class="fw-semibold">{{ $ticket->number }}</td>
-                        <td>{{ $ticket->customer->name }}</td>
+                        <td class="fw-semibold"><a href="{{ route('tickets.show', $ticket) }}" class="ticket-id-link">{{ $ticket->number }}</a></td>
+                        <td><a href="{{ route('customers.show', $ticket->customer) }}" class="ticket-id-link">{{ $ticket->customer->name }}</a></td>
                         <td>{{ $ticket->service->name }}</td>
                         @if ($isAdmin)
                             <td>{{ $ticket->assignedTo->name ?? 'Unassigned' }}</td>

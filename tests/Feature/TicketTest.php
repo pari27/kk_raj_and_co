@@ -36,6 +36,7 @@ class TicketTest extends TestCase
 
         $response = $this->actingAs($employee)->patch(route('tickets.update-status', $ticket), [
             'status' => 'Submitted to Department',
+            'comment' => 'Test note',
         ]);
 
         $response->assertRedirect(route('tickets.show', $ticket));
@@ -49,7 +50,7 @@ class TicketTest extends TestCase
         $ticket = $this->createTicket(['assigned_to' => $other->id]);
 
         $this->actingAs($employee)
-            ->patch(route('tickets.update-status', $ticket), ['status' => 'On Hold'])
+            ->patch(route('tickets.update-status', $ticket), ['status' => 'On Hold', 'comment' => 'Test note'])
             ->assertForbidden();
     }
 
@@ -60,9 +61,19 @@ class TicketTest extends TestCase
 
         $response = $this->actingAs($admin)->patch(route('tickets.update-status', $ticket), [
             'status' => 'Documents Pending',
+            'comment' => 'Test note',
         ]);
 
         $response->assertSessionHasErrors('status');
+    }
+
+    public function test_a_comment_is_required_when_changing_the_status(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+        $ticket = $this->createTicket();
+
+        $this->actingAs($admin)->patch(route('tickets.update-status', $ticket), ['status' => 'On Hold'])
+            ->assertSessionHasErrors('comment');
     }
 
     public function test_status_cannot_be_changed_after_task_completion(): void
@@ -72,6 +83,7 @@ class TicketTest extends TestCase
 
         $response = $this->actingAs($admin)->patch(route('tickets.update-status', $ticket), [
             'status' => 'On Hold',
+            'comment' => 'Test note',
         ]);
 
         $response->assertStatus(422);
@@ -85,6 +97,7 @@ class TicketTest extends TestCase
 
         $this->actingAs($admin)->patch(route('tickets.update-status', $ticket), [
             'status' => 'Task Completed',
+            'comment' => 'Test note',
         ]);
 
         $this->assertNotNull($ticket->refresh()->completed_at);

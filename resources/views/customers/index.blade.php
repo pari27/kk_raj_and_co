@@ -63,7 +63,6 @@
                 <div class="position-relative">
                     <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ number_format($card['count']) }}</div>
-                    <div class="small u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -72,12 +71,7 @@
 
 <div class="tm-card p-0">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 p-3">
-        <div class="tm-search d-flex align-items-center gap-2 px-3 py-2 u-a559f1">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" id="clientsSearch" placeholder="Search your details here" class="u-d0e030">
-        </div>
+        <x-search-box id="clientsSearch" />
 
         <div class="d-flex flex-wrap align-items-center gap-2">
             <div class="dropdown">

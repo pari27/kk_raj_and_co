@@ -651,8 +651,47 @@ class ClientPortalTest extends TestCase
             ->assertSee('Upload your Photo')
             ->assertSee('Documents needed')
             ->assertSee('0 of 2 uploaded')
-            ->assertSee('Your contact at')
-            ->assertSee('Priya Das');
+            ->assertSee('Recent updates')
+            ->assertSee('Contact ')
+            // The staff member's own details are not shown on the dashboard any more.
+            ->assertDontSee('Your contact at')
+            ->assertDontSee('Priya Das');
+    }
+
+    public function test_the_dashboard_lists_the_latest_updates_and_the_firms_contact_details(): void
+    {
+        [$client] = $this->clientWithService();
+        config([
+            'app.firm_phone' => '033 4000 1234',
+            'app.firm_email' => 'info@firm.test',
+            'app.firm_hours' => 'Mon–Sat, 10 am – 7 pm',
+            'app.firm_address' => '12 Park Street, Kolkata',
+        ]);
+
+        foreach (range(1, 6) as $i) {
+            \App\Models\ClientNotification::create(['customer_id' => $client->id, 'type' => 'service', 'title' => "Update number {$i}"]);
+        }
+
+        $this->asClient($client)->get(route('customer.dashboard'))
+            ->assertOk()
+            ->assertSee('Update number 6')->assertSee('Update number 2')
+            ->assertDontSee('Update number 1<')
+            ->assertSee('All updates')
+            ->assertSee('tel:0334000123', false)->assertSee('033 4000 1234')
+            ->assertSee('mailto:info@firm.test', false)
+            ->assertSee('Mon–Sat, 10 am – 7 pm')
+            ->assertSee('12 Park Street, Kolkata');
+    }
+
+    public function test_the_contact_panel_hides_details_the_firm_has_not_set(): void
+    {
+        [$client] = $this->clientWithService();
+        config(['app.firm_phone' => null, 'app.firm_email' => null, 'app.firm_hours' => null, 'app.firm_address' => null]);
+
+        $this->asClient($client)->get(route('customer.dashboard'))
+            ->assertOk()
+            ->assertSee('contact details will appear here soon')
+            ->assertDontSee('Tap to call');
     }
 
     public function test_the_side_menu_help_box_only_shows_when_the_firm_has_set_a_phone(): void

@@ -131,15 +131,6 @@ class ReportController extends Controller
             fn ($value) => $value !== null && $value !== '',
         ));
 
-        // Client history opens on the first client instead of an empty page.
-        if ($report === 'client_history' && empty($filters['client_id'])) {
-            $first = $this->reports->options($request->user())['clients']->first();
-
-            if ($first) {
-                $filters['client_id'] = $first->id;
-            }
-        }
-
         return [$report, $filters];
     }
 }

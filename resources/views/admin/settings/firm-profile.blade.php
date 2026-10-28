@@ -30,6 +30,24 @@
                     <textarea id="firmAddressInput" name="firm_address" rows="2" maxlength="500" class="form-control tm-field @error('firm_address') is-invalid @enderror" placeholder="Registered office address" required>{{ old('firm_address', $setting->firm_address ?: config('app.firm_address')) }}</textarea>
                     @error('firm_address')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                 </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-md-6">
+                        <label class="tm-field-label d-block" for="firmPhoneInput">Phone</label>
+                        <input type="text" id="firmPhoneInput" name="firm_phone" maxlength="30" class="form-control tm-field @error('firm_phone') is-invalid @enderror" placeholder="e.g. 033 4000 1234" value="{{ old('firm_phone', $setting->firm_phone ?: config('app.firm_phone')) }}">
+                        @error('firm_phone')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="tm-field-label d-block" for="firmEmailInput">Email</label>
+                        <input type="email" id="firmEmailInput" name="firm_email" maxlength="190" class="form-control tm-field @error('firm_email') is-invalid @enderror" placeholder="e.g. info@firm.com" value="{{ old('firm_email', $setting->firm_email ?: config('app.firm_email')) }}">
+                        @error('firm_email')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="tm-field-label d-block" for="firmHoursInput">Opening hours</label>
+                    <input type="text" id="firmHoursInput" name="firm_hours" maxlength="120" class="form-control tm-field @error('firm_hours') is-invalid @enderror" placeholder="e.g. Mon–Sat, 10 am – 7 pm" value="{{ old('firm_hours', $setting->firm_hours ?: config('app.firm_hours')) }}">
+                    @error('firm_hours')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                    <div class="form-text tm-muted">Phone, email and hours are shown to clients on their dashboard. Leave them empty to hide them.</div>
+                </div>
                 <div class="mb-3">
                     <label class="tm-field-label d-block" for="firmLogoInput">Logo</label>
                     <div class="firm-logo-preview mb-2"><img src="{{ config('app.firm_logo_url') }}" alt="Current logo"></div>

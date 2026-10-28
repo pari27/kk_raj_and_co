@@ -138,4 +138,23 @@ class SuperAdminTest extends TestCase
         $this->actingAs($this->admin())->post(route("super.system.errors.resolve-all"))->assertForbidden();
         $this->assertDatabaseCount("dismissed_errors", 0);
     }
+
+    public function test_the_super_admin_is_never_emailed(): void
+    {
+        \Illuminate\Support\Facades\Mail::fake();
+        $super = $this->superAdmin(['email' => 'support@netiapps.com']);
+        $admin = $this->admin(['email' => 'boss@firm.com']);
+
+        // An event email addressed to the Super Admin is dropped; the same email to an Admin is sent.
+        \App\Services\EventMailer::send('admin_new_enquiry', $super, ['admin_name' => 'x', 'actor_name' => 'y', 'customer_name' => 'z', 'enquiry_number' => 'E-1', 'total' => '1']);
+        \App\Services\EventMailer::send('admin_new_enquiry', $admin, ['admin_name' => 'x', 'actor_name' => 'y', 'customer_name' => 'z', 'enquiry_number' => 'E-1', 'total' => '1']);
+
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\FormalNotificationMail::class, 1);
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\FormalNotificationMail::class, fn ($mail) => $mail->hasTo('boss@firm.com'));
+
+        // Laravel notifications by mail (for example a password reset link) are cancelled too.
+        $notification = new \Illuminate\Auth\Notifications\ResetPassword('token');
+        $this->assertFalse(\Illuminate\Support\Facades\Event::until(new \Illuminate\Notifications\Events\NotificationSending($super, $notification, 'mail')));
+        $this->assertNotFalse(\Illuminate\Support\Facades\Event::until(new \Illuminate\Notifications\Events\NotificationSending($admin, $notification, 'mail')));
+    }
 }

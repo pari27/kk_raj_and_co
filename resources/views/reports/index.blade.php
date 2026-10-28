@@ -170,6 +170,7 @@
 
         <div class="col-auto">
             <button type="submit" class="btn btn-tm-primary u-603dd1">View report</button>
+            <a href="{{ route('reports.index', ['report' => $report]) }}" class="btn btn-outline-secondary ms-2">Reset</a>
         </div>
     </form>
 </div>

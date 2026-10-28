@@ -293,23 +293,6 @@ class ClientPortalService
     }
 
     /**
-     * For each service still open, who is handling it and how to reach them.
-     *
-     * @return Collection<int, array{service: string, number: string, contact: array<string, mixed>|null}>
-     */
-    public function pendingContacts(Collection $services): Collection
-    {
-        return $services
-            ->filter(fn (Ticket $ticket) => ! $ticket->status->isClosed())
-            ->map(fn (Ticket $ticket) => [
-                'service' => $ticket->service->name,
-                'number' => $ticket->number,
-                'contact' => $ticket->assignedTo ? $this->contactCard($ticket->assignedTo) : null,
-            ])
-            ->values();
-    }
-
-    /**
      * How to reach a staff member, as shown on the contact cards.
      *
      * @return array{name: string, initials: string, role: string|null, phone: string|null, email: string|null}

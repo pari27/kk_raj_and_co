@@ -39,7 +39,7 @@ class TicketController extends Controller
             'pending_total' => $pending->count(),
             'waiting_for_client' => $pending->whereIn('status', [TicketStatus::DocumentsPending, TicketStatus::PartiallyReceived, TicketStatus::AdditionalDocumentsRequired])->count(),
             'in_progress' => $pending->where('status', TicketStatus::WorkInProgress)->count(),
-            'awaiting_payment' => $pending->where('status', TicketStatus::TaskCompleted)->count(),
+            'awaiting_payment' => (int) round($pending->concat($history)->pluck('enquiry')->filter()->unique('id')->sum(fn ($enquiry) => $enquiry->balanceDue())),
             'closed_total' => $history->count(),
             'closed_this_month' => $history->filter(fn ($t) => $t->completed_at && $t->completed_at->isCurrentMonth())->count(),
             'fees_collected' => $history->pluck('enquiry')->unique('id')->sum(fn ($enquiry) => $enquiry->amountPaid()),

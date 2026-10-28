@@ -15,11 +15,23 @@
     $closedCount = $totalCount - $openCount;
     $creators = $enquiries->pluck('createdBy.name')->filter()->unique()->sort()->values();
 
+    // Indian digit grouping, e.g. 1,19,330
+    $indian = function (int $n): string {
+        $digits = (string) $n;
+
+        if (strlen($digits) <= 3) {
+            return $digits;
+        }
+
+        return preg_replace('/\B(?=(\d{2})+$)/', ',', substr($digits, 0, -3)).','.substr($digits, -3);
+    };
+
     $statCards = [
-        ['label' => 'Enquiries this month', 'count' => $stats['enquiries_this_month'], 'caption' => now()->format('F'), 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
-        ['label' => 'Services created', 'count' => $stats['tickets_created'], 'caption' => 'from these enquiries', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
-        ['label' => 'Enquiry value', 'count' => $stats['enquiry_value'], 'prefix' => '₹', 'caption' => 'this month, including GST', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
-        ['label' => 'Open enquiries', 'count' => $stats['open_enquiries'], 'caption' => 'services still in progress', 'gradient' => 'linear-gradient(135deg, #3a2205, #8a5a10)'],
+        ['label' => 'Total enquiries (this month)', 'count' => $stats['enquiries_this_month'], 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
+        ['label' => 'Services created (this month)', 'count' => $stats['tickets_created'], 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
+        ['label' => 'Enquiry value (this month)', 'count' => $stats['enquiry_value'], 'prefix' => '₹', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
+        ['label' => 'Open services', 'count' => $stats['open_services'], 'gradient' => 'linear-gradient(135deg, #3a2205, #8a5a10)'],
+        ['label' => 'Pending fees', 'count' => $stats['pending_fees'], 'prefix' => '₹', 'gradient' => 'linear-gradient(135deg, #0b3a37, #0f766e)'],
     ];
 @endphp
 
@@ -31,14 +43,13 @@
 
 <div class="row g-3 mb-4">
     @foreach ($statCards as $card)
-        <div class="col-6 col-xl-3">
+        <div class="col-6 col-xl">
             <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
                 <span class="position-absolute rounded-circle u-943986"></span>
                 <span class="position-absolute rounded-circle u-e46b84"></span>
                 <div class="position-relative">
                     <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
-                    <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ number_format($card['count']) }}</div>
-                    <div class="u-48932b">{{ $card['caption'] }}</div>
+                    <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ $indian((int) round($card['count'])) }}</div>
                 </div>
             </div>
         </div>
@@ -47,12 +58,7 @@
 
 <div class="tm-card p-0">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 p-3">
-        <div class="tm-search d-flex align-items-center gap-2 px-3 py-2 u-a559f1">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" id="enquiriesSearch" placeholder="Search your details here" class="u-d0e030">
-        </div>
+        <x-search-box id="enquiriesSearch" />
 
         <div class="d-flex flex-wrap align-items-center gap-2">
             <div class="u-94a14c">

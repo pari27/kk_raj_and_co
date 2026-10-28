@@ -11,6 +11,7 @@ use App\Models\Payment;
 use App\Models\Ticket;
 use App\Models\TicketDocument;
 use App\Models\User;
+use App\Services\AssignmentMails;
 use App\Services\EventMailer;
 use App\Services\NotificationService as Notifier;
 use Illuminate\Auth\Events\Failed;
@@ -193,11 +194,17 @@ class NotificationServiceProvider extends ServiceProvider
                 $url, $ticket->number, 'Open service',
             );
 
-            EventMailer::send('service_reassigned', $assignee, [
-                'employee_name' => $assignee->name,
-                'service_number' => $ticket->number,
-                'service_name' => (string) $service,
-            ], $url, 'Open service');
+            // While an enquiry is being saved the emails are gathered, so one person gets one email
+            // for all the services they were given (sent by AssignmentMails::flush()).
+            if (AssignmentMails::isCollecting()) {
+                AssignmentMails::add($ticket, $actor());
+            } else {
+                EventMailer::send('service_reassigned', $assignee, [
+                    'employee_name' => $assignee->name,
+                    'service_number' => $ticket->number,
+                    'service_name' => (string) $service,
+                ], $url, 'Open service');
+            }
 
             Notifier::notify(
                 array_filter(Notifier::admins(), fn (User $admin) => $admin->id !== $assignee->id),
@@ -207,15 +214,17 @@ class NotificationServiceProvider extends ServiceProvider
                 $url, $ticket->number, 'Open service',
             );
 
-            foreach (array_filter(Notifier::admins(), fn (User $admin) => $admin->id !== $assignee->id) as $admin) {
-                EventMailer::send('admin_service_assigned', $admin, [
-                    'admin_name' => $admin->name,
-                    'actor_name' => $actor(),
-                    'service_number' => $ticket->number,
-                    'service_name' => (string) $service,
-                    'customer_name' => (string) $client,
-                    'employee_name' => $assignee->name,
-                ], $url, 'Open service');
+            if (! AssignmentMails::isCollecting()) {
+                foreach (array_filter(Notifier::admins(), fn (User $admin) => $admin->id !== $assignee->id) as $admin) {
+                    EventMailer::send('admin_service_assigned', $admin, [
+                        'admin_name' => $admin->name,
+                        'actor_name' => $actor(),
+                        'service_number' => $ticket->number,
+                        'service_name' => (string) $service,
+                        'customer_name' => (string) $client,
+                        'employee_name' => $assignee->name,
+                    ], $url, 'Open service');
+                }
             }
         };
 
@@ -351,11 +360,20 @@ class NotificationServiceProvider extends ServiceProvider
                 route('enquiries.show', $enquiry), $enquiry->number,
             );
 
+            // When the enquiry comes from the enquiry form, the admin email is held and sent once, together with
+            // the list of services and who got each (see AssignmentMails::flush()), instead of as two emails.
+            if (AssignmentMails::isCollecting()) {
+                AssignmentMails::holdNewEnquiry($enquiry, $actor(), $total);
+
+                return;
+            }
+
             $this->mailAdmins('admin_new_enquiry', [
                 'actor_name' => $actor(),
                 'customer_name' => (string) $enquiry->customer?->name,
                 'enquiry_number' => $enquiry->number,
                 'total' => $total,
+                'services_list' => '-',
             ], route('enquiries.show', $enquiry), 'View enquiry');
         });
 

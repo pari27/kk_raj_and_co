@@ -3,39 +3,29 @@
 @section('title', 'Updates — ' . config('app.firm_name'))
 
 @section('content')
-@php
-    // Which icon and colour an update gets, from what it is about.
-    $look = function ($update) {
-        $title = strtolower($update->title);
 
-        return match (true) {
-            str_contains($title, 'verified') => ['green', 'check'],
-            str_contains($title, 're-upload') => ['red', 'upload'],
-            str_contains($title, 'completed') => ['green', 'download'],
-            $update->type === 'payment' => ['red', 'rupee'],
-            default => ['gray', 'list'],
-        };
-    };
-@endphp
-
-<x-page-header title="Updates" subtitle="Messages about your services" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('customer.dashboard')], ['label' => 'Updates']]" />
+<x-page-header title="Updates" subtitle="Messages about your services" :breadcrumbs="[['label' => 'Dashboard', 'url' => route('customer.dashboard')], ['label' => 'Updates']]">
+    <x-slot:actions>
+        <form method="POST" action="{{ route('customer.updates.read-all') }}">
+            @csrf
+            <button type="submit" class="btn btn-outline-secondary" @disabled(! $hasUnread)>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Mark all as read
+            </button>
+        </form>
+    </x-slot:actions>
+</x-page-header>
 
 <div class="p-card">
     <div class="p-card-head navy">
         <span>Notifications</span>
-        @if ($hasUnread)
-            <form method="POST" action="{{ route('customer.updates.read-all') }}" class="m-0">
-                @csrf
-                <button type="submit" class="btn btn-link p-0 text-white u-43a94f">Mark all read</button>
-            </form>
-        @endif
     </div>
 
     @forelse ($groups as $group => $updates)
         <div class="p-group">{{ strtoupper($group) }}</div>
 
         @foreach ($updates as $update)
-            @php [$tone, $icon] = $look($update); @endphp
+            @php [$tone, $icon] = $update->look(); @endphp
             <a href="{{ route('customer.updates.open', $update) }}" class="p-upd {{ $update->isUnread() ? '' : 'read' }}">
                 <span class="ico {{ $tone }}"><x-portal-icon :name="$icon" :size="18" /></span>
                 <div>

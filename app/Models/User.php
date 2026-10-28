@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'is_active', 'employee_id'])]
+#[Fillable(['name', 'email', 'password', 'role', 'is_active', 'employee_id', 'created_by'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -83,6 +83,14 @@ class User extends Authenticatable
     public function isEmployee(): bool
     {
         return $this->role === UserRole::Employee;
+    }
+
+    /**
+     * The person who added this account.
+     */
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'created_by');
     }
 
     public function profile(): BelongsTo

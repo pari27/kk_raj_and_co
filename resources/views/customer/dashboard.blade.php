@@ -49,7 +49,7 @@
 </div>
 
 <div class="row g-3">
-    <div class="{{ $contacts->isNotEmpty() ? 'col-12 col-lg-8' : 'col-12' }}">
+    <div class="col-12 col-lg-8">
         <div class="p-card">
             <div class="p-card-head navy sm"><span>Needs your attention</span><a href="{{ route('customer.tickets.index') }}">More →</a></div>
 
@@ -68,34 +68,52 @@
         </div>
     </div>
 
-    @if ($contacts->isNotEmpty())
-        <div class="col-12 col-lg-4">
-            <div class="p-card">
-                <div class="p-card-head navy sm"><span>Your contact at {{ config('app.firm_name') }}</span></div>
+    <div class="col-12 col-lg-4">
+        <div class="p-card">
+            <div class="p-card-head navy sm"><span>Recent updates</span><a href="{{ route('customer.updates') }}">All updates →</a></div>
 
-                @foreach ($contacts as $item)
-                    <div class="p-card-body {{ $item['contact'] ? '' : 'p-unassigned' }}" style="{{ $loop->last ? '' : 'border-bottom: 1px solid var(--p-line);' }}">
-                        <div class="tm-muted fw-bold text-uppercase u-bb809f">For {{ $item['service'] }}</div>
-
-                        @if ($item['contact'])
-                            <div class="p-contact">
-                                <span class="p-av">{{ $item['contact']['initials'] }}</span>
-                                <div>
-                                    <div class="fw-bold">{{ $item['contact']['name'] }}</div>
-                                    <div class="p-contact-lines">
-                                    @if ($item['contact']['phone'])<div class="p-contact-line"><x-portal-icon name="phone" :size="15" /> {{ $item['contact']['phone'] }}</div>@endif
-                                    @if ($item['contact']['email'])<div class="p-contact-line"><x-portal-icon name="mail" :size="15" /> {{ $item['contact']['email'] }}</div>@endif
-                                    </div>
-                                </div>
-                            </div>
-                        @else
-                            <div class="tm-muted small">We'll tell you who is handling this soon.</div>
-                        @endif
+            @forelse ($recentUpdates as $update)
+                @php [$tone, $icon] = $update->look(); @endphp
+                <a href="{{ route('customer.updates.open', $update) }}" class="p-upd p-upd-sm {{ $update->isUnread() ? '' : 'read' }}">
+                    <span class="ico {{ $tone }}"><x-portal-icon :name="$icon" :size="15" /></span>
+                    <div class="min-w-0">
+                        <div class="tt">{{ $update->title }}</div>
+                        <div class="bd">{{ $update->created_at->isToday() ? $update->created_at->format('g:i A') : $update->created_at->format('j M') }}</div>
                     </div>
-                @endforeach
+                    @if ($update->isUnread())<i class="dot" aria-label="Unread"></i>@endif
+                </a>
+            @empty
+                <div class="p-card-body text-center tm-muted u-8ae449">Nothing new yet. We'll tell you here when something changes.</div>
+            @endforelse
+        </div>
+
+        @php
+            $firmPhone = config('app.firm_phone');
+            $firmEmail = config('app.firm_email');
+            $firmHours = config('app.firm_hours');
+            $firmAddress = config('app.firm_address');
+        @endphp
+        <div class="p-card">
+            <div class="p-card-head navy sm"><span>Contact {{ config('app.firm_name') }}</span></div>
+            <div class="p-card-body p-firm-contact">
+                @if ($firmPhone)
+                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $firmPhone) }}" class="line"><x-portal-icon name="phone" :size="16" /> <span><strong>{{ $firmPhone }}</strong><small>Tap to call</small></span></a>
+                @endif
+                @if ($firmEmail)
+                    <a href="mailto:{{ $firmEmail }}" class="line"><x-portal-icon name="mail" :size="16" /> <span><strong>{{ $firmEmail }}</strong><small>Write to us</small></span></a>
+                @endif
+                @if ($firmHours)
+                    <div class="line"><x-portal-icon name="list" :size="16" /> <span><strong>{{ $firmHours }}</strong><small>Opening hours</small></span></div>
+                @endif
+                @if ($firmAddress)
+                    <div class="line"><x-portal-icon name="home" :size="16" /> <span><strong>{{ $firmAddress }}</strong><small>Our office</small></span></div>
+                @endif
+                @unless ($firmPhone || $firmEmail || $firmHours || $firmAddress)
+                    <div class="tm-muted small">The firm's contact details will appear here soon.</div>
+                @endunless
             </div>
         </div>
-    @endif
+    </div>
 </div>
 
 @include('customer._services-card')

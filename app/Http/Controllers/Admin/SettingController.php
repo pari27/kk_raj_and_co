@@ -65,6 +65,9 @@ class SettingController extends Controller
         $validated = $request->validate([
             'firm_name' => ['required', 'string', 'max:120'],
             'firm_address' => ['required', 'string', 'max:500'],
+            'firm_phone' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+()\-\s]{6,30}$/'],
+            'firm_email' => ['nullable', 'email:rfc', 'max:190'],
+            'firm_hours' => ['nullable', 'string', 'max:120'],
             'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
             'remove_logo' => ['nullable', 'boolean'],
         ]);
@@ -78,8 +81,19 @@ class SettingController extends Controller
         if ($setting->firm_address !== $validated['firm_address']) {
             $changes[] = 'address';
         }
+        foreach (['firm_phone' => 'phone', 'firm_email' => 'email', 'firm_hours' => 'hours'] as $field => $label) {
+            if ((string) $setting->{$field} !== trim((string) ($validated[$field] ?? ''))) {
+                $changes[] = $label;
+            }
+        }
 
-        $data = ['firm_name' => $validated['firm_name'], 'firm_address' => $validated['firm_address']];
+        $data = [
+            'firm_name' => $validated['firm_name'],
+            'firm_address' => $validated['firm_address'],
+            'firm_phone' => trim((string) ($validated['firm_phone'] ?? '')) ?: null,
+            'firm_email' => trim((string) ($validated['firm_email'] ?? '')) ?: null,
+            'firm_hours' => trim((string) ($validated['firm_hours'] ?? '')) ?: null,
+        ];
 
         if ($request->hasFile('logo')) {
             if ($setting->firm_logo_path) {

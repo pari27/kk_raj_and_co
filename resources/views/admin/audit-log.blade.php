@@ -38,13 +38,12 @@
 <div class="row g-3 mb-4">
     @foreach ($statCards as $card)
         <div class="col-6 col-xl-3">
-            <div class="tm-stat-card px-3 py-2 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                <span class="position-absolute rounded-circle u-69a6c5"></span>
-                <span class="position-absolute rounded-circle u-751a72"></span>
+            <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
+                <span class="position-absolute rounded-circle u-943986"></span>
+                <span class="position-absolute rounded-circle u-e46b84"></span>
                 <div class="position-relative">
-                    <div class="u-4e3053">{{ $card['label'] }}</div>
-                    <div class="fs-5 tm-serif fw-bold text-white">{{ number_format($card['count']) }}</div>
-                    <div class="u-a6f4eb">{{ $card['caption'] }}</div>
+                    <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
+                    <div class="h3 tm-serif fw-bold mb-1 text-white">{{ number_format($card['count']) }}</div>
                 </div>
             </div>
         </div>
@@ -54,13 +53,10 @@
 <div class="tm-card p-0">
     <div class="p-3">
         <div class="row g-2 align-items-center">
-            <div class="col-12 col-md-7">
-                <div class="position-relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa1b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="position-absolute u-f0de67" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="auditLogSearch" class="form-control tm-field u-1a3a16" placeholder="Search your details here" aria-label="Search your details here">
-                </div>
+            <div class="col-12 col-md-9">
+                <x-search-box id="auditLogSearch" />
             </div>
-            <div class="col-12 col-md-5">
+            <div class="col-12 col-md-3">
                 <button type="button" id="auditLogDateRangeBtn" class="btn btn-outline-secondary d-flex align-items-center gap-2 w-100">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     <span class="text-uppercase tm-muted u-dcc109">Date range</span>

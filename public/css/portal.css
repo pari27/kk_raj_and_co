@@ -201,7 +201,7 @@ body.portal > .d-flex { flex: 1 0 auto; }
 
 /* ---- updates ---------------------------------------------------------- */
 .p-group { font-size: .7rem; letter-spacing: .12em; font-weight: 700; color: var(--tm-muted); background: #f3f4f7; padding: .55rem 1.1rem; }
-.p-upd { display: flex; gap: .9rem; padding: .95rem 1.1rem; border-bottom: 1px solid var(--p-line); text-decoration: none; color: inherit; background: #f6f9ff; }
+.p-upd { display: flex; gap: .9rem; padding: .5rem 1.1rem; border-bottom: 1px solid var(--p-line); text-decoration: none; color: inherit; background: #f6f9ff; }
 .p-upd.read { background: #fff; }
 .p-upd:hover { color: inherit; filter: brightness(.99); }
 .p-upd .ico { width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -362,3 +362,16 @@ a.p-stat:hover { color: #fff; transform: translateY(-3px); box-shadow: 0 10px 22
 
 /* Footer credit on the client portal: keep it clear of the bottom menu on phones */
 @media (max-width: 767.98px) { body.portal .site-credit { padding-bottom: 3.6rem; } }
+
+/* Client dashboard: recent updates and contact the firm */
+.p-upd-sm { padding: .6rem 1rem; gap: .7rem; align-items: center; }
+.p-upd-sm .ico { width: 30px; height: 30px; }
+.p-upd-sm .tt { font-size: .78rem; }
+.p-upd-sm .bd { font-size: .68rem; }
+.p-upd-sm .dot { width: 8px; height: 8px; border-radius: 50%; background: #2f9e58; display: inline-block; margin-left: auto; flex-shrink: 0; }
+.p-firm-contact { display: flex; flex-direction: column; gap: .8rem; }
+.p-firm-contact .line { display: flex; align-items: flex-start; gap: .7rem; color: inherit; text-decoration: none; }
+.p-firm-contact .line svg { color: var(--p-green); margin-top: .15rem; flex-shrink: 0; }
+.p-firm-contact .line strong { display: block; font-size: .8rem; font-weight: 600; word-break: break-word; }
+.p-firm-contact .line small { display: block; font-size: .68rem; color: var(--tm-muted); }
+.p-firm-contact a.line:hover strong { text-decoration: underline; }

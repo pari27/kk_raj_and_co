@@ -58,6 +58,30 @@ class EmailTemplate extends Model
             ],
             'required' => [],
         ],
+        'services_assigned' => [
+            'variables' => [
+                'employee_name' => "The employee's name",
+                'services_list' => 'The services assigned, one per line',
+                'firm_name' => 'Your firm name',
+            ],
+            'required' => ['services_list'],
+        ],
+        'client_documents_requested' => [
+            'variables' => [
+                'customer_name' => "The client's name",
+                'enquiry_number' => 'The enquiry number',
+                'documents_list' => 'The documents needed, grouped by service',
+                'firm_name' => 'Your firm name',
+            ],
+            'required' => ['documents_list'],
+        ],
+        'client_welcome' => [
+            'variables' => [
+                'customer_name' => "The client's name",
+                'firm_name' => 'Your firm name',
+            ],
+            'required' => [],
+        ],
         'admin_new_enquiry' => [
             'variables' => [
                 'admin_name' => "The admin's name",
@@ -65,6 +89,7 @@ class EmailTemplate extends Model
                 'customer_name' => "The client's name",
                 'enquiry_number' => 'The enquiry number',
                 'total' => 'The enquiry total',
+                'services_list' => 'The services in it and who each was assigned to, one per line',
                 'firm_name' => 'Your firm name',
             ],
             'required' => [],

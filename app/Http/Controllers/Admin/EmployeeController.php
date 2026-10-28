@@ -67,6 +67,40 @@ class EmployeeController extends Controller
         return response()->json(['available' => ! $taken]);
     }
 
+    /**
+     * Used by the Add Employee form: is this mobile number already an employee?
+     */
+    public function lookupByMobile(Request $request): JsonResponse
+    {
+        $this->authorize('createEmployee', User::class);
+
+        $mobile = trim((string) $request->query('phone'));
+
+        if (! preg_match('/^\d{10}$/', $mobile)) {
+            return response()->json(['employee' => null]);
+        }
+
+        $profile = Employee::query()->with('designation')->where('mobile', $mobile)->first();
+        $employee = $profile ? User::query()->where('employee_id', $profile->id)->first() : null;
+
+        if (! $employee) {
+            return response()->json(['employee' => null]);
+        }
+
+        return response()->json([
+            'employee' => [
+                'name' => $employee->name,
+                'email' => $employee->email,
+                'gender' => $profile->gender,
+                'designation_id' => $profile->designation_id,
+                'designation' => $profile->designation?->name,
+                'since' => $employee->created_at->format('M Y'),
+                'open_services' => Ticket::query()->where('assigned_to', $employee->id)->where('status', '!=', TicketStatus::TaskCompleted->value)->count(),
+                'url' => route('admin.employees.show', $employee),
+            ],
+        ]);
+    }
+
     public function store(StoreEmployeeRequest $request): RedirectResponse
     {
         $this->authorize('createEmployee', User::class);
@@ -88,6 +122,7 @@ class EmployeeController extends Controller
                 'is_active' => $request->boolean('is_active'),
                 'password' => Str::random(40),
                 'employee_id' => $profile->id,
+                'created_by' => \Illuminate\Support\Facades\Auth::guard('web')->id(),
             ]);
         });
 
@@ -165,13 +200,14 @@ class EmployeeController extends Controller
             ->take(5)
             ->get();
 
-        $addedBy = AuditLog::query()
-            ->where('subject_type', User::class)
-            ->where('subject_id', $employee->id)
-            ->where('action', 'Created')
-            ->with('user')
-            ->oldest('created_at')
+        $lastLogin = AuditLog::query()
+            ->where('user_id', $employee->id)
+            ->where('action', 'Logged in')
+            ->latest('created_at')
+            ->latest('id')
             ->first();
+
+        $addedBy = $employee->createdBy;
 
         return view('admin.employees.show', compact(
             'employee',
@@ -185,6 +221,7 @@ class EmployeeController extends Controller
             'recentTickets',
             'activity',
             'addedBy',
+            'lastLogin',
         ));
     }
 

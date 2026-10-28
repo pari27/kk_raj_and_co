@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TicketStatus;
 use App\Enums\UserRole;
 use App\Http\Requests\StoreEnquiryRequest;
 use App\Models\AuditLog;
@@ -11,6 +12,8 @@ use App\Models\Service;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\AssignmentMails;
+use App\Services\EventMailer;
 use App\Models\Setting;
 use App\Support\NumberSequence;
 use Illuminate\Http\RedirectResponse;
@@ -31,7 +34,7 @@ class EnquiryController extends Controller
         );
 
         $enquiries = $scopeToOwnTickets(
-            Enquiry::query()->with(['customer', 'createdBy', 'tickets.service'])
+            Enquiry::query()->with(['customer', 'createdBy', 'tickets.service', 'payments'])
         )->latest('created_at')->latest('id')->get();
 
         $today = now();
@@ -50,7 +53,11 @@ class EnquiryController extends Controller
                 ->whereYear('created_at', $today->year)
                 ->whereMonth('created_at', $today->month)
                 ->sum('total'),
-            'open_enquiries' => $scopeToOwnTickets(Enquiry::query())->where('status', 'Open')->count(),
+            'open_services' => Ticket::query()
+                ->when($user->isEmployee(), fn ($query) => $query->where('assigned_to', $user->id))
+                ->where('status', '!=', TicketStatus::TaskCompleted->value)
+                ->count(),
+            'pending_fees' => (int) round($enquiries->sum(fn (Enquiry $enquiry) => $enquiry->balanceDue())),
         ];
 
         return view('enquiries.index', compact('enquiries', 'stats'));
@@ -97,6 +104,8 @@ class EnquiryController extends Controller
         $createdTickets = [];
         $customer = null;
         $customerWasCreated = false;
+
+        AssignmentMails::collect();
 
         $enquiry = DB::transaction(function () use ($request, $lines, $services, $user, $canManagePricing, &$createdTickets, &$customer, &$customerWasCreated) {
             $emailNotificationsEnabled = $request->boolean('customer_email_notifications');
@@ -182,6 +191,9 @@ class EnquiryController extends Controller
             return $enquiry;
         });
 
+        // Saved: now send the gathered "service assigned" emails, one per person.
+        AssignmentMails::flush($createdTickets);
+
         if ($customerWasCreated) {
             AuditLogger::log(
                 action: 'Created',
@@ -190,6 +202,8 @@ class EnquiryController extends Controller
                 recordUrl: route('customers.show', $customer),
                 subject: $customer,
             );
+
+            EventMailer::welcomeClient($customer);
         }
 
         AuditLogger::log(
@@ -200,6 +214,8 @@ class EnquiryController extends Controller
             details: "For {$customer->name} — ".count($lines).' service(s)',
             subject: $enquiry,
         );
+
+        EventMailer::requestDocuments($customer, $enquiry->number, $createdTickets);
 
         foreach ($createdTickets as $ticket) {
             AuditLogger::log(

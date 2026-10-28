@@ -43,7 +43,6 @@
                 <div class="position-relative">
                     <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] }}{{ number_format($card['count']) }}</div>
-                    <div class="small u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -54,13 +53,7 @@
     <div class="p-3">
         <div class="row g-2 align-items-center">
             <div class="col-12 col-xl-4">
-                <input
-                    type="search"
-                    id="servicesSearch"
-                    class="form-control form-control-sm tm-field"
-                    placeholder="Search by services name, description, fee or status"
-                    aria-label="Search by services name, description, fee or status"
-                >
+                <x-search-box id="servicesSearch" />
             </div>
 
             <div class="col-12 col-xl-8 d-flex flex-wrap align-items-center justify-content-xl-end gap-2">
@@ -116,7 +109,7 @@
                                         @if ($canManage)
                                             <a
                                                 href="{{ route('admin.services.show', $service) }}"
-                                                class="fw-semibold text-decoration-none {{ $service->is_active ? 'text-body' : 'tm-muted' }} u-5a305f"
+                                                class="fw-semibold text-decoration-none service-name-link {{ $service->is_active ? 'text-body' : 'tm-muted' }} u-5a305f"
                                                
                                             >{{ $service->name }}</a>
                                         @else

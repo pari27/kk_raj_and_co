@@ -40,7 +40,7 @@ class ReportService
         'staff_work' => ['label' => 'Staff work', 'description' => 'Assigned, completed and open per person', 'filters' => ['from', 'to', 'staff_id', 'designation_id']],
         'pending_documents' => ['label' => 'Pending documents', 'description' => 'Documents clients still need to upload', 'filters' => ['from', 'to', 'service_id', 'staff_id']],
         'enquiries' => ['label' => 'Enquiries', 'description' => 'Enquiries received and their totals', 'filters' => ['from', 'to', 'created_by', 'enquiry_status']],
-        'client_history' => ['label' => 'Client history', 'description' => 'All services for one client', 'filters' => ['client_id', 'from', 'to']],
+        'client_history' => ['label' => 'Client history', 'description' => 'Every client with total, paid and balance', 'filters' => ['from', 'to']],
     ];
 
     /** Reports whose rows are long lists (paged); the rest are short summaries. */
@@ -245,12 +245,12 @@ class ReportService
         $enquiries = Enquiry::query()
             ->visibleTo($user)
             ->with(['customer', 'tickets.service', 'payments'])
-            ->whereHas('tickets', fn (Builder $tickets) => $tickets->where('status', TicketStatus::TaskCompleted->value))
+            ->where('created_at', '<=', $asOn)
             ->get();
 
+        // Everything unpaid counts, whether or not the work is finished.
         $rows = $enquiries->map(function (Enquiry $enquiry) use ($asOn, $filters, $user) {
             $completed = $enquiry->tickets
-                ->filter(fn (Ticket $ticket) => $ticket->status === TicketStatus::TaskCompleted && $ticket->completed_at && $ticket->completed_at->lte($asOn))
                 ->filter(fn (Ticket $ticket) => ! $user->isEmployee() || $ticket->assigned_to === $user->id)
                 ->when(! empty($filters['service_id']), fn (Collection $tickets) => $tickets->where('service_id', (int) $filters['service_id']))
                 ->when(! empty($filters['staff_id']), fn (Collection $tickets) => $tickets->where('assigned_to', (int) $filters['staff_id']));
@@ -266,14 +266,14 @@ class ReportService
                 return null;
             }
 
-            $since = $completed->min('completed_at');
+            $since = $enquiry->created_at;
 
             return [
                 'client' => $enquiry->customer?->name ?? '—',
                 'phone' => $enquiry->customer?->phone ?? '—',
                 'enquiry' => ['text' => $enquiry->number, 'url' => route('enquiries.show', $enquiry)],
                 'services' => $completed->pluck('service.name')->filter()->unique()->implode(', ') ?: '—',
-                'completed_on' => $since->format('j M Y'),
+                'enquiry_date' => $since->format('j M Y'),
                 'days' => ['value' => (int) $since->copy()->startOfDay()->diffInDays($asOn->copy()->startOfDay())],
                 'due' => $due,
             ];
@@ -286,7 +286,7 @@ class ReportService
                 ['key' => 'phone', 'label' => 'Phone', 'type' => 'text'],
                 ['key' => 'enquiry', 'label' => 'Enquiry', 'type' => 'link'],
                 ['key' => 'services', 'label' => 'Services', 'type' => 'text'],
-                ['key' => 'completed_on', 'label' => 'Completed on', 'type' => 'text'],
+                ['key' => 'enquiry_date', 'label' => 'Enquiry date', 'type' => 'text'],
                 ['key' => 'days', 'label' => 'Days pending', 'type' => 'days', 'align' => 'end', 'danger_at' => 15],
                 ['key' => 'due', 'label' => 'Amount due', 'type' => 'money_red', 'align' => 'end'],
             ],
@@ -513,7 +513,7 @@ class ReportService
     {
         $enquiries = Enquiry::query()
             ->visibleTo($user)
-            ->with(['customer', 'createdBy', 'tickets.service'])
+            ->with(['customer', 'createdBy', 'tickets.service', 'payments'])
             ->when(! empty($filters['from']), fn (Builder $query) => $query->whereDate('created_at', '>=', $filters['from']))
             ->when(! empty($filters['to']), fn (Builder $query) => $query->whereDate('created_at', '<=', $filters['to']))
             ->when(! empty($filters['created_by']), fn (Builder $query) => $query->where('created_by', $filters['created_by']))
@@ -529,6 +529,7 @@ class ReportService
             'created_by' => $enquiry->createdBy?->name ?? '—',
             'status' => ['text' => $enquiry->status ?? 'Open', 'tone' => ($enquiry->status ?? 'Open') === 'Closed' ? 'success' : 'info'],
             'total' => (float) $enquiry->total,
+            'pending' => max(0.0, (float) $enquiry->total - (float) $enquiry->payments->sum('amount')),
         ]);
 
         return [
@@ -541,9 +542,10 @@ class ReportService
                 ['key' => 'created_by', 'label' => 'Created by', 'type' => 'text'],
                 ['key' => 'status', 'label' => 'Status', 'type' => 'chip'],
                 ['key' => 'total', 'label' => 'Total', 'type' => 'money', 'align' => 'end'],
+                ['key' => 'pending', 'label' => 'Pending', 'type' => 'money_red', 'align' => 'end'],
             ],
             'rows' => $rows,
-            'total' => ['total' => (float) $rows->sum('total')],
+            'total' => ['total' => (float) $rows->sum('total'), 'pending' => (float) $rows->sum('pending')],
             'total_label' => 'Total · '.$rows->count().' '.($rows->count() === 1 ? 'enquiry' : 'enquiries'),
         ];
     }
@@ -554,59 +556,41 @@ class ReportService
 
     private function clientHistory(array $filters, User $user): array
     {
-        $client = ! empty($filters['client_id']) ? Customer::query()->find($filters['client_id']) : null;
-
-        $columns = [
-            ['key' => 'date', 'label' => 'Date', 'type' => 'text'],
-            ['key' => 'number', 'label' => 'Service No.', 'type' => 'link'],
-            ['key' => 'service', 'label' => 'Service', 'type' => 'text'],
-            ['key' => 'staff', 'label' => 'Staff', 'type' => 'text'],
-            ['key' => 'status', 'label' => 'Status', 'type' => 'status'],
-            ['key' => 'fee', 'label' => 'Fee', 'type' => 'money', 'align' => 'end'],
-            ['key' => 'paid', 'label' => 'Paid', 'type' => 'money_green', 'align' => 'end'],
-            ['key' => 'balance', 'label' => 'Balance', 'type' => 'money_red', 'align' => 'end'],
-        ];
-
-        if (! $client) {
-            return [
-                'subtitle' => $this->range($filters),
-                'columns' => $columns,
-                'rows' => collect(),
-                'total' => [],
-                'total_label' => 'Total',
-                'client' => null,
-                'note' => 'There are no clients to show yet.',
-            ];
-        }
-
         $tickets = $this->ticketQuery(array_intersect_key($filters, array_flip(['from', 'to'])), $user)
-            ->where('customer_id', $client->id)
-            ->with(['service', 'assignedTo', 'enquiry.tickets', 'enquiry.payments'])
+            ->with(['customer', 'enquiry.tickets', 'enquiry.payments'])
             ->latest('created_at')->latest('id')
             ->get();
 
-        $rows = $tickets->map(function (Ticket $ticket) {
-            $share = $this->share($ticket);
+        // One row per client, adding up all of that client's services.
+        $rows = $tickets->groupBy('customer_id')->map(function ($group) {
+            $shares = $group->map(fn (Ticket $ticket) => $this->share($ticket));
+            $balance = (float) $shares->sum('balance');
 
             return [
-                'date' => $ticket->created_at?->format('j M Y'),
-                'number' => ['text' => $ticket->number, 'url' => route('tickets.show', $ticket)],
-                'service' => $ticket->service?->name ?? '—',
-                'staff' => $ticket->assignedTo?->name ?? 'Unassigned',
-                'status' => $ticket->status?->value,
-                'fee' => $share['billed'],
-                'paid' => $share['paid'],
-                'balance' => $share['balance'],
+                'client' => $group->first()->customer?->name ?? '—',
+                'phone' => $group->first()->customer?->phone ?? '—',
+                'email' => $group->first()->customer?->email ?: '—',
+                'fee' => (float) $shares->sum('billed'),
+                'paid' => (float) $shares->sum('paid'),
+                'balance' => $balance,
+                'services' => $group->count(),
             ];
-        });
+        })->sortByDesc('balance')->values();
 
         return [
             'subtitle' => $this->range($filters),
-            'columns' => $columns,
+            'columns' => [
+                ['key' => 'client', 'label' => 'Client name', 'type' => 'text'],
+                ['key' => 'phone', 'label' => 'Mobile', 'type' => 'text'],
+                ['key' => 'email', 'label' => 'Email', 'type' => 'text'],
+                ['key' => 'fee', 'label' => 'Total', 'type' => 'money', 'align' => 'end'],
+                ['key' => 'paid', 'label' => 'Paid', 'type' => 'money_green', 'align' => 'end'],
+                ['key' => 'balance', 'label' => 'Balance', 'type' => 'money_red', 'align' => 'end'],
+            ],
             'rows' => $rows,
             'total' => ['fee' => (float) $rows->sum('fee'), 'paid' => (float) $rows->sum('paid'), 'balance' => (float) $rows->sum('balance')],
-            'total_label' => 'Total · '.$rows->count().' '.($rows->count() === 1 ? 'service' : 'services'),
-            'client' => $client,
+            'total_label' => 'Total · '.$rows->count().' '.($rows->count() === 1 ? 'client' : 'clients'),
+            'client' => null,
             'note' => null,
         ];
     }

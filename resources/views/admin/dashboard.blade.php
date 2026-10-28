@@ -25,7 +25,6 @@
             <a href="{{ $card['url'] }}" class="tm-stat-card emp-dash-stat emp-dash-stat-{{ $card['gradient'] }}">
                 <div class="lb">{{ $card['label'] }}</div>
                 <div class="vl js-count-up" data-count="{{ $card['count'] }}" data-prefix="{{ $card['prefix'] }}">{{ $card['prefix'] }}{{ number_format($card['count']) }}</div>
-                <div class="sb">{{ $card['sub'] }}</div>
             </a>
         </div>
     @endforeach

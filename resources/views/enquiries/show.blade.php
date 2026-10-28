@@ -155,7 +155,7 @@
             <div class="d-flex align-items-center justify-content-between gap-2 p-2 px-3 u-1fcbae">
                 <h2 class="h6 tm-serif fw-bold mb-0 text-white">Fee breakdown</h2>
                 @if ($feesPending > 0)
-                    <a href="#enquiryPaymentModal" role="button" data-bs-toggle="modal" class="enquiry-make-payment-button flex-shrink-0">Make payment</a>
+                    <a href="#enquiryPaymentModal" role="button" data-bs-toggle="modal" class="enquiry-make-payment-button flex-shrink-0">Record payment</a>
                 @endif
             </div>
             <ul class="list-unstyled p-3 mb-0 u-8ae449">
