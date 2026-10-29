@@ -40,7 +40,7 @@
                     <a href="{{ route($item['route']) }}" class="tm-nav-link {{ request()->routeIs(...$item['match']) ? 'active' : '' }}">
                         <span class="tm-nav-icon"><x-portal-icon :name="$item['icon']" :size="17" /></span>
                         {{ $item['label'] }}
-                        @if (! empty($item['badge']))<span class="badge rounded-pill bg-danger ms-auto u-87458d">{{ $item['badge'] }}</span>@endif
+                        @if (array_key_exists('badge', $item))<span class="badge rounded-pill bg-danger ms-auto u-87458d {{ $item['badge'] ? '' : 'd-none' }}" data-unread-badge>{{ $item['badge'] }}</span>@endif
                     </a>
                 @endforeach
             </nav>
@@ -65,7 +65,7 @@
                 <div class="d-flex align-items-center gap-3 ms-auto">
                     <a href="{{ route('customer.updates') }}" class="tm-icon-btn position-relative text-decoration-none u-e63c6b" aria-label="Updates">
                         <x-portal-icon name="bell" :size="17" />
-                        @if ($pUnread)<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger u-d95e57">{{ $pUnread }}</span>@endif
+                        <span id="tmBellBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger u-d95e57 {{ $pUnread ? '' : 'd-none' }}">{{ $pUnread }}</span>
                     </a>
 
                     <div class="dropdown">
@@ -120,12 +120,15 @@
             <a href="{{ route($item['route']) }}" class="{{ $active ? 'active' : '' }}">
                 <span class="pbottom-icon">
                     <x-portal-icon :name="$item['icon']" :size="20" />
-                    @if (! empty($item['badge']))<span class="pbottom-dot"></span>@endif
+                    @if (array_key_exists('badge', $item))<span class="pbottom-dot {{ $item['badge'] ? '' : 'd-none' }}" data-unread-dot></span>@endif
                 </span>
                 <span>{{ $item['short'] }}</span>
             </a>
         @endforeach
     </nav>
+
+    @include('partials.lock-screen', ['lockGuard' => 'customer'])
+    @include('partials.session-watch')
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>

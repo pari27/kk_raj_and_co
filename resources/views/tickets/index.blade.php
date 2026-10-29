@@ -24,16 +24,10 @@
     $pendingCards = [
         ['label' => 'Pending services', 'count' => $stats['pending_total'], 'caption' => $isAdmin ? 'across the firm' : 'assigned to you', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
         ['label' => 'Waiting for documents', 'count' => $stats['waiting_for_client'], 'caption' => 'documents not received', 'gradient' => 'linear-gradient(135deg, #3a2205, #8a5a10)'],
-        ['label' => 'In progress', 'count' => $stats['in_progress'], 'caption' => 'being worked on', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
+        ['label' => 'Completed (this month)', 'count' => $stats['closed_this_month'], 'caption' => now()->format('F'), 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
         ['label' => 'Pending payment', 'count' => $stats['awaiting_payment'], 'prefix' => '₹', 'caption' => 'task completed', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
     ];
 
-    $historyCards = [
-        ['label' => 'Closed services', 'count' => $stats['closed_total'], 'caption' => 'all time', 'gradient' => 'linear-gradient(135deg, #0a2e14, #1f6b30)'],
-        ['label' => 'Closed this month', 'count' => $stats['closed_this_month'], 'caption' => now()->format('F'), 'gradient' => 'linear-gradient(135deg, #062a28, #0f766e)'],
-        ['label' => 'Fees collected', 'count' => $stats['fees_collected'], 'prefix' => '₹', 'caption' => $isAdmin ? 'across the firm' : 'on your services', 'gradient' => 'linear-gradient(135deg, #060e24, #0a4fc4)'],
-        ['label' => 'Average time', 'count' => $stats['avg_days'], 'suffix' => ' days', 'caption' => 'created to completed', 'gradient' => 'linear-gradient(135deg, #380c33, #6e1d58)'],
-    ];
 @endphp
 
 <x-breadcrumbs :items="[['label' => 'Dashboard', 'url' => route('dashboard')], ['label' => $isAdmin ? 'Services' : 'My services']]" />
@@ -54,22 +48,6 @@
                 <div class="position-relative">
                     <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
                     <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ $indian($card['count']) }}</div>
-                </div>
-            </div>
-        </div>
-    @endforeach
-</div>
-
-<div id="historyCards" class="row g-3 mb-4 d-none">
-    @foreach ($historyCards as $card)
-        <div class="col-6 col-xl-3">
-            <div class="tm-stat-card p-3 h-100 text-white position-relative" style="background: {{ $card['gradient'] }}; border: 0; border-radius: .6rem; overflow: hidden;">
-                <span class="position-absolute rounded-circle u-943986"></span>
-                <span class="position-absolute rounded-circle u-e46b84"></span>
-                <div class="position-relative">
-                    <div class="small mb-2 u-bbebd4">{{ $card['label'] }}</div>
-                    <div class="h3 tm-serif fw-bold mb-1 text-white">{{ $card['prefix'] ?? '' }}{{ $indian($card['count']) }}{{ $card['suffix'] ?? '' }}</div>
-                    <div class="small u-48932b">{{ $card['caption'] }}</div>
                 </div>
             </div>
         </div>
@@ -102,8 +80,9 @@
                 <input type="hidden" id="ticketDateTo">
             </div>
             <select id="sortOrder" class="form-select tm-field">
-                <option value="desc" selected>Newest first</option>
-                <option value="asc">Oldest first</option>
+                {{-- The rows arrive newest first, so "asc" (the order they came in) is newest first. --}}
+                <option value="asc" selected>Newest first</option>
+                <option value="desc">Oldest first</option>
             </select>
         </div>
     </div>
@@ -118,6 +97,7 @@
                         <th class="tm-th-sortable" data-sort-key="employee" data-sort-type="text">Assigned to<x-tm-sort-icon /></th>
                     @endif
                     <th class="tm-th-sortable" data-sort-key="status" data-sort-type="text">Status<x-tm-sort-icon /></th>
+                    <th>Comment</th>
                     <th>Documents</th>
                     <th class="tm-th-sortable" data-sort-key="open-days" data-sort-type="number">Open for<x-tm-sort-icon /></th>
                     <th>Action</th>
@@ -141,6 +121,7 @@
                         data-employee="{{ $ticket->assignedTo->name ?? 'Unassigned' }}"
                         data-phone="{{ $ticket->customer->phone }}"
                         data-status="{{ $ticket->status->value }}"
+                        data-comment="{{ $ticket->currentStatusComment() }}"
                         data-open-days="{{ $openDays }}"
                         data-sort="{{ $i }}"
                     >
@@ -158,6 +139,11 @@
                         <td>
                             <x-status-badge :status="$ticket->status->value" />
                         </td>
+                        <td>
+                            @if ($comment = $ticket->currentStatusComment())
+                                <div class="ticket-status-comment" title="{{ $comment }}">{{ $comment }}</div>
+                            @endif
+                        </td>
                         <td class="small">
                             @if ($ticketDocs->isEmpty())
                                 <span class="tm-muted">No documents required</span>
@@ -174,7 +160,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
                             <x-empty-state title="No open services" description="Services created from enquiries will show up here." />
                         </td>
                     </tr>
@@ -196,6 +182,7 @@
                     <th class="tm-th-sortable" data-sort-key="completed-ts" data-sort-type="number">Completed<x-tm-sort-icon /></th>
                     <th class="tm-th-sortable" data-sort-key="fee" data-sort-type="number">Fee<x-tm-sort-icon /></th>
                     <th>Status</th>
+                    <th>Comment</th>
                     <th>Payment</th>
                     <th>Action</th>
                 </tr>
@@ -207,6 +194,7 @@
                         data-client="{{ $ticket->customer->name }}"
                         data-service="{{ $ticket->service->name }}"
                         data-employee="{{ $ticket->assignedTo->name ?? 'Unassigned' }}"
+                        data-comment="{{ $ticket->currentStatusComment() }}"
                         data-completed-ts="{{ $ticket->completed_at?->timestamp }}"
                         data-fee="{{ $ticket->total }}"
                         data-sort="{{ $i }}"
@@ -219,13 +207,24 @@
                         @endif
                         <td>{{ $ticket->completed_at?->format('j M Y') }}</td>
                         <td>₹{{ number_format((float) $ticket->total) }}</td>
-                        <td><x-status-badge :status="$ticket->status->value" /></td>
+                        <td>
+                            <x-status-badge :status="$ticket->status->value" />
+                        </td>
+                        <td>
+                            @if ($comment = $ticket->currentStatusComment())
+                                <div class="ticket-status-comment" title="{{ $comment }}">{{ $comment }}</div>
+                            @endif
+                        </td>
                         <td><x-payment-status-badge :status="$ticket->paymentStatus()" /></td>
-                        <td><a href="{{ route('tickets.show', $ticket) }}" class="btn btn-sm btn-primary">View</a></td>
+                        <td>
+                            <a href="{{ route('tickets.show', $ticket) }}" class="tm-icon-btn-sm" title="View">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2f5fbe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </a>
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9">
+                        <td colspan="10">
                             <x-empty-state title="No completed services yet" description="Services marked Task Completed will show up here." />
                         </td>
                     </tr>
@@ -260,8 +259,6 @@
         };
 
         var tabs = document.querySelectorAll('.tm-ticket-tab');
-        var pendingCards = document.getElementById('pendingCards');
-        var historyCards = document.getElementById('historyCards');
         var pendingTable = document.getElementById('pendingTable').closest('.table-responsive');
         var historyTable = document.getElementById('historyTable').closest('.table-responsive');
         var subtitleEl = document.getElementById('ticketsSubtitle');
@@ -311,6 +308,7 @@
                     || (row.getAttribute('data-service') || '').toLowerCase().includes(search)
                     || (row.getAttribute('data-phone') || '').toLowerCase().includes(search)
                     || (row.getAttribute('data-status') || '').toLowerCase().includes(search)
+                    || (row.getAttribute('data-comment') || '').toLowerCase().includes(search)
                     || (row.getAttribute('data-employee') || '').toLowerCase().includes(search)
                     || (row.getAttribute('data-open-days') || '') === search;
 
@@ -390,8 +388,6 @@
                 btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
             });
 
-            pendingCards.classList.toggle('d-none', tab !== 'pending');
-            historyCards.classList.toggle('d-none', tab !== 'history');
             pendingTable.classList.toggle('d-none', tab !== 'pending');
             historyTable.classList.toggle('d-none', tab !== 'history');
             dateRangeWrap.classList.toggle('d-none', tab !== 'history');

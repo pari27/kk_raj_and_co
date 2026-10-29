@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Enums\TicketStatus;
 use App\Enums\UserRole;
 use App\Http\Requests\UpdateTicketStatusRequest;
+use App\Models\AppNotification;
 use App\Models\AuditLog;
+use App\Models\ClientNotification;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Services\AuditLogger;
 use App\Services\EnquiryStatusService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -32,7 +35,7 @@ class TicketController extends Controller
             $base->where('assigned_to', $user->id);
         }
 
-        $pending = (clone $base)->whereNotIn('status', self::CLOSED_STATUSES)->latest('created_at')->get();
+        $pending = (clone $base)->whereNotIn('status', self::CLOSED_STATUSES)->latest('created_at')->latest('id')->get();
         $history = (clone $base)->whereIn('status', self::CLOSED_STATUSES)->latest('completed_at')->get();
 
         $stats = [
@@ -96,8 +99,12 @@ class TicketController extends Controller
         $before = $ticket->status;
         $status = TicketStatus::from($request->validated('status'));
 
+        $comment = trim($request->validated('comment'));
+
         $ticket->update([
             'status' => $status,
+            'status_comment' => $comment,
+            'status_comment_for' => $status->value,
             'completed_at' => $status->isClosed() ? ($ticket->completed_at ?? now()) : null,
         ]);
 
@@ -106,7 +113,7 @@ class TicketController extends Controller
             module: 'Service',
             recordLabel: $ticket->number,
             recordUrl: route('tickets.show', $ticket),
-            details: "Status {$before->value} → {$status->value}",
+            details: "Status {$before->value} → {$status->value} — {$comment}",
             subject: $ticket,
         );
 
@@ -117,9 +124,60 @@ class TicketController extends Controller
             ->with('status', "Service {$ticket->number} is now \"{$status->value}\".");
     }
 
+    /**
+     * Delete a service that no document has been submitted for yet. The enquiry's fee is worked out again from its other services.
+     */
+    public function destroy(Ticket $ticket): RedirectResponse
+    {
+        $this->authorize('delete', $ticket);
+
+        if ($reason = $ticket->deletionBlocker()) {
+            return redirect(url()->previous(route('tickets.show', $ticket)))->with('error', $reason);
+        }
+
+        $enquiry = $ticket->enquiry()->with(['tickets', 'payments'])->first();
+        $number = $ticket->number;
+        $serviceName = $ticket->service?->name ?? 'Service';
+        $staffUrl = route('tickets.show', $ticket);
+        $clientUrl = route('customer.tickets.show', $ticket);
+        $fees = $enquiry->feesWithout($ticket);
+
+        DB::transaction(function () use ($ticket, $enquiry, $fees, $staffUrl, $clientUrl) {
+            // Notifications that point at this service would lead nowhere now.
+            AppNotification::query()->where('url', $staffUrl)->delete();
+            ClientNotification::query()->where('url', $clientUrl)->delete();
+
+            $ticket->delete();
+            $enquiry->update($fees);
+        });
+
+        EnquiryStatusService::recompute($enquiry->fresh());
+
+        AuditLogger::log(
+            action: 'Deleted',
+            module: 'Service',
+            recordLabel: $number,
+            details: "{$serviceName} removed from {$enquiry->number}",
+        );
+
+        AuditLogger::log(
+            action: 'Updated',
+            module: 'Enquiry',
+            recordLabel: $enquiry->number,
+            recordUrl: route('enquiries.show', $enquiry),
+            details: "Deleted service {$serviceName} ({$number}) — enquiry total now ₹".number_format($fees['total'], 2),
+            subject: $enquiry,
+        );
+
+        return redirect()
+            ->route('enquiries.show', $enquiry)
+            ->with('status', "{$serviceName} ({$number}) was deleted from {$enquiry->number}.");
+    }
     public function reassign(Ticket $ticket): RedirectResponse
     {
         $this->authorize('reassign', Ticket::class);
+
+        abort_if($ticket->status->isClosed(), 422, "A service can't be reassigned after task completion.");
 
         $assignableRoles = [UserRole::Admin->value, UserRole::Employee->value];
         $validated = Validator::make(request()->all(), [

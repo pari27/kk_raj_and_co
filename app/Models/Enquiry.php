@@ -57,6 +57,26 @@ class Enquiry extends Model
         return $this->hasMany(Payment::class);
     }
 
+    /**
+     * The fee figures worked out from the services that are left once $without is gone.
+     * A service's own total includes its GST, so the net part is that total less the GST.
+     *
+     * @return array{subtotal: float, gst_total: float, total: float}
+     */
+    public function feesWithout(Ticket $without): array
+    {
+        $remaining = $this->tickets->reject(fn (Ticket $ticket) => $ticket->is($without));
+
+        $subtotal = round((float) $remaining->sum(fn (Ticket $ticket) => (float) $ticket->total - (float) $ticket->gst_amount), 2);
+        $gstTotal = round((float) $remaining->sum(fn (Ticket $ticket) => (float) $ticket->gst_amount), 2);
+
+        return [
+            'subtotal' => $subtotal,
+            'gst_total' => $gstTotal,
+            'total' => max(0.0, round($subtotal + $gstTotal - (float) $this->discount, 2)),
+        ];
+    }
+
     public function amountPaid(): float
     {
         return (float) $this->payments->sum('amount');

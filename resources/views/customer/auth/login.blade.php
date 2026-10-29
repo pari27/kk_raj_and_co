@@ -12,6 +12,14 @@
         </p>
     </div>
 
+    <div class="alert alert-danger py-2 session-busy-alert @unless (session('session_conflict')) d-none @endunless" id="sessionBusy" data-shown="{{ session('session_conflict') ? 1 : 0 }}" data-after-kick="{{ session('session_notice') ? 1 : 0 }}" role="alert">
+        This account is already logged in on another device. Do you want to log out from there and log in here?
+    </div>
+
+    @if (session('session_notice'))
+        <div class="alert alert-danger py-2 session-busy-alert" role="alert">{{ session('session_notice') }}</div>
+    @endif
+
     @if (session('status'))
         <div class="alert alert-success py-2 small" role="alert">{{ session('status') }}</div>
     @endif
@@ -22,7 +30,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('customer.login.store') }}" novalidate>
+   <form method="POST" action="{{ route('customer.login.store') }}" novalidate>
         @csrf
 
         <div class="mb-3">
@@ -63,7 +71,7 @@
 
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="remember" id="remember" value="1">
+                <input class="form-check-input" type="checkbox" name="remember" id="remember" @checked(old('remember')) value="1">
                 <label class="form-check-label tm-muted small" for="remember">Remember me</label>
             </div>
             <a href="{{ route('customer.verify-otp') }}" class="tm-link small text-decoration-underline">Forgot password?</a>
@@ -93,4 +101,36 @@
         @endif
     </form>
 </div>
+
+<script>
+    (function () {
+        var email = document.getElementById('email');
+        var alertBox = document.getElementById('sessionBusy');
+        var url = @json(route('customer.login.session-check'));
+        var last = null;
+        // Just signed out by another device: that message is enough, so the first check stays silent.
+        var silent = alertBox.dataset.afterKick === '1';
+
+        function check() {
+            var value = email.value.trim();
+            if (value === last) { return; }
+            last = value;
+
+            if (value.indexOf('@') < 1) { alertBox.classList.add('d-none'); return; }
+
+            fetch(url + '?email=' + encodeURIComponent(value), { headers: { 'Accept': 'application/json' } })
+                .then(function (response) { return response.ok ? response.json() : { busy: false }; })
+                .then(function (data) {
+                    if (email.value.trim() !== value) { return; }
+                    alertBox.classList.toggle('d-none', !data.busy || silent);
+                    silent = false;
+                })
+                .catch(function () {});
+        }
+
+        email.addEventListener('change', check);
+        email.addEventListener('blur', check);
+        check();
+    })();
+</script>
 @endsection

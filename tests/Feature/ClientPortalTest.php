@@ -378,6 +378,26 @@ class ClientPortalTest extends TestCase
         return [$client, $ticket, $enquiry];
     }
 
+    public function test_my_services_shows_the_status_comment_in_its_own_column(): void
+    {
+        [$client, $ticket] = $this->clientWithService(['status' => 'On Hold']);
+        $ticket->update(['status_comment' => 'Waiting for the bank statement', 'status_comment_for' => 'On Hold']);
+
+        $this->asClient($client)->get(route('customer.tickets.index'))
+            ->assertOk()
+            ->assertSeeInOrder(['<th>Status</th>', '<th>Comment</th>', '<th>Documents</th>'], false)
+            ->assertSee('Waiting for the bank statement');
+    }
+
+    public function test_a_comment_that_no_longer_matches_the_status_is_not_shown_to_the_client(): void
+    {
+        [$client, $ticket] = $this->clientWithService(['status' => 'Work In Progress']);
+        $ticket->update(['status_comment' => 'Paused for the audit', 'status_comment_for' => 'On Hold']);
+
+        $this->asClient($client)->get(route('customer.tickets.index'))
+            ->assertOk()
+            ->assertDontSee('Paused for the audit');
+    }
     public function test_the_dashboard_shows_only_the_clients_own_services_and_fees(): void
     {
         [$client, , $enquiry] = $this->clientWithService();
@@ -619,7 +639,7 @@ class ClientPortalTest extends TestCase
             'Documents Pending' => [1, 'Documents needed'],
             'Additional Documents Required' => [1, 'Documents needed'],
             'Documents Received' => [2, 'Checking'],
-            'Under Verification' => [2, 'Checking'],
+            'Documents Verified' => [2, 'Checking'],
             'Work In Progress' => [3, 'Work in progress'],
             'Submitted to Department' => [3, 'Work in progress'],
             'On Hold' => [3, 'On hold'],
@@ -761,6 +781,57 @@ class ClientPortalTest extends TestCase
         $this->assertNotNull($update->fresh()->read_at);
     }
 
+    public function test_a_read_update_leaves_the_updates_list(): void
+    {
+        $client = $this->client();
+        $first = \App\Models\ClientNotification::create(['customer_id' => $client->id, 'type' => 'service', 'title' => 'Documents checked']);
+        \App\Models\ClientNotification::create(['customer_id' => $client->id, 'type' => 'service', 'title' => 'Payment received']);
+
+        $this->asClient($client)->get(route('customer.updates'))
+            ->assertSee('Documents checked')
+            ->assertSee('Payment received');
+
+        // Opening one marks it read, and it is gone from the list.
+        $this->asClient($client)->get(route('customer.updates.open', $first));
+
+        $this->asClient($client)->get(route('customer.updates'))
+            ->assertDontSee('Documents checked')
+            ->assertSee('Payment received');
+
+        // Mark all as read empties the list.
+        $this->asClient($client)->post(route('customer.updates.read-all'));
+
+        $this->asClient($client)->get(route('customer.updates'))
+            ->assertDontSee('Payment received')
+            ->assertSee('Nothing new yet');
+    }
+    public function test_the_updates_page_is_never_kept_by_the_browser_and_rows_leave_the_list_when_opened(): void
+    {
+        $client = $this->client();
+        \App\Models\ClientNotification::create(['customer_id' => $client->id, 'type' => 'service', 'title' => 'Documents checked']);
+
+        $response = $this->asClient($client)->get(route('customer.updates'));
+
+        $this->assertStringContainsString('no-store', (string) $response->headers->get('Cache-Control'));
+        $response->assertSee('js-update-row', false)->assertSee('window.tmCheckNow', false);
+    }
+
+    public function test_the_ping_tells_a_client_how_many_updates_are_unread_and_the_bell_has_hooks_for_it(): void
+    {
+        $client = $this->client();
+        $first = \App\Models\ClientNotification::create(['customer_id' => $client->id, 'type' => 'service', 'title' => 'One']);
+        \App\Models\ClientNotification::create(['customer_id' => $client->id, 'type' => 'service', 'title' => 'Two']);
+
+        $this->asClient($client)->getJson(route('session.ping'))->assertOk()->assertJson(['unread' => 2]);
+
+        $this->asClient($client)->get(route('customer.updates.open', $first));
+        $this->asClient($client)->getJson(route('session.ping'))->assertJson(['unread' => 1]);
+
+        $this->asClient($client)->get(route('customer.dashboard'))
+            ->assertSee('id="tmBellBadge"', false)
+            ->assertSee('data-unread-badge', false)
+            ->assertSee('data-unread-dot', false);
+    }
     public function test_updates_belong_to_one_client_only(): void
     {
         [$client] = $this->clientWithService();
@@ -777,12 +848,13 @@ class ClientPortalTest extends TestCase
         \App\Models\ClientNotification::create(['customer_id' => $client->id, 'type' => 'service', 'title' => 'One']);
         \App\Models\ClientNotification::create(['customer_id' => $client->id, 'type' => 'service', 'title' => 'Two']);
 
-        $this->asClient($client)->get(route('customer.dashboard'))->assertSee('pbottom-dot', false);
+        $this->asClient($client)->get(route('customer.dashboard'))->assertSee('pbottom-dot', false)->assertDontSee('pbottom-dot d-none', false);
 
         $this->asClient($client)->post(route('customer.updates.read-all'))->assertRedirect();
 
         $this->assertSame(0, \App\Models\ClientNotification::where('customer_id', $client->id)->whereNull('read_at')->count());
-        $this->asClient($client)->get(route('customer.dashboard'))->assertDontSee('pbottom-dot', false);
+        // The dot stays in the page (so it can come back live) but is hidden.
+        $this->asClient($client)->get(route('customer.dashboard'))->assertSee('pbottom-dot d-none', false);
     }
 
     public function test_the_profile_shows_the_clients_details(): void
@@ -860,25 +932,29 @@ class ClientPortalTest extends TestCase
             ->assertSee('₹1,180');
     }
 
-    public function test_a_finished_and_settled_service_reaches_the_fifth_step_paid(): void
+    public function test_payment_is_not_a_step_and_a_completed_service_has_every_step_ticked(): void
     {
-        [$client, $ticket, $enquiry] = $this->clientWithService();
+        [$client, $ticket, $enquiry] = $this->clientWithService(['status' => TicketStatus::WorkInProgress]);
         $portal = app(\App\Services\ClientPortalService::class);
+        $fresh = fn () => $ticket->fresh(['service.documents', 'documents', 'enquiry.payments', 'enquiry.tickets']);
 
-        $ticket->update(['status' => TicketStatus::TaskCompleted, 'completed_at' => now()]);
-        $stage = $portal->stage($ticket->fresh(['service.documents', 'documents', 'enquiry.payments', 'enquiry.tickets']));
-        $this->assertSame(4, $stage['step']);
-        $this->assertFalse($stage['paid']);
+        $this->assertSame(['Documents', 'Checking', 'Work in progress', 'Completed'], \App\Services\ClientPortalService::STEPS);
 
+        // Paying early does not move the work along.
         Payment::factory()->create(['enquiry_id' => $enquiry->id, 'amount' => 1180]);
-        $stage = $portal->stage($ticket->fresh(['service.documents', 'documents', 'enquiry.payments', 'enquiry.tickets']));
-        $this->assertSame(5, $stage['step']);
+        $stage = $portal->stage($fresh());
+        $this->assertSame(3, $stage['step']);
         $this->assertTrue($stage['paid']);
+
+        // Completed is step 4 whether or not the fee has been paid.
+        $ticket->update(['status' => TicketStatus::TaskCompleted, 'completed_at' => now()]);
+        $this->assertSame(4, $portal->stage($fresh())['step']);
 
         $this->asClient($client)->get(route('customer.tickets.show', $ticket))
             ->assertOk()
-            ->assertSee('Documents')->assertSee('Checking')->assertSee('Work in progress')->assertSee('Completed')->assertSee('Paid')
-            ->assertSee('STEP 5 OF 5');
+            ->assertSee('Documents → Checking → Work in progress → Completed', false)
+            ->assertDontSee('Completed → Paid', false)
+            ->assertSee('STEP 4 OF 4');
     }
 
     public function test_the_dashboard_cards_count_the_right_things(): void

@@ -33,7 +33,8 @@ class AdminAccountsTest extends TestCase
             ->assertSee('First Admin')
             ->assertSee('Second Admin')
             ->assertDontSee('Just An Employee')
-            ->assertDontSee('support@netiapps.example');
+            // The Super Admin's own email shows on their lock screen, so check the list itself.
+            ->assertViewHas('accounts', fn ($accounts) => $accounts->count() === 2 && ! $accounts->contains('id', $super->id));
     }
 
     public function test_only_the_super_admin_can_open_or_use_admin_accounts(): void

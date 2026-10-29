@@ -7,7 +7,7 @@ enum TicketStatus: string
     case DocumentsPending = 'Documents Pending';
     case PartiallyReceived = 'Partially Received';
     case DocumentsReceived = 'Documents Received';
-    case UnderVerification = 'Under Verification';
+    case DocumentsVerified = 'Documents Verified';
     case AdditionalDocumentsRequired = 'Additional Documents Required';
     case WorkInProgress = 'Work In Progress';
     case SubmittedToDepartment = 'Submitted to Department';
@@ -20,7 +20,7 @@ enum TicketStatus: string
             self::DocumentsPending => 'secondary',
             self::PartiallyReceived => 'dark',
             self::DocumentsReceived => 'info',
-            self::UnderVerification => 'primary',
+            self::DocumentsVerified => 'primary',
             self::AdditionalDocumentsRequired => 'warning',
             self::WorkInProgress => 'warning',
             self::SubmittedToDepartment => 'info',

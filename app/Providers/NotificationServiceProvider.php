@@ -90,7 +90,7 @@ class NotificationServiceProvider extends ServiceProvider
             $view->with([
                 'tmUnreadCount' => $user ? AppNotification::where('user_id', $user->id)->whereNull('read_at')->count() : 0,
                 'tmRecentNotifications' => $user
-                    ? AppNotification::where('user_id', $user->id)->latest()->latest('id')->limit(4)->get()
+                    ? AppNotification::where('user_id', $user->id)->whereNull('read_at')->latest()->latest('id')->limit(4)->get()
                     : collect(),
             ]);
         });

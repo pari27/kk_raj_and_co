@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Models\ClientNotification;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -13,12 +14,14 @@ use Illuminate\View\View;
  */
 class UpdateController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
         $customer = Auth::guard('customer')->user();
 
         $updates = ClientNotification::query()
             ->where('customer_id', $customer->id)
+            // Once an update is read it leaves the list.
+            ->whereNull('read_at')
             ->latest('created_at')->latest('id')
             ->limit(100)
             ->get()
@@ -26,10 +29,11 @@ class UpdateController extends Controller
                 return $update->created_at->isToday() ? 'Today' : ($update->created_at->isYesterday() ? 'Yesterday' : 'Earlier');
             });
 
-        return view('customer.updates', [
+        // Not kept by the browser, so coming back to this page (Back button) shows the list as it is now.
+        return response()->view('customer.updates', [
             'groups' => $updates,
             'hasUnread' => $updates->flatten()->contains(fn (ClientNotification $update) => $update->isUnread()),
-        ]);
+        ], 200, ['Cache-Control' => 'no-store, max-age=0']);
     }
 
     public function open(ClientNotification $notification): RedirectResponse

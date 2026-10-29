@@ -36,6 +36,14 @@ class EnquiryPolicy
     }
 
     /**
+     * More services can be added by an Admin until the enquiry is closed (every service completed and the fee paid in full).
+     */
+    public function addService(User $user, Enquiry $enquiry): bool
+    {
+        return $user->isAdmin() && $enquiry->status !== 'Closed';
+    }
+
+    /**
      * Setting a discount or overriding a line's price is an Admin-only action.
      */
     public function managePricing(User $user): bool

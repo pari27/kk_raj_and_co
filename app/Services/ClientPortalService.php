@@ -21,7 +21,7 @@ class ClientPortalService
     /**
      * The steps a client sees, whatever the internal status is.
      */
-    public const STEPS = ['Documents', 'Checking', 'Work in progress', 'Completed', 'Paid'];
+    public const STEPS = ['Documents', 'Checking', 'Work in progress', 'Completed'];
 
     /**
      * Services of this client, newest first.
@@ -38,21 +38,21 @@ class ClientPortalService
     }
 
     /**
-     * Which of the four work steps a status belongs to (the fifth, Paid, depends on the fee).
+     * Which of the four work steps a status belongs to. Payment is not a step: it can happen at any stage.
      */
     public static function stepFor(TicketStatus $status): int
     {
         return match ($status) {
             TicketStatus::DocumentsPending, TicketStatus::PartiallyReceived, TicketStatus::AdditionalDocumentsRequired => 1,
-            TicketStatus::DocumentsReceived, TicketStatus::UnderVerification => 2,
+            TicketStatus::DocumentsReceived, TicketStatus::DocumentsVerified => 2,
             TicketStatus::TaskCompleted => 4,
             default => 3,
         };
     }
 
     /**
-     * Where this service stands, in the client's words. `step` runs 1 to 5; the
-     * fifth, Paid, is reached once the work is complete and the fee is settled.
+     * Where this service stands, in the client's words. `step` runs 1 to 4; payment is
+     * reported separately in `paid`.
      *
      * @return array{step: int, label: string, tone: string, caption: string, paid: bool}
      */
@@ -75,7 +75,7 @@ class ClientPortalService
         };
 
         return $stage + [
-            'step' => $step === 4 && $paid ? 5 : $step,
+            'step' => $step,
             'paid' => $paid,
         ];
     }

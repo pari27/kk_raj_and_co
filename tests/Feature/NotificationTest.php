@@ -229,4 +229,87 @@ class NotificationTest extends TestCase
         $this->assertSame(1, AppNotification::where('user_id', $first->id)->where('link_text', $other->number)->count());
         $this->assertSame(1, AppNotification::where('user_id', $second->id)->where('link_text', $ticket->number)->count());
     }
+
+    public function test_only_unread_notifications_are_listed_and_a_read_one_leaves_the_list(): void
+    {
+        $employee = User::factory()->create(['role' => UserRole::Employee, 'is_active' => true]);
+        $first = AppNotification::create(['user_id' => $employee->id, 'type' => 'tickets', 'title' => 'Service assigned to you', 'body' => 'a']);
+        AppNotification::create(['user_id' => $employee->id, 'type' => 'documents', 'title' => 'Document uploaded', 'body' => 'b']);
+        AppNotification::create(['user_id' => $employee->id, 'type' => 'payments', 'title' => 'Already seen payment', 'body' => 'c', 'read_at' => now()]);
+
+        $this->actingAs($employee)->get(route('notifications.index'))
+            ->assertSee('Service assigned to you')
+            ->assertSee('Document uploaded')
+            ->assertDontSee('Already seen payment')
+            ->assertDontSee('border-success border-2">All', false);
+
+        // Opening one marks it read, and it is gone.
+        $this->actingAs($employee)->get(route('notifications.open', $first));
+
+        $this->actingAs($employee)->get(route('notifications.index'))
+            ->assertDontSee('Service assigned to you')
+            ->assertSee('Document uploaded');
+
+        // Mark all as read empties the list.
+        $this->actingAs($employee)->post(route('notifications.read-all'));
+
+        $this->actingAs($employee)->get(route('notifications.index'))
+            ->assertDontSee('Document uploaded')
+            ->assertSee('You are all caught up. No unread notifications.');
+    }
+
+    public function test_the_type_filter_still_works_on_the_unread_list(): void
+    {
+        $employee = User::factory()->create(['role' => UserRole::Employee, 'is_active' => true]);
+        AppNotification::create(['user_id' => $employee->id, 'type' => 'tickets', 'title' => 'Service assigned to you', 'body' => 'a']);
+        AppNotification::create(['user_id' => $employee->id, 'type' => 'documents', 'title' => 'Document uploaded', 'body' => 'b']);
+
+        // The bell shows every unread one; the page's own list follows the chosen type.
+        $this->actingAs($employee)->get(route('notifications.index', ['type' => 'documents']))
+            ->assertViewHas('notifications', fn ($page) => $page->count() === 1 && $page->first()->title === 'Document uploaded');
+    }
+
+    public function test_the_notifications_page_is_never_kept_by_the_browser_and_rows_come_off_the_list_when_opened(): void
+    {
+        $employee = User::factory()->create(['role' => UserRole::Employee, 'is_active' => true]);
+        AppNotification::create(['user_id' => $employee->id, 'type' => 'tickets', 'title' => 'Service assigned to you', 'body' => 'a']);
+
+        $response = $this->actingAs($employee)->get(route('notifications.index'));
+
+        // So pressing Back after opening a notification shows the list as it is now.
+        $this->assertStringContainsString('no-store', (string) $response->headers->get('Cache-Control'));
+
+        // And a row disappears from the page the moment it is opened, even from another tab.
+        $response->assertSee('js-notification-row', false)
+            ->assertSee("addEventListener(name, function () {", false);
+    }
+
+    public function test_the_ping_reports_how_many_notifications_are_unread_so_the_bell_can_refresh(): void
+    {
+        $employee = User::factory()->create(['role' => UserRole::Employee, 'is_active' => true]);
+        $first = AppNotification::create(['user_id' => $employee->id, 'type' => 'tickets', 'title' => 'One', 'body' => 'a']);
+        AppNotification::create(['user_id' => $employee->id, 'type' => 'documents', 'title' => 'Two', 'body' => 'b']);
+        AppNotification::create(['user_id' => $employee->id, 'type' => 'payments', 'title' => 'Seen', 'body' => 'c', 'read_at' => now()]);
+
+        $this->actingAs($employee)->getJson(route('session.ping'))->assertOk()->assertJson(['unread' => 2]);
+
+        // Opening one lowers the number the bell is told.
+        $this->actingAs($employee)->get(route('notifications.open', $first));
+        $this->actingAs($employee)->getJson(route('session.ping'))->assertJson(['unread' => 1]);
+
+        // Someone else's notifications are never counted, and a signed-out visitor gets no number.
+        $other = User::factory()->create(['role' => UserRole::Employee, 'is_active' => true]);
+        AppNotification::create(['user_id' => $other->id, 'type' => 'tickets', 'title' => 'Not mine', 'body' => 'd']);
+        $this->actingAs($employee)->getJson(route('session.ping'))->assertJson(['unread' => 1]);
+    }
+
+    public function test_the_bell_has_hooks_for_the_live_count_even_when_nothing_is_unread(): void
+    {
+        $employee = User::factory()->create(['role' => UserRole::Employee, 'is_active' => true]);
+
+        $this->actingAs($employee)->get(route('dashboard'))
+            ->assertSee('id="tmBellBadge"', false)
+            ->assertSee('id="tmBellNew"', false)
+            ->assertSee('window.tmCheckNow = check', false);
+    }
 }

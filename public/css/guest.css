@@ -155,3 +155,5 @@
 .site-credit { position: fixed; left: 0; right: 0; bottom: 0; text-align: center; font-size: .72rem; color: var(--tm-muted); padding: .5rem 1rem; border-top: 1px solid var(--tm-card-border); }
 .site-credit a { color: #fff; font-weight: 600; text-decoration: none; }
 .site-credit a:hover { text-decoration: underline; }
+
+.alert.session-busy-alert { font-size: .8rem; }

@@ -34,6 +34,12 @@ return [
 
     'lifetime' => (int) env('SESSION_LIFETIME', 120),
 
+    /*
+    | Minutes of no activity before the lock screen covers a staff page.
+    */
+
+    'lock_after_minutes' => (int) env('LOCK_SCREEN_MINUTES', 20),
+
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 
     /*

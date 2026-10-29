@@ -33,6 +33,7 @@ class Customer extends Authenticatable
             'password' => 'hashed',
             'last_login_at' => 'datetime',
             'password_changed_at' => 'datetime',
+            'session_seen_at' => 'datetime',
         ];
     }
 

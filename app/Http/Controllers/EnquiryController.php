@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\TicketStatus;
 use App\Enums\UserRole;
+use App\Http\Requests\AddEnquiryServiceRequest;
 use App\Http\Requests\StoreEnquiryRequest;
 use App\Models\AuditLog;
 use App\Models\Customer;
@@ -13,6 +14,7 @@ use App\Models\Ticket;
 use App\Models\User;
 use App\Services\AuditLogger;
 use App\Services\AssignmentMails;
+use App\Services\EnquiryStatusService;
 use App\Services\EventMailer;
 use App\Models\Setting;
 use App\Support\NumberSequence;
@@ -236,6 +238,71 @@ class EnquiryController extends Controller
             ->with('status', "Enquiry {$enquiry->number} was created.");
     }
 
+    /**
+     * Add one more service to an enquiry that is still open. The fee is recalculated; any discount stays as it was.
+     */
+    public function addService(AddEnquiryServiceRequest $request, Enquiry $enquiry): RedirectResponse
+    {
+        $user = $request->user();
+        $service = Service::query()->where('is_active', true)->findOrFail($request->validated('service_id'));
+        $override = $request->filled('price') ? (float) $request->validated('price') : null;
+        $breakdown = $service->priceBreakdown($override ?? (float) $service->default_price);
+
+        $ticket = DB::transaction(function () use ($enquiry, $service, $breakdown, $request, $user) {
+            $ticket = Ticket::create([
+                'number' => NumberSequence::next('tickets', Setting::servicePrefix()),
+                'enquiry_id' => $enquiry->id,
+                'service_id' => $service->id,
+                'customer_id' => $enquiry->customer_id,
+                'assigned_to' => $request->validated('assigned_to') ?: null,
+                'created_by' => $user->id,
+                'price' => $breakdown['price'],
+                'gst_percent' => $service->gst_percent,
+                'gst_amount' => $breakdown['gst_amount'],
+                'total' => $breakdown['total'],
+                'status' => 'Documents Pending',
+            ]);
+
+            // The part of the service's total that is not GST (the typed price already includes GST for a GST-included service).
+            $subtotal = (float) $enquiry->subtotal + ($breakdown['total'] - $breakdown['gst_amount']);
+            $gstTotal = (float) $enquiry->gst_total + $breakdown['gst_amount'];
+
+            $enquiry->update([
+                'subtotal' => $subtotal,
+                'gst_total' => $gstTotal,
+                'total' => max(0, round($subtotal + $gstTotal - (float) $enquiry->discount, 2)),
+            ]);
+
+            return $ticket;
+        });
+
+        EnquiryStatusService::recompute($enquiry);
+
+        AuditLogger::log(
+            action: 'Created',
+            module: 'Service',
+            recordLabel: $ticket->number,
+            recordUrl: route('tickets.show', $ticket),
+            details: 'Added to '.$enquiry->number.($ticket->assigned_to ? ' · Assigned to '.($ticket->assignedTo?->name ?? 'employee') : ' · Unassigned'),
+            subject: $ticket,
+        );
+
+        AuditLogger::log(
+            action: 'Updated',
+            module: 'Enquiry',
+            recordLabel: $enquiry->number,
+            recordUrl: route('enquiries.show', $enquiry),
+            details: "Added service {$service->name} ({$ticket->number}) — enquiry total now ₹".number_format((float) $enquiry->fresh()->total, 2),
+            subject: $enquiry,
+        );
+
+        // Ask the client for this service's documents, as when the enquiry was first created.
+        EventMailer::requestDocuments($enquiry->customer, $enquiry->number, [$ticket]);
+
+        return redirect()
+            ->route('enquiries.show', $enquiry)
+            ->with('status', "{$service->name} ({$ticket->number}) was added to {$enquiry->number}.");
+    }
     public function show(Enquiry $enquiry): View
     {
         $this->authorize('view', $enquiry);
@@ -261,6 +328,69 @@ class EnquiryController extends Controller
 
         $ticketIds = $enquiry->tickets->pluck('id');
 
+        $canAddService = $user->can('addService', $enquiry);
+        $addService = null;
+
+        if ($canAddService) {
+            $palette = [
+                ['bg' => '#e0edff', 'text' => '#2f5fbe'],
+                ['bg' => '#e5f5e0', 'text' => '#2f8f3e'],
+                ['bg' => '#ece5fb', 'text' => '#6d5bd0'],
+                ['bg' => '#fbe5ea', 'text' => '#b91c4a'],
+                ['bg' => '#fdecd2', 'text' => '#b9650a'],
+            ];
+
+            // How many open services each person already has.
+            $openCounts = Ticket::query()
+                ->whereNotIn('status', [TicketStatus::TaskCompleted->value])
+                ->whereNotNull('assigned_to')
+                ->selectRaw('assigned_to, count(*) as open_count')
+                ->groupBy('assigned_to')
+                ->pluck('open_count', 'assigned_to');
+
+            $addService = [
+                // Services already in this enquiry are not offered again.
+                'services' => Service::query()
+                    ->where('is_active', true)
+                    ->whereNotIn('id', $enquiry->tickets()->pluck('service_id'))
+                    ->with('documents:id,service_id,name')
+                    ->orderBy('name')
+                    ->get()
+                    ->map(fn (Service $service) => [
+                        'id' => $service->id,
+                        'name' => $service->name,
+                        'price' => (float) $service->default_price,
+                        'gst_percent' => (float) $service->gst_percent,
+                        'includes_gst' => (bool) $service->price_includes_gst,
+                        'documents' => $service->documents->pluck('name')->values()->all(),
+                    ])->values()->all(),
+                'assignees' => User::query()
+                    ->whereIn('role', [UserRole::Admin, UserRole::Employee])
+                    ->where('is_active', true)
+                    ->orderByRaw('CASE role WHEN ? THEN 0 ELSE 1 END', [UserRole::Admin->value])
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'role'])
+                    ->values()
+                    ->map(function (User $assignee, int $i) use ($palette, $openCounts, $user) {
+                        $words = preg_split('/\s+/', trim($assignee->name));
+
+                        return [
+                            'id' => $assignee->id,
+                            'label' => $assignee->id === $user->id
+                                ? $assignee->name.' (me)'
+                                : ($assignee->role === UserRole::Employee ? $assignee->name : $assignee->role->label().' — '.$assignee->name),
+                            'initials' => strtoupper(substr($words[0] ?? '', 0, 1).substr($words[1] ?? '', 0, 1)),
+                            'color' => $palette[$i % count($palette)],
+                            'open' => (int) ($openCounts[$assignee->id] ?? 0),
+                        ];
+                    })->all(),
+                // What the new service will be called, and what the enquiry totals now.
+                'next_number' => NumberSequence::next('tickets', Setting::servicePrefix()),
+                'enquiry_total' => (float) $enquiry->total,
+                'client_first_name' => strtok(trim((string) $enquiry->customer->name), ' ') ?: 'The client',
+                'client_gets_email' => (bool) ($enquiry->customer->email && $enquiry->customer->email_notifications_enabled),
+            ];
+        }
         $activity = AuditLog::query()
             ->where(function ($query) use ($enquiry, $ticketIds) {
                 $query->where(fn ($q) => $q->where('subject_type', Enquiry::class)->where('subject_id', $enquiry->id))
@@ -277,6 +407,8 @@ class EnquiryController extends Controller
             'feesReceivedCount',
             'feesPending',
             'activity',
+            'canAddService',
+            'addService',
         ));
     }
 }

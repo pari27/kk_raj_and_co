@@ -7,6 +7,8 @@
     $money = fn ($amount) => '₹'.number_format((float) $amount);
     $closed = $ticket->status->isClosed();
     $step = $stage['step'];
+    // Once the work is completed every step is ticked, whether or not the fee is paid yet.
+    $position = $closed ? count($steps) + 1 : $step;
     $stepTone = $step === 1 ? '' : ($step === 2 ? 'blue' : ($step >= 4 ? 'green' : ''));
     $niceFormats = function (?string $formats) {
         $list = array_values(array_filter(array_map('trim', explode(',', (string) $formats))));
@@ -31,15 +33,15 @@
 
 <div class="p-card">
     <div class="p-card-body">
-        {{-- Computer: five steps joined by a line --}}
+        {{-- Computer: the work steps joined by a line --}}
         <div class="p-stepper">
             @foreach ($steps as $index => $label)
-                @php $n = $index + 1; $state = $n < $step ? 'done' : ($n === $step ? 'current' : ''); @endphp
+                @php $n = $index + 1; $state = $n < $position ? 'done' : ($n === $position ? 'current' : ''); @endphp
                 <div class="p-step {{ $state }} {{ $state === 'current' ? $stepTone : '' }}">
                     <span class="dot">@if ($state === 'done')<x-portal-icon name="check" :size="15" />@endif</span>
                     {{ $label }}
                 </div>
-                @if (! $loop->last)<div class="p-line {{ $n < $step ? 'done' : '' }}"></div>@endif
+                @if (! $loop->last)<div class="p-line {{ $n < $position ? 'done' : '' }}"></div>@endif
             @endforeach
         </div>
 
@@ -50,7 +52,7 @@
                 <span class="eyebrow tm-muted u-09d558">STEP {{ $step }} OF {{ count($steps) }}</span>
             </div>
             <div class="segs">
-                @foreach ($steps as $index => $label)<span class="{{ $index < $step ? 'on' : '' }}"></span>@endforeach
+                @foreach ($steps as $index => $label)<span class="{{ $index < $position ? 'on' : '' }}"></span>@endforeach
             </div>
             <div class="trail">{{ implode(' → ', $steps) }}</div>
         </div>

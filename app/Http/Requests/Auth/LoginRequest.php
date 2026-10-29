@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
+use App\Services\SingleSession;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -25,6 +27,25 @@ class LoginRequest extends FormRequest
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
         ];
+    }
+
+    /**
+     * The account these credentials belong to, if it is already signed in on another device.
+     * Wrong credentials are left for authenticate() to reject.
+     */
+    public function accountWithOtherSession(): ?User
+    {
+        $this->ensureIsNotRateLimited();
+
+        $credentials = $this->only('email', 'password');
+        $provider = Auth::getProvider();
+        $user = $provider->retrieveByCredentials($credentials);
+
+        if (! $user instanceof User || ! $provider->validateCredentials($user, $credentials) || ! $user->is_active) {
+            return null;
+        }
+
+        return app(SingleSession::class)->hasActiveSession($user) ? $user : null;
     }
 
     /**

@@ -29,6 +29,7 @@
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="MAIL_REPLY_TO_ADDRESS" value="replies@firm.test"/>
+        <env name="LOCK_SCREEN_MINUTES" value="20"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>

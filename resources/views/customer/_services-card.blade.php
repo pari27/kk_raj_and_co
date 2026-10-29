@@ -16,6 +16,7 @@
                     <tr>
                         <th>Service</th>
                         <th>Status</th>
+                        <th>Comment</th>
                         <th>Documents</th>
                         <th class="text-end">Fee</th>
                         <th>Payment</th>
@@ -34,6 +35,11 @@
                                 <div class="tm-muted u-cc37c5">{{ $ticket->number }}</div>
                             </td>
                             <td><span class="ppill {{ $stage['tone'] }}">{{ $stage['label'] }}</span></td>
+                            <td>
+                                @if ($comment = $ticket->currentStatusComment())
+                                    <div class="ticket-status-comment" title="{{ $comment }}">{{ $comment }}</div>
+                                @endif
+                            </td>
                             <td class="small">{{ $counts['sent'] }} of {{ $counts['total'] }} uploaded</td>
                             <td class="text-end fw-semibold p-svc-name">{{ $money($ticket->total) }}</td>
                             <td><span class="ppill {{ $stage['paid'] ? 'lightgreen' : 'red' }}">{{ $stage['paid'] ? 'Paid' : 'Not paid' }}</span></td>
@@ -53,6 +59,9 @@
                     <div>
                         <div class="nm">{{ $ticket->service->name }}</div>
                         <span class="ppill {{ $stage['tone'] }}">{{ $stage['label'] }}</span>
+                        @if ($comment = $ticket->currentStatusComment())
+                            <div class="ticket-status-comment mt-1">{{ $comment }}</div>
+                        @endif
                     </div>
                     <div class="right">
                         <div class="fee">{{ $money($ticket->total) }}</div>

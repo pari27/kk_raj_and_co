@@ -19,7 +19,7 @@ class TicketDocumentStatusService
             TicketStatus::DocumentsPending,
             TicketStatus::PartiallyReceived,
             TicketStatus::DocumentsReceived,
-            TicketStatus::UnderVerification,
+            TicketStatus::DocumentsVerified,
             TicketStatus::AdditionalDocumentsRequired,
         ];
 
@@ -50,7 +50,7 @@ class TicketDocumentStatusService
 
         $status = match (true) {
             $hasRejected => TicketStatus::AdditionalDocumentsRequired,
-            $allMandatoryVerified => TicketStatus::UnderVerification,
+            $allMandatoryVerified => TicketStatus::DocumentsVerified,
             $allMandatoryUploaded && $hasAnyUpload => TicketStatus::DocumentsReceived,
             $someMandatoryUploaded => TicketStatus::PartiallyReceived,
             default => TicketStatus::DocumentsPending,

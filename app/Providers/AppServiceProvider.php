@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Setting;
 use App\Services\AuditLogger;
+use App\Services\SingleSession;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
@@ -38,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->registerAuditLogListeners();
+        $this->registerSingleSessionListeners();
 
         Event::listen(function (NotificationSending $event) {
             // No email at all for the software team's Super Admin, and none when notifications are off.
@@ -46,6 +48,28 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return Setting::notificationsEnabled();
+        });
+    }
+
+    /**
+     * Every sign-in takes over the account; signing out frees it again.
+     */
+    private function registerSingleSessionListeners(): void
+    {
+        Event::listen(function (Login $event) {
+            if (! request()->hasSession()) {
+                return;
+            }
+
+            app(SingleSession::class)->claim($event->user, $event->guard, request());
+        });
+
+        Event::listen(function (Logout $event) {
+            if (! $event->user || ! request()->hasSession()) {
+                return;
+            }
+
+            app(SingleSession::class)->release($event->user, $event->guard, request());
         });
     }
 

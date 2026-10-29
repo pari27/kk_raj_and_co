@@ -277,7 +277,7 @@ class TicketDocumentTest extends TestCase
 
         $this->actingAs($admin)->patch(route('tickets.documents.verify', [$ticket, $mandatory]));
 
-        $this->assertSame(TicketStatus::UnderVerification, $ticket->refresh()->status);
+        $this->assertSame(TicketStatus::DocumentsVerified, $ticket->refresh()->status);
     }
 
     public function test_rejecting_a_document_moves_ticket_to_additional_documents_required(): void

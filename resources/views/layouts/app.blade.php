@@ -152,14 +152,12 @@
                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                             <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                         </svg>
-                        @if ($tmUnreadCount > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger u-d95e57">{{ $tmUnreadCount > 99 ? '99+' : $tmUnreadCount }}</span>
-                        @endif
+                        <span id="tmBellBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger u-d95e57 {{ $tmUnreadCount > 0 ? '' : 'd-none' }}">{{ $tmUnreadCount > 99 ? '99+' : $tmUnreadCount }}</span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end p-0 overflow-hidden u-b8baa0">
                         <div class="d-flex align-items-center justify-content-between px-3 py-2 text-white u-8b012c">
                             <span class="fw-bold">Notifications
-                                @if ($tmUnreadCount > 0)<span class="badge rounded-pill bg-danger ms-1">{{ $tmUnreadCount }} new</span>@endif
+                                <span id="tmBellNew" class="badge rounded-pill bg-danger ms-1 {{ $tmUnreadCount > 0 ? '' : 'd-none' }}">{{ $tmUnreadCount }} new</span>
                             </span>
                             <form method="POST" action="{{ route('notifications.read-all') }}">
                                 @csrf
@@ -181,7 +179,7 @@
                                 </div>
                             </a>
                         @empty
-                            <div class="text-center tm-muted small py-4">No notifications yet.</div>
+                            <div class="text-center tm-muted small py-4">No new notifications.</div>
                         @endforelse
                         <a href="{{ route('notifications.index') }}" class="d-block text-center py-2 fw-bold small text-decoration-none">View all notifications →</a>
                     </div>
@@ -223,6 +221,9 @@
             @include('partials.credit-footer')
         </div>
     </div>
+
+    @include('partials.lock-screen')
+    @include('partials.session-watch')
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>

@@ -36,18 +36,27 @@
     };
     $mandatoryCount = $ticket->service->documents->where('is_mandatory', true)->count();
     $optionalCount = $ticket->service->documents->where('is_mandatory', false)->count();
-    $progressSteps = ['Documents', 'Verification', 'Work in progress', 'Submitted', 'Completed', 'Paid'];
+    $progressSteps = ['Documents', 'Documents received', 'Verification', 'Work in progress', 'Submitted', 'Completed'];
     $progressIndex = match ($ticket->status) {
         \App\Enums\TicketStatus::DocumentsPending,
-        \App\Enums\TicketStatus::PartiallyReceived,
         \App\Enums\TicketStatus::AdditionalDocumentsRequired => 0,
-        \App\Enums\TicketStatus::DocumentsReceived,
-        \App\Enums\TicketStatus::UnderVerification => 1,
+        // Some, but not all, of the documents have come in.
+        \App\Enums\TicketStatus::PartiallyReceived => 1,
+        // Everything has come in and is waiting to be checked.
+        \App\Enums\TicketStatus::DocumentsReceived => 2,
+        // Everything is checked, so the work itself is next.
+        \App\Enums\TicketStatus::DocumentsVerified,
         \App\Enums\TicketStatus::WorkInProgress,
-        \App\Enums\TicketStatus::OnHold => 2,
-        \App\Enums\TicketStatus::SubmittedToDepartment => 3,
-        \App\Enums\TicketStatus::TaskCompleted => $ticket->paymentStatus() === \App\Enums\PaymentStatus::FullyPaid ? 5 : 4,
+        \App\Enums\TicketStatus::OnHold => 3,
+        \App\Enums\TicketStatus::SubmittedToDepartment => 4,
+        // Completed is the last step: once the task is done every step is ticked. Payment is shown on its own, not as a step.
+        \App\Enums\TicketStatus::TaskCompleted => count($progressSteps),
     };
+    // "1 of 3 received", shown under "Documents received" while only some documents are in.
+    $receivedCount = $documentRows->filter(fn ($row) => $row['current'] && $row['current']->status !== 'Rejected')->count();
+    $receivedNote = $ticket->status === \App\Enums\TicketStatus::PartiallyReceived
+        ? $receivedCount.' of '.$documentRows->count().' received'
+        : null;
 @endphp
 
 <div id="ticket-show-page">
@@ -66,7 +75,7 @@
         };
         $initials = fn (?string $name): string => collect(preg_split('/\s+/', trim((string) $name)))->filter()->take(2)->map(fn ($part) => mb_strtoupper(mb_substr($part, 0, 1)))->implode('') ?: '?';
         $daysOpen = (int) abs($ticket->created_at->diffInDays($ticket->completed_at ?? now()));
-        $stepNote = 'Step '.($progressIndex + 1).' of '.count($progressSteps).($ticket->assignedTo && ! $ticket->status->isClosed() ? ' · being handled by '.$ticket->assignedTo->name : '');
+        $stepNote = 'Step '.min($progressIndex + 1, count($progressSteps)).' of '.count($progressSteps).($ticket->assignedTo && ! $ticket->status->isClosed() ? ' · being handled by '.$ticket->assignedTo->name : '');
     @endphp
 
     <section class="tm-card ticket-summary mb-3">
@@ -164,7 +173,7 @@
                             @if (! $loop->last)<span class="ticket-step-line"></span>@endif
                         </div>
                         <span>{{ $step }}</span>
-                        @if ($index === $progressIndex)<span class="ticket-step-now">Now</span>@endif
+                        @if ($index === $progressIndex)<span class="ticket-step-now">{{ $index === 1 && $receivedNote ? $receivedNote : 'Now' }}</span>@endif
                     </div>
                 @endforeach
             </div>
@@ -276,7 +285,7 @@
                 <section class="tm-card p-0 mb-3 ticket-panel" id="ticket-status-panel">
                     <div class="ticket-panel-heading ticket-panel-heading-green"><h2>Update status</h2></div>
                     @if ($ticket->status->isClosed())
-                        <div class="alert alert-warning mb-0 mx-3 mt-3 u-5a305f">
+                        <div class="alert ticket-closed-note mb-0 mx-3 mt-3">
                             After task completion, you can't change the status.
                         </div>
                     @endif
@@ -292,7 +301,7 @@
                             </select>
                             @error('status')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             <label class="form-label fw-semibold small mt-3">Comment <span class="text-danger">*</span></label>
-                            <textarea name="comment" required class="form-control tm-field ticket-comment @error('comment') is-invalid @enderror" rows="3" maxlength="2000" placeholder="What changed and why"></textarea>
+                            <textarea name="comment" required class="form-control tm-field ticket-comment @error('comment') is-invalid @enderror" rows="3" maxlength="50" placeholder="What changed and why"></textarea>
                             @error('comment')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             <div class="d-flex justify-content-between align-items-center mt-2">
                                 <small class="tm-muted">Comments become part of the service timeline.</small>
@@ -355,13 +364,18 @@
                         <form method="POST" action="{{ route('tickets.reassign', $ticket) }}">
                             @csrf
                             @method('PATCH')
+                            <fieldset {{ $ticket->status->isClosed() ? 'disabled' : '' }}>
                             <select name="assigned_to" class="form-select tm-field mb-2" aria-label="Assign service to">
                                 <option value="">Unassigned</option>
                                 @foreach ($employees as $employee)
-                                    <option value="{{ $employee->id }}" {{ $ticket->assigned_to === $employee->id ? 'selected' : '' }}>{{ $employee->role->label() === 'Employee' ? $employee->name : $employee->role->label().' — '.$employee->name }}</option>
+                                    <option value="{{ $employee->id }}" {{ $ticket->assigned_to === $employee->id ? 'selected' : '' }}>{{ $employee->id === auth()->id() ? $employee->name.' (me)' : ($employee->role->label() === 'Employee' ? $employee->name : $employee->role->label().' — '.$employee->name) }}</option>
                                 @endforeach
                             </select>
                             <button type="submit" class="btn btn-outline-secondary btn-sm w-100">Reassign</button>
+                            </fieldset>
+                            @if ($ticket->status->isClosed())
+                                <div class="ticket-reassign-note mt-2">After task completion, the service can't be reassigned.</div>
+                            @endif
                         </form>
                     @else
                         <div class="small tm-muted">Only an Admin can reassign a service.</div>
@@ -369,6 +383,25 @@
                 </div>
             </section>
 
+            @can('delete', $ticket)
+                @php $deleteBlocker = $ticket->deletionBlocker(); @endphp
+                <section class="tm-card p-0 mb-3 ticket-panel ticket-compact-content" id="ticket-delete-panel">
+                    <div class="ticket-panel-heading"><h2>Delete service</h2></div>
+                    <div class="p-3">
+                        @if ($deleteBlocker)
+                            <button type="button" class="btn btn-outline-danger btn-sm w-100" disabled>Delete service</button>
+                            <div class="ticket-reassign-note mt-2">{{ $deleteBlocker }}</div>
+                        @else
+                            <div class="small tm-muted mb-2">A service can be deleted until a document is submitted for it. The enquiry's fee is worked out again without it.</div>
+                            <form method="POST" action="{{ route('tickets.destroy', $ticket) }}" class="js-confirm-delete" data-confirm="Delete {{ $ticket->number }} ({{ $ticket->service->name }})? This can't be undone.">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger btn-sm w-100">Delete service</button>
+                            </form>
+                        @endif
+                    </div>
+                </section>
+            @endcan
             <section class="tm-card p-0 ticket-panel ticket-compact-content">
                 <div class="ticket-panel-heading ticket-panel-heading-teal"><h2>Same enquiry</h2></div>
                 <div class="ticket-enquiry-row">
@@ -648,5 +681,15 @@
             openUploadModal(currentHistoryDoc.serviceDocumentId, currentHistoryDoc.name, currentHistoryDoc.formats, currentHistoryDoc.maxSize);
         });
     })();
+</script>
+@endpush
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.js-confirm-delete').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!window.confirm(form.dataset.confirm)) { event.preventDefault(); }
+        });
+    });
 </script>
 @endpush

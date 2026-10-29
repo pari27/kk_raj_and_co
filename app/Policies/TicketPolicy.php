@@ -49,6 +49,14 @@ class TicketPolicy
     /**
      * Reassigning a ticket to a different employee is an Admin-only action.
      */
+    /**
+     * Only an Admin can delete a service (and only while Ticket::deletionBlocker() allows it).
+     */
+    public function delete(User $user, Ticket $ticket): bool
+    {
+        return $this->isAdminLike($user);
+    }
+
     public function reassign(User $user): bool
     {
         return $this->isAdminLike($user);

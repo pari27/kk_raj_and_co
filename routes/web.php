@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\EmployeeDesignationController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\LockScreenController;
 use App\Http\Controllers\Auth\StaffPasswordResetController;
 use App\Http\Controllers\Auth\SetEmployeePasswordController;
 use App\Http\Controllers\CustomerController;
@@ -42,6 +43,9 @@ Route::middleware('guest')->group(function () {
     Route::post('login', [AuthenticatedSessionController::class, 'store'])
         ->middleware('throttle:10,1')
         ->name('login.store');
+    Route::get('login/session-check', [AuthenticatedSessionController::class, 'sessionCheck'])
+        ->middleware('throttle:20,1')
+        ->name('login.session-check');
 
     Route::get('forgot-password', [StaffPasswordResetController::class, 'create'])->name('password.request');
     Route::post('forgot-password', [StaffPasswordResetController::class, 'send'])
@@ -62,8 +66,22 @@ Route::middleware(['guest', 'signed'])->group(function () {
     Route::post('employees/{employee}/set-password', [SetEmployeePasswordController::class, 'store'])->name('employees.set-password.store');
 });
 
+// Open pages ask this every few seconds: it keeps the device marked as present and reveals a sign-in from elsewhere.
+Route::get('session/ping', function () {
+    $unread = null;
+
+    if (Auth::guard('web')->check()) {
+        $unread = \App\Models\AppNotification::where('user_id', Auth::guard('web')->id())->whereNull('read_at')->count();
+    } elseif (Auth::guard('customer')->check()) {
+        $unread = \App\Models\ClientNotification::where('customer_id', Auth::guard('customer')->id())->whereNull('read_at')->count();
+    }
+
+    return response()->json(['ok' => true, 'unread' => $unread]);
+})->name('session.ping');
+
 Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::post('lock/unlock', [LockScreenController::class, 'unlock'])->middleware('throttle:10,1')->name('lock.unlock');
 
     Route::get('password/change', [ProfilePasswordController::class, 'edit'])->name('password.change');
     Route::put('password/change', [ProfilePasswordController::class, 'update'])->name('password.update');
@@ -88,11 +106,13 @@ Route::middleware('auth')->group(function () {
         Route::get('enquiries/create', [EnquiryController::class, 'create'])->name('enquiries.create');
         Route::post('enquiries', [EnquiryController::class, 'store'])->name('enquiries.store');
         Route::get('enquiries/{enquiry}', [EnquiryController::class, 'show'])->name('enquiries.show');
+        Route::post('enquiries/{enquiry}/services', [EnquiryController::class, 'addService'])->name('enquiries.services.store');
 
         Route::get('services', [TicketController::class, 'index'])->name('tickets.index');
         Route::get('services/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
         Route::patch('services/{ticket}/status', [TicketController::class, 'updateStatus'])->name('tickets.update-status');
         Route::patch('services/{ticket}/reassign', [TicketController::class, 'reassign'])->name('tickets.reassign');
+        Route::delete('services/{ticket}', [TicketController::class, 'destroy'])->name('tickets.destroy');
         Route::post('services/{ticket}/documents', [TicketDocumentController::class, 'store'])->name('tickets.documents.store');
         Route::patch('services/{ticket}/documents/{document}/verify', [TicketDocumentController::class, 'verify'])->name('tickets.documents.verify');
         Route::patch('services/{ticket}/documents/{document}/reject', [TicketDocumentController::class, 'reject'])->name('tickets.documents.reject');
@@ -190,7 +210,8 @@ Route::prefix('client')->name('customer.')->group(function () {
     Route::middleware('guest:customer')->group(function () {
         Route::get('login', [PortalAuthController::class, 'create'])->name('login');
         Route::post('login', [PortalAuthController::class, 'store'])->middleware('throttle:10,1')->name('login.store');
-
+        Route::get('login/session-check', [PortalAuthController::class, 'sessionCheck'])->middleware('throttle:20,1')->name('login.session-check');
+    
         Route::get('verify-otp', [PortalOtpController::class, 'create'])->name('verify-otp');
         Route::post('verify-otp/send', [PortalOtpController::class, 'send'])->middleware('throttle:5,1')->name('otp.send');
         Route::post('verify-otp', [PortalOtpController::class, 'verify'])->middleware('throttle:10,1')->name('otp.verify');
@@ -201,6 +222,7 @@ Route::prefix('client')->name('customer.')->group(function () {
 
     Route::middleware('auth:customer')->group(function () {
         Route::post('logout', [PortalAuthController::class, 'destroy'])->name('logout');
+        Route::post('lock/unlock', [LockScreenController::class, 'unlockClient'])->middleware('throttle:10,1')->name('lock.unlock');
 
         Route::get('dashboard', [PortalDashboardController::class, 'index'])->name('dashboard');
         Route::get('services', [PortalServiceController::class, 'index'])->name('tickets.index');

@@ -8,8 +8,7 @@
         return $n->created_at->isToday() ? 'Today' : ($n->created_at->isYesterday() ? 'Yesterday' : 'Earlier');
     });
     $typeLabels = \App\Models\AppNotification::TYPES;
-    $tabUrl = fn (string $t) => route('notifications.index', array_filter(['tab' => $t === 'unread' ? 'unread' : null, 'type' => $type]));
-    $typeUrl = fn (?string $t) => route('notifications.index', array_filter(['tab' => $tab === 'unread' ? 'unread' : null, 'type' => $t]));
+    $typeUrl = fn (?string $t) => route('notifications.index', array_filter(['type' => $t]));
 @endphp
 
 @section('content')
@@ -28,15 +27,6 @@
 <div class="row g-3 tm-notif">
     <div class="col-12 col-xl-8">
         <div class="tm-card p-0 overflow-hidden">
-            <div class="d-flex gap-4 px-4 pt-3 border-bottom">
-                <a href="{{ $tabUrl('all') }}" class="pb-2 text-decoration-none fw-semibold {{ $tab === 'all' ? 'text-dark border-bottom border-success border-2' : 'tm-muted' }}">
-                    All <span class="badge rounded-pill bg-success-subtle text-success-emphasis">{{ $allCount }}</span>
-                </a>
-                <a href="{{ $tabUrl('unread') }}" class="pb-2 text-decoration-none fw-semibold {{ $tab === 'unread' ? 'text-dark border-bottom border-success border-2' : 'tm-muted' }}">
-                    Unread <span class="badge rounded-pill bg-danger-subtle text-danger-emphasis">{{ $unreadCount }}</span>
-                </a>
-            </div>
-
             <div class="d-flex flex-wrap gap-2 px-4 py-3 border-bottom">
                 <a href="{{ $typeUrl(null) }}" class="btn btn-sm rounded-pill {{ $type === null ? 'btn-dark' : 'btn-outline-secondary' }}">All types</a>
                 @foreach ($typeLabels as $key => $label)
@@ -47,7 +37,7 @@
             @forelse ($groups as $label => $items)
                 <div class="px-4 py-2 small fw-bold tm-muted text-uppercase u-8e4f28">{{ $label }}</div>
                 @foreach ($items as $n)
-                    <a href="{{ route('notifications.open', $n) }}" class="d-flex gap-3 px-4 py-3 border-bottom text-decoration-none text-reset" style="{{ $n->isUnread() ? 'background: #f5f8ff;' : '' }}">
+                    <a href="{{ route('notifications.open', $n) }}" class="js-notification-row d-flex gap-3 px-4 py-3 border-bottom text-decoration-none text-reset" style="{{ $n->isUnread() ? 'background: #f5f8ff;' : '' }}">
                         @include('notifications._icon', ['notification' => $n, 'size' => 42])
                         <div class="flex-grow-1 min-w-0">
                             <div class="d-flex justify-content-between gap-2">
@@ -68,7 +58,7 @@
                     </a>
                 @endforeach
             @empty
-                <div class="text-center tm-muted py-5">No notifications to show.</div>
+                <div class="text-center tm-muted py-5">You are all caught up. No unread notifications.</div>
             @endforelse
 
             @if ($notifications->hasPages())
@@ -107,3 +97,29 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Opening a notification marks it read, so take it off this list right away,
+    // even when it was opened in another tab and this page stays behind.
+    document.querySelectorAll('.js-notification-row').forEach(function (row) {
+        ['click', 'auxclick'].forEach(function (name) {
+            row.addEventListener(name, function () {
+                setTimeout(function () {
+                    var label = row.previousElementSibling;
+                    var next = row.nextElementSibling;
+                    row.remove();
+
+                    // A day heading with nothing under it goes too.
+                    var emptyHeading = label && !label.classList.contains('js-notification-row')
+                        && (!next || !next.classList.contains('js-notification-row'));
+                    if (emptyHeading) { label.remove(); }
+
+                    // The notification has been marked read by now, so bring the bell's number up to date.
+                    setTimeout(function () { if (window.tmCheckNow) { window.tmCheckNow(); } }, 800);
+                }, 150);
+            });
+        });
+    });
+</script>
+@endpush

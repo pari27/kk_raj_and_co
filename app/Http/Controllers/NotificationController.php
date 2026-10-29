@@ -5,22 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\AppNotification;
 use App\Models\NotificationPreference;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class NotificationController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $user = Auth::user();
-        $tab = $request->query('tab') === 'unread' ? 'unread' : 'all';
         $type = array_key_exists((string) $request->query('type'), AppNotification::TYPES) ? $request->query('type') : null;
 
         $base = AppNotification::where('user_id', $user->id);
 
+        // Only what has not been read is listed: once a notification is read it leaves the list.
         $notifications = (clone $base)
-            ->when($tab === 'unread', fn ($q) => $q->whereNull('read_at'))
+            ->whereNull('read_at')
             ->when($type, fn ($q) => $q->where('type', $type))
             ->latest()->latest('id')
             ->paginate(10)
@@ -29,15 +30,14 @@ class NotificationController extends Controller
         $unreadByType = (clone $base)->whereNull('read_at')
             ->selectRaw('type, count(*) as total')->groupBy('type')->pluck('total', 'type');
 
-        return view('notifications.index', [
+        // Not kept by the browser, so coming back to this page (Back button) shows the list as it is now.
+        return response()->view('notifications.index', [
             'notifications' => $notifications,
-            'tab' => $tab,
             'type' => $type,
-            'allCount' => (clone $base)->count(),
             'unreadCount' => $unreadByType->sum(),
             'unreadByType' => $unreadByType,
             'preferences' => NotificationPreference::forUser($user),
-        ]);
+        ], 200, ['Cache-Control' => 'no-store, max-age=0']);
     }
 
     public function open(AppNotification $notification): RedirectResponse

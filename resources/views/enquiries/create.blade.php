@@ -410,6 +410,11 @@
             }
 
             function assignmentOptionLabel(assignee) {
+                // The person signed in sees themselves as "Name (me)".
+                if (String(assignee.id) === String(currentUserId)) {
+                    return assignee.name + ' (me)';
+                }
+
                 return assignee.role === 'Employee' ? assignee.name : assignee.role + ' — ' + assignee.name;
             }
 

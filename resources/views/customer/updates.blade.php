@@ -26,7 +26,7 @@
 
         @foreach ($updates as $update)
             @php [$tone, $icon] = $update->look(); @endphp
-            <a href="{{ route('customer.updates.open', $update) }}" class="p-upd {{ $update->isUnread() ? '' : 'read' }}">
+            <a href="{{ route('customer.updates.open', $update) }}" class="js-update-row p-upd {{ $update->isUnread() ? '' : 'read' }}">
                 <span class="ico {{ $tone }}"><x-portal-icon :name="$icon" :size="18" /></span>
                 <div>
                     <div class="tt">{{ $update->title }}</div>
@@ -43,3 +43,29 @@
     @endforelse
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Opening an update marks it read, so take it off this list right away,
+    // even when it was opened in another tab and this page stays behind.
+    document.querySelectorAll('.js-update-row').forEach(function (row) {
+        ['click', 'auxclick'].forEach(function (name) {
+            row.addEventListener(name, function () {
+                setTimeout(function () {
+                    var label = row.previousElementSibling;
+                    var next = row.nextElementSibling;
+                    row.remove();
+
+                    // A day heading with nothing under it goes too.
+                    var emptyHeading = label && !label.classList.contains('js-update-row')
+                        && (!next || !next.classList.contains('js-update-row'));
+                    if (emptyHeading) { label.remove(); }
+
+                    // The update has been marked read by now, so bring the bell's number up to date.
+                    setTimeout(function () { if (window.tmCheckNow) { window.tmCheckNow(); } }, 800);
+                }, 150);
+            });
+        });
+    });
+</script>
+@endpush

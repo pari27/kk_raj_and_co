@@ -47,6 +47,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'role' => UserRole::class,
             'is_active' => 'boolean',
+            'session_seen_at' => 'datetime',
         ];
     }
 
