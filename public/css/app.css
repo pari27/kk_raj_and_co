@@ -2577,7 +2577,8 @@ body.route-tickets-show .ts-wrapper.form-select.focus { border-color: var(--tm-a
 @media (min-width: 1200px) { .admin-dash-col { flex: 1 0 0; } }
 
 .admin-dash-attn .emp-dash-attn .tt { font-size: .8rem; }
-.admin-dash-enq .emp-dash-no { font-size: .8rem; }
+.admin-dash-enq .emp-dash-no { font-size: .8rem; white-space: nowrap; }
+.admin-dash-enq .emp-pill { white-space: nowrap; }
 
 /* Hide the left menu on wide screens (button in the top bar) */
 @media (min-width: 768px) {

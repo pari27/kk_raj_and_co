@@ -89,7 +89,7 @@
                                 <td class="fw-semibold">{{ $ticket->customer?->name ?? '—' }}</td>
                                 <td class="text-secondary">{{ $ticket->service?->name ?? '—' }}</td>
                                 <td class="text-secondary">{{ $ticket->assignedTo?->name ?? 'Unassigned' }}</td>
-                                <td><span class="emp-pill emp-pill-{{ \Illuminate\Support\Str::slug($ticket->status?->value ?? '') }}">{{ $ticket->status?->value ?? '—' }}</span></td>
+                                <td><span class="emp-pill emp-pill-{{ \Illuminate\Support\Str::slug($ticket->status?->value ?? '') }}">{{ $ticket->status ? str_replace('Documents', 'Docs', $ticket->status->value) : '—' }}</span></td>
                                 <td class="text-end"><a href="{{ route('tickets.show', $ticket) }}" class="tm-icon-btn-sm" title="View" aria-label="View service"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2f5fbe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg></a></td>
                             </tr>
                         @empty
