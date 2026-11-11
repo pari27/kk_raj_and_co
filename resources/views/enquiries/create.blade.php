@@ -77,7 +77,7 @@
                     <label class="tm-field-label d-block">Mobile number <span class="text-danger">*</span></label>
                     <div class="d-flex gap-2">
                         <span class="d-flex align-items-center px-3 u-d03817">+91</span>
-                        <input type="text" name="customer_phone" id="clientPhoneInput" inputmode="numeric" maxlength="10" class="form-control tm-field" placeholder="98765 43210" value="{{ old('customer_phone') }}">
+                        <input type="text" name="customer_phone" id="clientPhoneInput" data-mobile-input inputmode="numeric" maxlength="10" class="form-control tm-field" placeholder="98765 43210" value="{{ old('customer_phone') }}">
                     </div>
 
                     <div id="clientLookupBanner" class="rounded-3 p-3 mt-3 d-none"></div>

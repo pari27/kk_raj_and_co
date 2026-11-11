@@ -74,25 +74,26 @@
     <div class="col-12 col-xl-8">
         <section class="emp-dash-card tm-card-hover admin-dash-enq">
             <div class="emp-dash-head emp-dash-head-navy">
-                <span>Recent enquiries</span>
-                <a href="{{ route('enquiries.index') }}">All enquiries →</a>
+                <span>Open services</span>
+                <a href="{{ route('tickets.index') }}">All services →</a>
             </div>
             <div class="table-responsive">
                 <table class="table emp-dash-table align-middle mb-0">
                     <thead>
-                        <tr><th>Enquiry</th><th>Client</th><th>Services</th><th>Created by</th><th class="text-end">Total</th></tr>
+                        <tr><th>Service no.</th><th>Client</th><th>Service</th><th>Assigned to</th><th>Status</th><th class="text-end">Action</th></tr>
                     </thead>
                     <tbody>
-                        @forelse ($recentEnquiries as $enquiry)
+                        @forelse ($openServices as $ticket)
                             <tr>
-                                <td><a href="{{ route('enquiries.show', $enquiry) }}" class="emp-dash-no">{{ $enquiry->number }}</a></td>
-                                <td class="fw-semibold">{{ $enquiry->customer?->name ?? '—' }}</td>
-                                <td class="text-secondary">{{ $enquiry->tickets->count() }} {{ \Illuminate\Support\Str::plural('service', $enquiry->tickets->count()) }}</td>
-                                <td class="text-secondary">{{ $enquiry->createdBy?->name ?? '—' }}</td>
-                                <td class="text-end fw-semibold">{{ $money($enquiry->total) }}</td>
+                                <td><a href="{{ route('tickets.show', $ticket) }}" class="emp-dash-no">{{ $ticket->number }}</a></td>
+                                <td class="fw-semibold">{{ $ticket->customer?->name ?? '—' }}</td>
+                                <td class="text-secondary">{{ $ticket->service?->name ?? '—' }}</td>
+                                <td class="text-secondary">{{ $ticket->assignedTo?->name ?? 'Unassigned' }}</td>
+                                <td><span class="emp-pill emp-pill-{{ \Illuminate\Support\Str::slug($ticket->status?->value ?? '') }}">{{ $ticket->status?->value ?? '—' }}</span></td>
+                                <td class="text-end"><a href="{{ route('tickets.show', $ticket) }}" class="tm-icon-btn-sm" title="View" aria-label="View service"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2f5fbe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg></a></td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="text-center text-secondary py-5">No enquiries yet.</td></tr>
+                            <tr><td colspan="6" class="text-center text-secondary py-5">No open services right now.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

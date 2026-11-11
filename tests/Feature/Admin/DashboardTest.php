@@ -20,7 +20,7 @@ class DashboardTest extends TestCase
         $response->assertOk();
         $response->assertSee('Needs attention');
         $response->assertSee('Open services by status');
-        $response->assertSee('Recent enquiries');
+        $response->assertSee('Open services');
         $response->assertSee('Staff workload');
         $response->assertSee('Recent payments');
     }

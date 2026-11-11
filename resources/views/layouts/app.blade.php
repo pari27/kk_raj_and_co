@@ -253,6 +253,30 @@
             var valid = value === '' || /^\d+(\.\d{1,2})?$/.test(value);
             e.target.classList.toggle('is-invalid', !valid);
         });
+
+        // Mobile number fields: a pasted number such as "+91 98765-43210" or "098765 43210"
+        // is reduced to the plain 10 digits. Typing keeps digits only.
+        document.addEventListener('paste', function (e) {
+            if (!e.target.matches || !e.target.matches('[data-mobile-input]')) {
+                return;
+            }
+
+            var digits = ((e.clipboardData || window.clipboardData).getData('text') || '').replace(/\D/g, '');
+            if (digits.length === 14 && digits.indexOf('0091') === 0) { digits = digits.slice(4); }
+            else if (digits.length === 12 && digits.indexOf('91') === 0) { digits = digits.slice(2); }
+            else if (digits.length === 11 && digits.charAt(0) === '0') { digits = digits.slice(1); }
+
+            e.preventDefault();
+            e.target.value = digits.slice(0, 10);
+            e.target.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+
+        document.addEventListener('input', function (e) {
+            if (e.target.matches && e.target.matches('[data-mobile-input]')) {
+                var cleaned = e.target.value.replace(/\D/g, '');
+                if (cleaned !== e.target.value) { e.target.value = cleaned; }
+            }
+        });
     </script>
     @stack('scripts')
 </body>

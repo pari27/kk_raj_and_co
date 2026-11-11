@@ -40,7 +40,7 @@ class AdminDashboardService
             'attention' => $this->attention($tickets, $open),
             'statusBreakdown' => $this->statusBreakdown($open),
             'openTotal' => $open->count(),
-            'recentEnquiries' => Enquiry::query()->with(['customer', 'createdBy', 'tickets'])->latest('created_at')->latest('id')->limit(5)->get(),
+            'openServices' => $open->sortByDesc(fn (Ticket $ticket): array => [$ticket->created_at, $ticket->id])->take(5)->values(),
             'staffWorkload' => $this->staffWorkload($tickets),
             'recentPayments' => Payment::query()->with('enquiry.customer')->latest('paid_at')->latest('id')->limit(5)->get(),
             'financialYear' => $this->financialYear(),

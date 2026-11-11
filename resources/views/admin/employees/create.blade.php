@@ -20,7 +20,7 @@
                             <label class="tm-field-label d-block">Mobile number <span class="text-danger">*</span></label>
                             <div class="tm-mobile-group @error('mobile') is-invalid @enderror">
                                 <span class="tm-mobile-prefix">+91</span>
-                                <input type="text" name="mobile" id="mobileInput" value="{{ old('mobile') }}" maxlength="10" inputmode="numeric" class="form-control tm-field" placeholder="98765 77341">
+                                <input type="text" name="mobile" id="mobileInput" data-mobile-input value="{{ old('mobile') }}" maxlength="10" inputmode="numeric" class="form-control tm-field" placeholder="98765 77341">
                             </div>
                             <div class="tm-validation-hint" id="mobileHint">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>

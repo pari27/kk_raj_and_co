@@ -32,7 +32,7 @@
                                 <label for="clientPhone" class="client-form-label">Mobile number <span class="text-danger">*</span></label>
                                 <div class="d-flex">
                                     <span class="client-phone-prefix">+91</span>
-                                    <input id="clientPhone" type="text" name="phone" value="{{ old('phone', $customer->phone) }}" maxlength="10" inputmode="numeric" class="form-control tm-field client-form-control client-phone-input @error('phone') is-invalid @enderror" placeholder="10-digit mobile number" required>
+                                    <input id="clientPhone" type="text" name="phone" data-mobile-input value="{{ old('phone', $customer->phone) }}" maxlength="10" inputmode="numeric" class="form-control tm-field client-form-control client-phone-input @error('phone') is-invalid @enderror" placeholder="10-digit mobile number" required>
                                 </div>
                                 @error('phone')
                                     @if($message !== 'This mobile number is already registered to another client.')

@@ -69,7 +69,7 @@
                             <label class="tm-field-label d-block">Mobile number <span class="text-danger">*</span></label>
                             <div class="tm-mobile-group @error('mobile') is-invalid @enderror">
                                 <span class="tm-mobile-prefix">+91</span>
-                                <input type="text" name="mobile" id="mobileInput" value="{{ old('mobile', $employee->profile?->mobile) }}" maxlength="10" inputmode="numeric" class="form-control tm-field">
+                                <input type="text" name="mobile" id="mobileInput" data-mobile-input value="{{ old('mobile', $employee->profile?->mobile) }}" maxlength="10" inputmode="numeric" class="form-control tm-field">
                             </div>
                             @error('mobile')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
